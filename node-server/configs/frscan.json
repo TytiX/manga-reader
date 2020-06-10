@@ -1,0 +1,15 @@
+{
+  "name": "frscan",
+  "mangasUrl": "https://www.frscan.me/manga-list",
+
+  "mangasListUrl": "https://www.frscan.me/changeMangaList?type=text",
+
+  "mangaEnclosingXpath": "//ul[@class='manga-list']/li",
+  "mangaLinkRelativeXpath": "/li/a/@href",
+  "mangaNameRelativeXpath": "/li/a/h6/text()",
+
+  "chapterEnclosingXpath": "//ul[@class='chapters']/li/h5",
+  "chapterLinkRelativeXpath": "/h5/a/@href",
+  "chapterNumberTextRelativeXpath": "/h5/a/text()",
+  "chapterNameRelativeXpath": "/h5/em/text()"
+}
