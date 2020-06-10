@@ -1,43 +1,35 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
-import { Mangas, Manga } from "./models/Manga.ts";
+import Database from "./database.ts";
+
+import { Manga } from "./models/Manga.ts";
 import { ScanSource } from "./models/Sources.ts";
 import { Chapter } from "./models/Chapter.ts";
 import { Page } from "./models/Page.ts";
 
 export class Storage {
-  private static instance: Storage;
-  datas: Mangas = [];
-
-  private constructor() {
+  db: Database;
+  constructor() {
+    this.db = new Database();
   }
 
-  static getInstance(): Storage {
-    if (!Storage.instance) {
-      Storage.instance = new Storage();
-    }
-    return Storage.instance;
-  }
-
-  getAll(): Mangas {
-    return this.datas;
+  async getAll() {
+    return await this.db.getAll();
   }
   find(mangaId: string): Manga | undefined {
-    return this.datas.find((m: Manga) => {
-      return m.id === mangaId;
-    });
+    return undefined; //this.db.findMangaById(mangaId);
   }
   findByName(name: string): Manga | undefined {
-    return this.datas.find((m: Manga) => {
-      return m.name === name;
-    });
+    return undefined; // this.mangaStore.mangas.find((m: Manga) => {
+    //   return m.name === name;
+    // });
   }
   findBySourceLink(link: string): Manga | undefined {
-    return this.datas.find((m: Manga) => {
-      return m.sources.find((s: ScanSource) => {
-        return s.link === link;
-      });
-    });
+    return undefined; //this.mangaStore.mangas.find((m: Manga) => {
+    //   return m.sources.find((s: ScanSource) => {
+    //     return s.link === link;
+    //   });
+    // });
   }
   findChapter(mangaId: string, source: string, chapter: number): Chapter | undefined {
     return undefined;
@@ -46,11 +38,15 @@ export class Storage {
     return undefined;
   }
   create(name: string, source: ScanSource): Manga {
-    let manga = new Manga();
-    manga.id = v4.generate();
-    manga.name = name;
+    const manga: Manga = {
+      id: v4.generate(),
+      name,
+      sources: []
+    };
     manga.sources.push(source);
-    this.datas.push(manga);
+
+    this.db.addManga(manga);
+
     return manga;
   }
   addScanSource(manga: Manga, source: ScanSource): Manga {

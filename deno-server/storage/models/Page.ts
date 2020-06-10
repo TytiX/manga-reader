@@ -1,5 +1,4 @@
 
-export type Pages = Page[];
-export class Page {
+export interface Page {
 
 }

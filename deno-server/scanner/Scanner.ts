@@ -67,8 +67,10 @@ export class Scanner {
 
   private searchOrCreate(name: string, link: string): Manga {
     let manga = this.storage.findBySourceLink(link);
+    Logger.info(`manga by link: ${manga}`);
     if (!manga) {
       manga = this.storage.findByName(name);
+      Logger.info(`manga by name: ${manga}`);
       if (!manga) { // create manga
         manga = this.storage.create(name, { name: this.config.name, link: link, chapters: [] });
       } else { // add scan source to existing manga

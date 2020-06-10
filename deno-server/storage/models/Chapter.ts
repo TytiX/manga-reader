@@ -1,5 +1,4 @@
 
-export type Chapters = Chapter[];
-export class Chapter {
+export interface Chapter {
 
 }

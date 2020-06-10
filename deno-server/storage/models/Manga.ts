@@ -1,8 +1,15 @@
-import { ScanSources } from "./Sources.ts";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
+import { ScanSource } from "./Sources.ts";
 
-export type Mangas = Manga[];
+@Entity()
 export class Manga {
-  id: string = "";
-  name: string = "";
-  sources: ScanSources = [];
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column()
+  name: string;
+
+  @ManyToMany(type => ScanSource)
+  @JoinTable()
+  sources: ScanSource[];
 }

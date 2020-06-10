@@ -1,8 +1,7 @@
-import { Chapters } from "./Chapter.ts";
+import { Chapter } from "./Chapter.ts";
 
-export type ScanSources = ScanSource[];
-export class ScanSource {
-  name: string = "";
-  link: string = "";
-  chapters: Chapters = [];
+export interface ScanSource {
+  name: string;
+  link: string;
+  chapters: Chapter[];
 }
