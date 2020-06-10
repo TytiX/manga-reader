@@ -38,14 +38,6 @@ export class Database {
 
   async findMangaById(id: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
-      order: {
-        number: 'ASC'
-      //   sources: {
-      //     chapters: {
-      //       number: 'ASC'
-      //     }
-      //   }
-      },
       relations: ['sources', 'sources.chapters'],
       where: { id: id }
     });
