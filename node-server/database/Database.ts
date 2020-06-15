@@ -54,7 +54,7 @@ export class Database {
   }
   async findSourceById(id: string): Promise<ScanSource> {
     return await this.sourceRepository.findOne({
-      relations: ['chapters'],
+      relations: ['chapters', 'manga'],
       where: { id: id }
     });
   }
@@ -119,14 +119,14 @@ export class Database {
   async findChapterByLink(link: string): Promise<[ScanSource, Chapter]> {
     const chapter = await this.chapterRepository.findOne({
       relations: ['source'],
-      where: { link }
+      where: { link: link }
     });
     if (chapter) {
       if (chapter.source) {
         const source = await this.sourceRepository.findOne(chapter.source.id);
         return [source, chapter];
       } else {
-        await this.chapterRepository.delete(chapter);
+        await this.chapterRepository.remove(chapter);
       }
     }
     return [undefined, undefined];
@@ -136,15 +136,17 @@ export class Database {
     chapterEntity.name = chapter.name;
     chapterEntity.number = chapter.number;
     chapterEntity.link = chapter.link;
-    chapterEntity.source = source;
     chapterEntity = await this.chapterRepository.save(chapterEntity);
 
-    if (source.chapters) {
-      source.chapters.push(chapterEntity);
+    let sourceEntity = await this.sourceRepository.findOne(source.id, {
+      relations: ['chapters', 'manga']
+    });
+    if (sourceEntity.chapters) {
+      sourceEntity.chapters.push(chapterEntity);
     } else {
-      source.chapters = [chapterEntity];
+      sourceEntity.chapters = [chapterEntity];
     }
-    return [await this.sourceRepository.save(source), chapterEntity];
+    return [await this.sourceRepository.save(sourceEntity), chapterEntity];
   }
 
   async addPagesToChapter(chapterId: string, pages: { number: number; url: any; }[]) {
@@ -189,25 +191,25 @@ export class Database {
   
   async deleteConfig(id: string): Promise<boolean> {
     try {
-      const config = await this.configRepository.findOne(id, {
-        relations: ['sources', 'sources.chapters', 'sources.chapters.pages']
-      });
-      const sourcesIds: string[] = [];
-      for (const source of config.sources) {
-        const chaptersIds: string[] = [];
-        for (const chapter of source.chapters) {
-          const pageIds: string[] = [];
-          for (const page of chapter.pages) {
-            pageIds.push(page.id);
-          }
-          await this.pageRepository.delete(pageIds);
-          chaptersIds.push(chapter.id);
-        }
-        await this.chapterRepository.delete(chaptersIds);
-        sourcesIds.push(source.id);
-      }
-      await this.sourceRepository.delete(sourcesIds);
-  
+      // const config = await this.configRepository.findOne(id, {
+      //   relations: ['sources', 'sources.chapters', 'sources.chapters.pages']
+      // });
+      // const sourcesIds: string[] = [];
+      // for (const source of config.sources) {
+      //   const chaptersIds: string[] = [];
+      //   for (const chapter of source.chapters) {
+      //     const pageIds: string[] = [];
+      //     for (const page of chapter.pages) {
+      //       pageIds.push(page.id);
+      //     }
+      //     if (pageIds.length > 0) await this.pageRepository.delete(pageIds);
+      //     chaptersIds.push(chapter.id);
+      //   }
+      //   if (chaptersIds.length > 0) await this.chapterRepository.delete(chaptersIds);
+      //   sourcesIds.push(source.id);
+      // }
+      // if (sourcesIds.length > 0) await this.sourceRepository.delete(sourcesIds);
+
       await this.configRepository.delete(id);
       return true;
     } catch(e) {

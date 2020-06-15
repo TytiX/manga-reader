@@ -8,8 +8,8 @@
     </div>
     <div class="card container mt-3">
       <h3>User Profiles</h3>
-      <b-button to="/profile/new">Create profile</b-button>
-      <!-- <UserProfileList :profiles="userprofiles"></UserProfileList> -->
+      <b-button @click="createProfile">Create profile</b-button>
+      <UserProfileList :profiles="userprofiles" @saveClicked="updateProfile" @deleteClicked="deleteProfile"></UserProfileList>
     </div>
   </div>
 </template>
@@ -20,12 +20,14 @@ import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
 import ConfigurationList from '@/components/settings/ConfigurationList.vue';
+import UserProfileList from '@/components/settings/UserProfileList.vue';
 import { ScannerConfig, UserProfile } from '@/models';
 
 @Component({
   components: {
     AppNavBar,
-    ConfigurationList
+    ConfigurationList,
+    UserProfileList
   }
 })
 export default class Settings extends Vue {
@@ -44,6 +46,23 @@ export default class Settings extends Vue {
   refreshUserProfile() {
     axios.get('/api/userprofile').then( response => {
       this.userprofiles = response.data;
+    });
+  }
+
+  createProfile() {
+    axios.post('/api/userprofile', {}).then( () => {
+      this.refreshUserProfile();
+    });
+  }
+
+  updateProfile(profile: UserProfile) {
+    axios.post('/api/userprofile', profile).then( response => {
+      this.refreshUserProfile();
+    });
+  }
+  deleteProfile(profileId: string) {
+    axios.delete('/api/userprofile/' + profileId).then( response => {
+      this.refreshUserProfile();
     });
   }
 

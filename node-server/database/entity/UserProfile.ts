@@ -5,7 +5,10 @@ import { ScanSource } from "./Sources";
 export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
+  @Column({
+    default: 'Guest',
+    unique: false
+  })
   name: string;
 
   @ManyToMany(type => ScanSource)

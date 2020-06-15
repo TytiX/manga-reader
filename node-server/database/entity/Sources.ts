@@ -23,12 +23,18 @@ export class ScanSource {
   })
   description: string;
 
-  @ManyToOne(type => Manga, manga => manga.sources)
+  @ManyToOne(type => Manga, manga => manga.sources, {
+    onDelete: 'CASCADE'
+  })
   manga: Manga;
 
-  @ManyToOne(type => ScannerConfig, config => config.sources)
+  @ManyToOne(type => ScannerConfig, config => config.sources, {
+    onDelete: 'CASCADE'
+  })
   scannerConfig: ScannerConfig;
   
-  @OneToMany(type => Chapter, chapter => chapter.source)
+  @OneToMany(type => Chapter, chapter => chapter.source, {
+    onDelete: 'DEFAULT'
+  })
   chapters: Chapter[];
 }

@@ -2,43 +2,84 @@ import { Router } from 'express';
 import { Database } from '../database/Database';
 import { scanChapter, scanChapters, getDefaultConfigs } from '../scanners/site-scanner';
 import { Scanner } from '../scanners/Scanner';
+import { Not } from 'typeorm';
 
 export default (db: Database) => {
 
   const router = Router();
 
-  // all mangas
+  /***************************************************************************
+   * Mangas
+   ***************************************************************************/
   router.get('/manga', async function(req, res) {
     res.send(
       await db.allMangas()
     );
   });
-  // manga detail
   router.get('/manga/:id', async function(req, res) {
     res.send(
       await db.findMangaById(req.params.id)
     );
   });
-  // source route
+  /***************************************************************************
+   * Sources
+   ***************************************************************************/
+  router.get('/source/orflans', async function(req, res) {
+    res.send(
+      await db.sourceRepository.findAndCount({
+        relations: [ 'manga' ],
+        where: {
+          manga: null
+        }
+      })
+    );
+  });
   router.get('/source/:id', async function(req, res) {
     res.send(
       await db.findSourceById(req.params.id)
     );
   });
-  // chapter route
+  /***************************************************************************
+   * Chapters
+   ***************************************************************************/
+  router.get('/chapter/orphans', async function(req, res) {
+    res.send(
+      await db.chapterRepository.findAndCount({
+        relations: [ 'source' ],
+        where: {
+          source: null
+        }
+      })
+    );
+  });
+  router.delete('/chapter/orphans', async function(req, res) {
+    const orphansChapters = await db.chapterRepository.find({
+      relations: [ 'source' ],
+      where: {
+        source: null
+      },
+      take: 500
+    });
+    res.send(
+      await db.chapterRepository.delete(orphansChapters.map(c => c.id))
+    );
+  });
   router.get('/chapter/:id', async function(req, res) {
     res.send(
       await db.findChapterById(req.params.id)
     );
   });
-  // chapter scan launch route
+  router.post('/chapter', async function(req, res) {
+    res.send(
+      await db.findChapterByLink((req.body as any).link)
+    );
+  });
   router.post('/chapter/scan', async function(req, res) {
     scanChapters(db, req.body);
     res.send({
       status: 'running'
     });
   });
-  // chapter scan launch route
   router.get('/chapter/:id/scan', async function(req, res) {
     scanChapter(db, req.params.id);
     res.send({

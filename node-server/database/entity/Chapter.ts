@@ -38,7 +38,9 @@ export class Chapter {
   @UpdateDateColumn()
   updateDate: Date;
 
-  @ManyToOne(type => ScanSource, source => source.chapters)
+  @ManyToOne(type => ScanSource, source => source.chapters, {
+    onDelete: 'CASCADE'
+  })
   source: ScanSource;
 
   @OneToMany(type => Page, page => page.chapter)

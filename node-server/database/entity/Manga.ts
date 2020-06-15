@@ -18,7 +18,9 @@ export class Manga {
   @Column()
   name: string;
 
-  @OneToMany(type => ScanSource, source => source.manga)
+  @OneToMany(type => ScanSource, source => source.manga, {
+    onDelete: 'DEFAULT'
+  })
   sources: ScanSource[];
 
   // @ManyToMany(type => Tag, tag => tag.mangas)
