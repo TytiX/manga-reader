@@ -6,6 +6,9 @@
       :to="'/settings/' + config.id">
       <b-img :src="config.iconUrl"></b-img>
       {{config.name}}
+      <div>
+        <b-button variant="danger" @click.prevent="deleteConfig(config.id)"><b-icon icon="trash"></b-icon></b-button>
+      </div>
     </b-list-group-item>
   </b-list-group>
 </template>
@@ -19,6 +22,10 @@ import { ScannerConfig } from '@/models';
 export default class ConfigurationList extends Vue {
   @Prop()
   configs!: ScannerConfig[];
+
+  deleteConfig(id: string) {
+    this.$emit('deleteClicked', id);
+  }
 }
 </script>
 

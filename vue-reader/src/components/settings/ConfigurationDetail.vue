@@ -72,7 +72,7 @@ export default class ConfigurationDetail extends Vue {
   config!: ScannerConfig;
 
   onSubmit() {
-    axios.post('/api/configuration', this.config).then( res => {
+    axios.post('/api/configuration', this.config).then( () => {
       this.$router.go(-1);
     });
   }

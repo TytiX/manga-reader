@@ -21,7 +21,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
-import ConfigurationDetail from '@/components/ConfigurationDetail.vue';
+import ConfigurationDetail from '@/components/settings/ConfigurationDetail.vue';
 import { ScannerConfig } from '@/models';
 
 @Component({
@@ -40,7 +40,9 @@ export default class SettingsDetail extends Vue {
       });
     } else {
       axios.get('/api/default/configuration').then( response => {
-        this.defaultConfigs = response.data.map( c => { return { value: c, text: c.name};});
+        this.defaultConfigs = response.data.map( (c: ScannerConfig) => {
+          return { value: c, text: c.name};
+        });
       });
     }
   }
