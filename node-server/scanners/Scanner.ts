@@ -29,7 +29,7 @@ export class Scanner {
   queue: PQueue;
   notifier: ScannerNotifier;
 
-  constructor(db: Database, config: ScannerConfig) {
+  constructor(db: Database, config?: ScannerConfig) {
     this.database = db;
     this.config = config;
     this.queue = new PQueue({concurrency: 100});

@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start": "ts-node main.ts",
     "dev": "ts-node-dev --respawn --transpileOnly main.ts"
   },
   "devDependencies": {

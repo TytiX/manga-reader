@@ -21,7 +21,7 @@ export function getDefaultConfigs() {
   for (const scanerConfig of configs) {
     if ( !scanerConfig.isDirectory() ) {
       const rawdata = fs.readFileSync(path.join(scanerConfig.basePath, scanerConfig.relativePath));
-      defaultConfigs.push(JSON.parse(rawdata));
+      defaultConfigs.push(JSON.parse(rawdata.toString()));
     }
   }
   return defaultConfigs;
@@ -34,7 +34,7 @@ export async function scanChapters(db: Database, chaptersIds: string[]) {
 }
 
 export async function scanChapter(db: Database, chapterId: string) {
-  const scanner = new Scanner(db, {});
+  const scanner = new Scanner(db);
 
   const chapter = await scanner.database.findChapterById(chapterId);
 
