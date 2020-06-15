@@ -1,26 +1,31 @@
 <template>
-  <div class="manga-list">
-    <div v-for="manga of mangas" :key="manga.id">
-      {{ manga.name }}
-    </div>
-  </div>
+  <b-container class="manga-list">
+    <b-row>
+      <b-col sm="4"
+        v-for="manga of mangas"
+        :key="manga.id">
+        <router-link
+          :to="'/manga/' + manga.id">
+          <MangaListItem :manga="manga"></MangaListItem>
+        </router-link>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import axios from 'axios';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
-import { Manga } from '@/models/Manga';
+import MangaListItem from '@/components/MangaListItem.vue';
+import { Manga } from '@/models';
 
-@Component
-export default class MangaList extends Vue {
-  mangas: Manga[] = [];
-
-  mounted() {
-    axios.get('/api/manga').then( response => {
-      this.mangas = response.data;
-    });
+@Component({
+  components: {
+    MangaListItem
   }
-
+})
+export default class MangaList extends Vue {
+  @Prop()
+  mangas!: Manga[];
 }
 </script>

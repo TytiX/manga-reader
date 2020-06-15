@@ -5,6 +5,9 @@ export interface ScanSource {
   id: string;
   name: string;
   link: string;
+  coverLink: string;
+  description: string;
+
   manga: Manga;
   chapters: Chapter[];
 }

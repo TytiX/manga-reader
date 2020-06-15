@@ -6,6 +6,7 @@ export interface Chapter {
   name: string;
   number: number;
   link: string;
+  scanned: boolean;
   source: ScanSource;
   pages: Page[];
 }
