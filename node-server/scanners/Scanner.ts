@@ -134,7 +134,8 @@ export class Scanner {
   async scanMangaChapters(manga: Manga, source: ScanSource, doc: any, updateChapters: boolean, firstScan: boolean) {
     if (updateChapters) {
       const chaptersEncloseNodes = xpath.select(this.config.chapterEnclosingXpath, doc);
-  
+
+      const chapters = [];
       for (const node of chaptersEncloseNodes) {
         const parsedNode = new DOMParser(this.parserOptions).parseFromString(`${node}`);
   
@@ -160,12 +161,19 @@ export class Scanner {
         if (Number.isNaN(chapterN)) {
           logger.error(`Error scanning : ${manga.name} - ${source.name} --> ${lastPartUrl}`);
         } else {
-          const [retSource, chapter] = await this.searchOrCreateChapter(source, {
+          chapters.push({
             link: nodeLink.value,
             name: name? name.nodeValue : undefined,
-            number: chapterN},
-            firstScan);
+            number: chapterN
+          });
         }
+      }
+
+      logger.info(`Found ${chapters.length} chapters --> ${manga.name} - ${source.name}`);
+      let count = 0;
+      for (const chapter of chapters) {
+        await this.searchOrCreateChapter(source, chapter, firstScan);
+        logger.info(`Progress: ${++count}/${chapters.length} --> ${manga.name} - ${source.name}`);
       }
     }
   }
@@ -220,8 +228,10 @@ export class Scanner {
 
   private async searchOrCreateChapter(source: ScanSource, chapter: { name: string; link: string; number: number; }, firstScan: boolean): Promise<[ScanSource, Chapter]> {
     let [retSource, retChapter] = await this.database.findChapterByLink(chapter.link);
+    logger.debug('chapter by link: ', retChapter);
     if (!retChapter) {
-      [retSource, retChapter] = await this.database.addChapterToSource(source, {
+      retSource = await this.database.findSourceById(source.id);
+      [retSource, retChapter] = await this.database.addChapterToSource(retSource, {
         name: chapter.name? chapter.name : null,
         number: chapter.number,
         link: chapter.link
