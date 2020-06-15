@@ -3,6 +3,8 @@ import {createConnection, Connection, getRepository, Repository} from 'typeorm';
 import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
 import logger from '../logger';
 import { UserProfile } from './entity/UserProfile';
+import { Gender } from './entity/Gender';
+import { Tag } from './entity/Tag';
 
 export class Database {
   connection?: Connection;
@@ -22,6 +24,8 @@ export class Database {
       synchronize: true,
       entities: [
         Manga,
+        Gender,
+        Tag,
         ScanSource,
         Chapter,
         Page,
@@ -40,7 +44,7 @@ export class Database {
 
   async allMangas(): Promise<Manga[]> {
     return await this.mangaRepository.find({
-      relations: ['sources'],
+      relations: ['sources', 'sources.scannerConfig'],
       order: {
         'name': 'ASC'
       }
@@ -235,26 +239,33 @@ export class Database {
   async createOrUpdateUserProfile(profile: UserProfile): Promise<UserProfile> {
     return await this.userProfileRepository.save(profile);
   }
-  async addFavoriteToProfile(profileId: string, sourceId: string): Promise<boolean> {
-    const profile = await this.userProfileRepository.findOne(profileId);
-    const source = await this.sourceRepository.findOne(sourceId);
-    if (profile.favorites) {
-      profile.favorites = [source];
-    } else {
-      profile.favorites.push(source);
-    }
-    await this.userProfileRepository.save(profile);
-    return true;
-  }
-  async removeFavoriteFromProfile(profileId: string, sourceId: string): Promise<boolean> {
+  async addFavoriteToProfile(profileId: string, mangaId: string): Promise<UserProfile> {
     const profile = await this.userProfileRepository.findOne(profileId, {
-      relations: ['favorites']
+      relations: [ 'favorites' ]
+    });
+    const manga = await this.mangaRepository.findOne(mangaId);
+    if (profile.favorites) {
+      profile.favorites.push(manga);
+    } else {
+      profile.favorites = [manga];
+    }
+    return await this.userProfileRepository.save(profile);
+  }
+  async removeFavoriteFromProfile(profileId: string, sourceId: string): Promise<UserProfile> {
+    const profile = await this.userProfileRepository.findOne(profileId, {
+      relations: [ 'favorites' ]
     });
     if (profile.favorites) {
       const toRemove = profile.favorites.findIndex( f => f.id === sourceId);
       profile.favorites.splice(toRemove, 1);
     }
-    await this.userProfileRepository.save(profile);
-    return true;
+    
+    return await this.userProfileRepository.save(profile);
+  }
+  async getFavorites(profileId: string): Promise<Manga[]> {
+    const profile = await this.userProfileRepository.findOne(profileId, {
+      relations: [ 'favorites', 'favorites.sources', 'favorites.sources.scannerConfig' ]
+    });
+    return profile.favorites;
   }
 }

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 
+import Favorites from '../views/Favorites.vue'
 import Home from '../views/Home.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
@@ -10,7 +11,12 @@ Vue.use(VueRouter)
   const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
+    name: 'Fav',
+    component: Favorites
+  },
+  {
+    path: '/mangas',
+    name: 'All',
     component: Home
   },
   {

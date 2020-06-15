@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
-import { ScanSource } from "./Sources";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm";
+
+import { Manga } from "./Manga";
 
 @Entity()
 export class UserProfile {
@@ -11,6 +12,7 @@ export class UserProfile {
   })
   name: string;
 
-  @ManyToMany(type => ScanSource)
-  favorites: ScanSource[];
+  @ManyToMany(type => Manga, manga => manga.userFavorites)
+  @JoinTable()
+  favorites: Manga[];
 }

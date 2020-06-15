@@ -1,7 +1,9 @@
 <template>
   <div class="home">
-    <AppNavBar title="Home"></AppNavBar>
-    <MangaList :mangas="mangas"></MangaList>
+    <AppNavBar title="All"></AppNavBar>
+    <MangaList
+      :mangas="mangas"
+      :favorites="favorites"></MangaList>
   </div>
 </template>
 
@@ -21,9 +23,13 @@ import { Manga } from '@/models';
 })
 export default class Home extends Vue {
   mangas: Manga[] = [];
+  favorites: Manga[] = [];
   mounted() {
     axios.get('/api/manga').then( response => {
       this.mangas = response.data;
+    });
+    axios.get('/api/favorites/' + this.$currentProfile).then( response => {
+      this.favorites = response.data;
     });
   }
 }

@@ -9,6 +9,7 @@ import {
 import { ScanSource } from './Sources';
 import { Tag } from './Tag';
 import { Gender } from './Gender';
+import { UserProfile } from './UserProfile';
 
 @Entity()
 export class Manga {
@@ -23,11 +24,14 @@ export class Manga {
   })
   sources: ScanSource[];
 
-  // @ManyToMany(type => Tag, tag => tag.mangas)
-  // @JoinTable()
-  // tags: Tag[];
+  @ManyToMany(type => UserProfile, profile => profile.favorites)
+  userFavorites: UserProfile[];
 
-  // @ManyToMany(type => Gender, gender => gender.mangas)
-  // @JoinTable()
-  // genres: Gender[];
+  @ManyToMany(type => Tag, tag => tag.mangas)
+  @JoinTable()
+  tags: Tag[];
+
+  @ManyToMany(type => Gender, gender => gender.mangas)
+  @JoinTable()
+  genders: Gender[];
 }

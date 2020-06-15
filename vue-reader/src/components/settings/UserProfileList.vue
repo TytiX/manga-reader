@@ -2,7 +2,9 @@
   <b-list-group class="w-100">
     <b-list-group-item
       v-for="profile of profiles"
-      :key="profile.id">
+      :key="profile.id"
+      @click="selectProfile(profile)">
+      <b-icon v-if="$currentProfile === profile.id" icon="check"></b-icon>
       <b-input v-model="profile.name"></b-input>
       <div>
         <b-button variant="warn" @click.prevent="saveUserProfile(profile)"><b-icon icon="cloud-upload"></b-icon></b-button>
@@ -22,6 +24,9 @@ export default class ConfigurationList extends Vue {
   @Prop()
   profiles!: UserProfile[];
 
+  selectProfile(profile: UserProfile) {
+    this.$setProfile(profile);
+  }
   saveUserProfile(profile: UserProfile) {
     this.$emit('saveClicked', profile);
   }

@@ -1,5 +1,6 @@
 import { Manga } from './Manga';
 import { Chapter } from './Chapter';
+import { ScannerConfig } from './ScannerConfig';
 
 export interface ScanSource {
   id: string;
@@ -9,5 +10,6 @@ export interface ScanSource {
   description: string;
 
   manga: Manga;
+  scannerConfig: ScannerConfig;
   chapters: Chapter[];
 }

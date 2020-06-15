@@ -114,6 +114,9 @@ export default (db: Database) => {
   /***************************************************************************
    * User profile
    ***************************************************************************/
+  router.get('/favorites/:profileId', async (req, res) => {
+    res.send(await db.getFavorites(req.params.profileId));
+  });
   router.get('/userprofile', async function(req, res) {
     res.send(await db.allProfiles());
   });
@@ -127,19 +130,19 @@ export default (db: Database) => {
     const profile = await db.createOrUpdateUserProfile(req.body)
     res.send(profile);
   });
-  router.post('/userprofile/:profileId/addfav/:sourceId', async function(req, res) {
+  router.post('/userprofile/:profileId/addfav/:mangaId', async function(req, res) {
     res.send(
       await db.addFavoriteToProfile(
         req.params.profileId,
-        req.params.sourceId
+        req.params.mangaId
       )
     );
   });
-  router.post('/userprofile/:profileId/rmfav/:sourceId', async function(req, res) {
+  router.post('/userprofile/:profileId/rmfav/:mangaId', async function(req, res) {
     res.send(
       await db.removeFavoriteFromProfile(
         req.params.profileId,
-        req.params.sourceId
+        req.params.mangaId
       )
     );
   });

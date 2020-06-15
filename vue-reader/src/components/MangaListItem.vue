@@ -2,6 +2,16 @@
   <div class="card mt-3">
     <b-img-lazy :src="coverUrl" fluid></b-img-lazy>
     {{manga.name}}
+    <div class="soruces">
+      <b-img-lazy
+        v-for="source of manga.sources"
+        :key="source.id"
+        :src="source.scannerConfig.iconUrl"></b-img-lazy>
+    </div>
+    <div class="actions">
+      <b-icon v-if="!isFavorite" @click.prevent="fav()" icon="heart"></b-icon>
+      <b-icon v-else @click.prevent="unfav()" icon="heart-fill"></b-icon>
+    </div>
   </div>
 </template>
 
@@ -14,6 +24,8 @@ import { Manga } from '@/models';
 export default class MangaListItem extends Vue {
   @Prop()
   manga!: Manga;
+  @Prop()
+  isFavorite!: boolean;
 
   try = 0;
   coverUrl!: string;
@@ -38,6 +50,13 @@ export default class MangaListItem extends Vue {
     const urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
     const url = new RegExp(urlRegex, 'i');
     return str.length < 2083 && url.test(str);
+  }
+
+  fav() {
+    this.$addToFavorite(this.manga.id);
+  }
+  unfav() {
+    this.$removeFromFavorite(this.manga.id);
   }
 
 }

@@ -7,6 +7,6 @@ export class Tag {
   id: number;
   @Column({ unique: true })
   name: string;
-  @ManyToMany(type => Manga)
+  @ManyToMany(type => Manga, manga => manga.tags)
   mangas: Manga[];
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppNavBar title="Favorites"></AppNavBar>
-    <MangaList :mangas="mangas"></MangaList>
+    <MangaList :mangas="mangas" :favorites="mangas"></MangaList>
   </div>
 </template>
 
@@ -21,6 +21,11 @@ import { Manga } from '@/models';
 })
 export default class Favorites extends Vue {
   mangas: Manga[] = [];
+  mounted() {
+    axios.get('/api/favorites/' + this.$currentProfile).then( response => {
+      this.mangas = response.data;
+    });
+  }
 }
 </script>
 

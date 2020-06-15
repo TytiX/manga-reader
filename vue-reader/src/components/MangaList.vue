@@ -6,7 +6,7 @@
         :key="manga.id">
         <router-link
           :to="'/manga/' + manga.id">
-          <MangaListItem :manga="manga"></MangaListItem>
+          <MangaListItem :manga="manga" :isFavorite="isInFavorites(manga)"></MangaListItem>
         </router-link>
       </b-col>
     </b-row>
@@ -27,5 +27,11 @@ import { Manga } from '@/models';
 export default class MangaList extends Vue {
   @Prop()
   mangas!: Manga[];
+  @Prop()
+  favorites?: Manga[];
+
+  isInFavorites(manga: Manga) {
+    return this.favorites && this.favorites.findIndex(m => manga.id === m.id) != -1;
+  }
 }
 </script>
