@@ -46,12 +46,17 @@ export default (db: Database) => {
     });
   });
 
-  // configurations
+  /***************************************************************************
+   * Configurations
+   ***************************************************************************/
   router.get('/configuration', async function(req, res) {
     res.send(await db.allConfigs());
   });
   router.get('/configuration/:id', async function(req, res) {
     res.send(await db.findScanConfigById(req.params.id));
+  });
+  router.delete('/configuration/:id', async function(req, res) {
+    res.send(await db.deleteConfig(req.params.id));
   });
   router.post('/configuration', async function(req, res) {
     const config = await db.createOrUpdateScanConfig(req.body)
@@ -62,6 +67,39 @@ export default (db: Database) => {
   router.get('/default/configuration', async function(req, res) {
     res.send(
       getDefaultConfigs()
+    );
+  });
+
+  /***************************************************************************
+   * User profile
+   ***************************************************************************/
+  router.get('/userprofile', async function(req, res) {
+    res.send(await db.allProfiles());
+  });
+  router.get('/userprofile/:id', async function(req, res) {
+    res.send(await db.findUserProfile(req.params.id));
+  });
+  router.delete('/userprofile/:id', async function(req, res) {
+    res.send(await db.deleteUserProfile(req.params.id));
+  });
+  router.post('/userprofile', async function(req, res) {
+    const profile = await db.createOrUpdateUserProfile(req.body)
+    res.send(profile);
+  });
+  router.post('/userprofile/:profileId/addfav/:sourceId', async function(req, res) {
+    res.send(
+      await db.addFavoriteToProfile(
+        req.params.profileId,
+        req.params.sourceId
+      )
+    );
+  });
+  router.post('/userprofile/:profileId/rmfav/:sourceId', async function(req, res) {
+    res.send(
+      await db.removeFavoriteFromProfile(
+        req.params.profileId,
+        req.params.sourceId
+      )
     );
   });
 

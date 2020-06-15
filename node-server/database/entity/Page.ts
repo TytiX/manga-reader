@@ -4,7 +4,7 @@ import { Chapter } from './Chapter';
 @Entity()
 export class Page {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column()
   number: number;

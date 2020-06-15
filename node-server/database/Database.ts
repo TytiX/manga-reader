@@ -2,6 +2,7 @@ import {createConnection, Connection, getRepository, Repository} from 'typeorm';
 
 import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
 import logger from '../logger';
+import { UserProfile } from './entity/UserProfile';
 
 export class Database {
   connection?: Connection;
@@ -10,6 +11,7 @@ export class Database {
   chapterRepository: Repository<Chapter>;
   pageRepository: Repository<Page>;
   configRepository: Repository<ScannerConfig>;
+  userProfileRepository: Repository<UserProfile>;
 
   constructor() { }
 
@@ -23,7 +25,8 @@ export class Database {
         ScanSource,
         Chapter,
         Page,
-        ScannerConfig
+        ScannerConfig,
+        UserProfile
       ]
     });
     this.mangaRepository = getRepository(Manga);
@@ -31,6 +34,7 @@ export class Database {
     this.chapterRepository = getRepository(Chapter);
     this.pageRepository = getRepository(Page);
     this.configRepository = getRepository(ScannerConfig);
+    this.userProfileRepository = getRepository(UserProfile);
     return this.connection;
   }
 
@@ -181,5 +185,74 @@ export class Database {
 
   async createOrUpdateScanConfig(config: ScannerConfig): Promise<ScannerConfig> {
     return await this.configRepository.save(config);
+  }
+  
+  async deleteConfig(id: string): Promise<boolean> {
+    try {
+      const config = await this.configRepository.findOne(id, {
+        relations: ['sources', 'sources.chapters', 'sources.chapters.pages']
+      });
+      const sourcesIds: string[] = [];
+      for (const source of config.sources) {
+        const chaptersIds: string[] = [];
+        for (const chapter of source.chapters) {
+          const pageIds: string[] = [];
+          for (const page of chapter.pages) {
+            pageIds.push(page.id);
+          }
+          await this.pageRepository.delete(pageIds);
+          chaptersIds.push(chapter.id);
+        }
+        await this.chapterRepository.delete(chaptersIds);
+        sourcesIds.push(source.id);
+      }
+      await this.sourceRepository.delete(sourcesIds);
+  
+      await this.configRepository.delete(id);
+      return true;
+    } catch(e) {
+      logger.error(e);
+      return false;
+    }
+  }
+  
+  /***************************************************************************
+   * User profile
+   ***************************************************************************/
+  async allProfiles(): Promise<UserProfile[]> {
+    return await this.userProfileRepository.find();
+  }
+  async findUserProfile(id: string): Promise<UserProfile> {
+    return await this.userProfileRepository.findOne(id, {
+      relations: ['favorites']
+    });
+  }
+  async deleteUserProfile(id: string) {
+    return await this.userProfileRepository.delete([id]);
+  }
+  async createOrUpdateUserProfile(profile: UserProfile): Promise<UserProfile> {
+    return await this.userProfileRepository.save(profile);
+  }
+  async addFavoriteToProfile(profileId: string, sourceId: string): Promise<boolean> {
+    const profile = await this.userProfileRepository.findOne(profileId);
+    const source = await this.sourceRepository.findOne(sourceId);
+    if (profile.favorites) {
+      profile.favorites = [source];
+    } else {
+      profile.favorites.push(source);
+    }
+    await this.userProfileRepository.save(profile);
+    return true;
+  }
+  async removeFavoriteFromProfile(profileId: string, sourceId: string): Promise<boolean> {
+    const profile = await this.userProfileRepository.findOne(profileId, {
+      relations: ['favorites']
+    });
+    if (profile.favorites) {
+      const toRemove = profile.favorites.findIndex( f => f.id === sourceId);
+      profile.favorites.splice(toRemove, 1);
+    }
+    await this.userProfileRepository.save(profile);
+    return true;
   }
 }
