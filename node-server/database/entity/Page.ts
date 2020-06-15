@@ -1,14 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Chapter } from "./Chapter";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Chapter } from './Chapter';
 
 @Entity()
 export class Page {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
+
+  @Column()
+  number: number;
 
   @Column()
   url: string;
 
-  @ManyToOne(type => Chapter, chapter => chapter.chapters)
+  @ManyToOne(type => Chapter, chapter => chapter.pages)
   chapter: Chapter;
 }

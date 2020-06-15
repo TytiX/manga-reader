@@ -1,5 +1,4 @@
-import { DOMParser } from 'xmldom';
-import * as xpath from 'xpath';
+import * as cheerio from 'cheerio';
 import axios from 'axios';
 import PQueue from 'p-queue';
 
@@ -7,10 +6,8 @@ import logger from '../logger';
 import { Database } from '../database/Database';
 
 import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
-import { UrlUtils } from '../utils/UrlUtils';
-import { ScannerNotifier } from '../events/ScannerNotifier';
 
-export class Scanner {
+export class ScannerCheerio {
   config: ScannerConfig;
   database: Database;
   parserOptions = {
@@ -27,77 +24,77 @@ export class Scanner {
     //errorHandler:function(level,msg){console.log(level,msg)}
   };
   queue: PQueue;
-  notifier: ScannerNotifier;
 
-  constructor(db: Database, config: ScannerConfig) {
-    this.database = db;
+  constructor(config: ScannerConfig) {
+    this.database = new Database();
     this.config = config;
     this.queue = new PQueue({concurrency: 100});
-    this.notifier = new ScannerNotifier();
   }
 
-  async scanMangas(firstScan: boolean) {
+  async connectDatabase() {
+    await this.database.connect();
+  }
+
+  private async scanMangas() {
     const response = await axios.get(this.config.mangasListUrl);
-    const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-    const mangasEncloseNodes = xpath.select(this.config.mangaEnclosingXpath, doc);
+    
+    const $ = cheerio.load(response.data);
+    const mangasEncloseNodes = $('ul.manga-list > li > a');
+    logger.warn(mangasEncloseNodes);
+    // const mangasEncloseNodes = xpath.select(this.config.mangaEnclosingXpath, doc);
 
     const mangas: { name: string; link: string; }[] = [];
 
-    for (const node of mangasEncloseNodes) {
-      const parsedNode = new DOMParser(this.parserOptions).parseFromString(`${node}`);
-      const nodeLink = xpath.select1(this.config.mangaLinkRelativeXpath, parsedNode);
-      const name = xpath.select1(this.config.mangaNameRelativeXpath, parsedNode);
-      mangas.push({
-        name: name.nodeValue,
-        link: nodeLink.value
-      });
-    }
+    // for (const node of mangasEncloseNodes) {
+      // const parsedNode = new DOMParser(this.parserOptions).parseFromString(`${node}`);
+      // const nodeLink = xpath.select1(this.config.mangaLinkRelativeXpath, parsedNode);
+      // const name = xpath.select1(this.config.mangaNameRelativeXpath, parsedNode);
+      // mangas.push({
+      //   name: name.nodeValue,
+      //   link: nodeLink.value
+      // });
+    //   logger.info(node);
+    // }
 
-    logger.info(`Found ${mangas.length} mangas on source - ${this.config.name}`);
-    let count = 0;
-    this.queue.on('active', () => {
-      count ++;
-      logger.debug(`Working on item #${count}.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`);
-      logger.info(`Scanning advancement ${count}/${mangas.length}.`);
-      this.notifier.emit('progress', count/mangas.length);
-    });
-    this.queue.on('idle', () => {
-      logger.info(`Scanning complete: ${this.config.name}`);
-      this.notifier.emit('scan complete');
-    });
-    for (const m of mangas) {
-      this.queue.add(() => this.searchAndScanManga(m, firstScan));
-    }
+    // logger.info(`Found ${mangas.length} mangas on source - ${this.config.name}`);
+    // let count = 0;
+    // this.queue.on('active', () => {
+    //   logger.debug(`Working on item #${++count}.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`);
+    //   logger.info(`Scanning advancement ${(++count) * 100 / mangas.length}%.`);
+    // });
+    // for (const m of mangas) {
+    //   this.queue.add(() => this.searchAndScanManga(m));
+    // }
   }
 
-  private async searchAndScanManga(m, firstScan: boolean) {
+  private async searchAndScanManga(m) {
     try {
       logger.info(`Scanning : ${m.name}`);
       const startTime = new Date().getTime();
       const [manga, source] = await this.searchOrCreate(m.name, m.link);
-      await this.scanManga(manga, source, firstScan);
+      await this.scanManga(manga, source);
       logger.info(`Scan time : ${manga.name} - ${(new Date().getTime() - startTime) / 1000}s`);
     } catch(e) {
       logger.error(e);
     }
   }
 
-  private async scanManga(manga: Manga, source: ScanSource, firstScan: boolean) {
+  private async scanManga(manga: Manga, source: ScanSource) {
     const response = await axios.get(source.link);
 
     const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
 
     await this.updateScanSource(source, doc, false);
 
-    await this.scanMangaChapters(manga, source, doc, true, firstScan);
+    await this.scanMangaChapters(manga, source, doc, true);
   }
 
-  async updateScanSource(source: ScanSource, doc: any, updateTags: boolean) {
+  async updateScanSource(source: ScanSource, doc: any, updateTags: false) {
     let updated = false;
     // get manga cover
     if (!source.coverLink) {
-      const coverImage = xpath.select1(this.config.mangaCoverXpath, doc);
-      const coverUri = UrlUtils.imgLinkCleanup(coverImage.value);
+      const coverImage = xpath.select1('/html/body/div[1]/div/div[1]/div/div[1]/div[1]/div/img/@src', doc);
+      const coverUri = coverImage.value.replace('//', 'https://')
       logger.debug(`cover uri: ${coverUri}`);
       source.coverLink = coverUri;
       // TODO: download cover...
@@ -105,7 +102,7 @@ export class Scanner {
     }
     // get manga description
     if (!source.description) {
-      const descriptionNode = xpath.select1(this.config.mangaDescriptionXpath, doc);
+      const descriptionNode = xpath.select1('/html/body/div[1]/div/div[1]/div/div[2]/div/div/p/text()', doc);
       if (descriptionNode) {
         logger.debug(`description: ${descriptionNode.nodeValue}`);
         source.description = descriptionNode.nodeValue;
@@ -120,7 +117,7 @@ export class Scanner {
         logger.debug(`gender: ${genderNode.nodeValue}`);
       }
       // get manga tags
-      const tagNodes = xpath.select('//dd[@class=\'tag-links\']/a/text()', doc);
+      const tagNodes = xpath.select('//dd[@class='tag-links']/a/text()', doc);
       for (const tagNode of tagNodes) {
         logger.debug(`tags: ${tagNode.nodeValue}`);
       }
@@ -131,7 +128,7 @@ export class Scanner {
     }
   }
 
-  async scanMangaChapters(manga: Manga, source: ScanSource, doc: any, updateChapters: boolean, firstScan: boolean) {
+  async scanMangaChapters(manga: Manga, source: ScanSource, doc: any, updateChapters: boolean) {
     if (updateChapters) {
       const chaptersEncloseNodes = xpath.select(this.config.chapterEnclosingXpath, doc);
   
@@ -146,25 +143,21 @@ export class Scanner {
         const urlSplit = (nodeLink.value as string).split('/');
         let lastPartUrl = urlSplit[urlSplit.length-1];
         lastPartUrl = lastPartUrl.split('-')[0];
-        lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-        let chapterN: number = Number(lastPartUrl);
-
-        if (Number.isNaN(chapterN)) {
-          lastPartUrl = urlSplit[urlSplit.length-1];
-          lastPartUrl = lastPartUrl.split('-')[1];
-          lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-          chapterN = Number(lastPartUrl);
-        }
+        lastPartUrl = lastPartUrl.replace(' ', '')
+          .replace(',', '.').replace('%20', '')
+          .replace('%60', '').replace('%5D', '');
+  
+        const chapterN: number = Number(lastPartUrl);
         logger.debug(`${manga.name} - ${source.name} --> chapter number: ${lastPartUrl}`);
+        logger.debug(`${manga.name} - ${source.name} --> chapter number: ${chapterN}`);
   
         if (Number.isNaN(chapterN)) {
           logger.error(`Error scanning : ${manga.name} - ${source.name} --> ${lastPartUrl}`);
         } else {
           const [retSource, chapter] = await this.searchOrCreateChapter(source, {
             link: nodeLink.value,
-            name: name? name.nodeValue : undefined,
-            number: chapterN},
-            firstScan);
+            name: name? name.value : undefined,
+            number: chapterN});
         }
       }
     }
@@ -180,11 +173,11 @@ export class Scanner {
       const response = await axios.get(chapter.link + '/' + currentPage);
       
       const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-      const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
+      const nodeImageLink = xpath.select1('//*[@id='ppp']/a/img/@src', doc);
 
       if (nodeImageLink) {
         logger.debug(nodeImageLink.value);
-        const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
+        const imgLink = nodeImageLink.value.replace('//', 'https://')
         pages.push({
           number: currentPage,
           url: imgLink
@@ -196,9 +189,7 @@ export class Scanner {
 
     } while(foundPage);
     await this.database.addPagesToChapter(chapter.id, pages);
-    const dbChapter = await this.database.markChapterAsScanned(chapter.id);
-    this.notifier.emit('end parsing chapter', dbChapter);
-    logger.info('end parsing chapter');
+    logger.debug('end parsing chapter');
   }
 
   private async searchOrCreate(name: string, link: string): Promise<[Manga, ScanSource]> {
@@ -208,17 +199,15 @@ export class Scanner {
       manga = await this.database.findMangaByName(name);
       logger.debug('manga by name: ', manga);
       if (!manga) { // create manga
-        [manga, source] = await this.database.createManga(name, { name: this.config.name, link: link }, this.config);
-        this.notifier.emit('create manga', manga);
+        [manga, source] = await this.database.createManga(name, { name: this.config.name, link: link });
       } else { // add scan source to existing manga
-        [manga, source] = await this.database.addScanSourceToManga(manga, { name: this.config.name, link: link }, this.config);
-        this.notifier.emit('add source manga', manga, source);
+        [manga, source] = await this.database.addScanSourceToManga(manga, { name: this.config.name, link: link })
       }
     }
     return [manga, source];
   }
 
-  private async searchOrCreateChapter(source: ScanSource, chapter: { name: string; link: string; number: number; }, firstScan: boolean): Promise<[ScanSource, Chapter]> {
+  private async searchOrCreateChapter(source: ScanSource, chapter: { name: string; link: string; number: number; }): Promise<[ScanSource, Chapter]> {
     let [retSource, retChapter] = await this.database.findChapterByLink(chapter.link);
     if (!retChapter) {
       [retSource, retChapter] = await this.database.addChapterToSource(source, {
@@ -227,10 +216,14 @@ export class Scanner {
         link: chapter.link
       });
       logger.info(`new chapter : ${retSource.manga.name} - ${retChapter.number}`);
-      if (!firstScan) {
-        this.notifier.emit('new chapter', retSource, retChapter);
-      }
+      // TODO: scan chapter for pages
+      // this.scanChapter(retSource, retChapter);
     }
     return [retSource, retChapter];
+  }
+
+  scan() {
+    // todo
+    this.scanMangas();
   }
 }

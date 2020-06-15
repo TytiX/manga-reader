@@ -1,9 +1,9 @@
 {
-  "name": "frscan",
-  "iconUrl": "https://frscan.me/uploads/favicon.png",
-  "mangasUrl": "https://www.frscan.me/manga-list",
+  "name": "lelscan-vf",
+  "iconUrl": "https://lelscan-vf.com/uploads/logo.png",
+  "mangasUrl": "https://www.lelscan-vf.com/manga-list",
 
-  "mangasListUrl": "https://www.frscan.me/changeMangaList?type=text",
+  "mangasListUrl": "https://www.lelscan-vf.com/changeMangaList?type=text",
 
   "mangaEnclosingXpath": "//ul[@class='manga-list']/li",
   "mangaLinkRelativeXpath": "/li/a/@href",

@@ -8,8 +8,8 @@ export class ScannerJsdom {
 
     const response = await axios.get(this.config.mangasUrl);
     const { window } = new JSDOM(`${response.data}`, {
-      resources: "usable",
-      runScripts: "dangerously"
+      resources: 'usable',
+      runScripts: 'dangerously'
     });
 
     // Set window and document from jsdom
