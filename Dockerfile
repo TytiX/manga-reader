@@ -7,5 +7,5 @@ RUN yarn build
 FROM node:alpine
 WORKDIR /app
 COPY ./node-server .
-COPY --from=vue-builder /app/build ./public
+COPY --from=vue-builder /app/dist ./public
 CMD [ "yarn", "start" ]
