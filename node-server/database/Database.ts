@@ -20,7 +20,7 @@ export class Database {
   async connect() {
     this.connection = await createConnection({
       type: 'sqlite',
-      database: './database.db',
+      database: './data/database.db',
       synchronize: true,
       entities: [
         Manga,
