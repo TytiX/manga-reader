@@ -6,7 +6,11 @@ RUN yarn build
 
 FROM node:alpine
 WORKDIR /app
-RUN apt-get update || : && apt-get install python -y
+RUN apk add --update-cache \
+    python \
+    python-dev \
+    py-pip \
+    build-base \
 COPY ./node-server .
 RUN yarn install
 COPY --from=vue-builder /app/dist ./public
