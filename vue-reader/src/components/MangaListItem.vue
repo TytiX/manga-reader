@@ -1,8 +1,8 @@
 <template>
   <div class="card mt-3">
     <b-img-lazy :src="coverUrl" fluid></b-img-lazy>
-    {{manga.name}}
-    <div class="soruces">
+    <div class="manga-name">{{manga.name}}</div>
+    <div class="sources">
       <b-img-lazy
         v-for="source of manga.sources"
         :key="source.id"
@@ -53,15 +53,27 @@ export default class MangaListItem extends Vue {
   }
 
   fav() {
-    this.$addToFavorite(this.manga.id);
+    this.$emit('fav', this.manga.id);
   }
   unfav() {
-    this.$removeFromFavorite(this.manga.id);
+    this.$emit('unfav', this.manga.id);
   }
 
 }
 </script>
 
 <style>
-
+.card:hover .img-fluid {
+  opacity: 0.3;
+}
+.manga-name {
+  /* height: 3rem; */
+}
+.actions {
+  position: absolute;
+  margin: 5px;
+}
+.sources {
+  /* height: 20px; */
+}
 </style>

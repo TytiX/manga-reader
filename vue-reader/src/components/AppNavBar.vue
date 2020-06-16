@@ -2,7 +2,8 @@
   <div>
     <b-navbar type="dark" variant="dark">
       <b-navbar-nav>
-        <b-nav-item v-b-toggle.sidebar-1><b-icon icon="list"></b-icon></b-nav-item>
+        <b-nav-item v-if="!back" v-b-toggle.sidebar-1><b-icon icon="list"></b-icon></b-nav-item>
+        <b-nav-item v-else @click="$router.go(-1)"><b-icon icon="arrow-left-short"></b-icon></b-nav-item>
         <!-- <b-nav-item v-if="!isHome" to="/"><b-icon icon="house"></b-icon></b-nav-item> -->
       </b-navbar-nav>
       <b-navbar-brand>{{title}}</b-navbar-brand>
@@ -31,6 +32,9 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 export default class AppNavBar extends Vue {
   @Prop()
   title!: string;
+  @Prop({ default: false })
+  back!: boolean;
+
   isHome = false;
   mounted() {
     this.isHome = this.$route.path === '/';

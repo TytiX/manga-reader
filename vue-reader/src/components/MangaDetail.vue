@@ -85,29 +85,5 @@ export default class MangaDetail extends Vue {
     return chapter.scanned ? 'check2-circle' : 'arrow-repeat'
   }
 
-  scanChapter(chapter: Chapter) {
-    axios.get('/api/chapter/' + chapter.id + '/scan').then( () => {
-      // scanning...
-    });
-  }
-  cacheOnServer(chapter: Chapter) {
-    this.$bvToast.toast(`Cannot cache chapter ${chapter.number}`, {
-      title: `Cannot cache`,
-      variant: 'danger'
-    });
-    // axios.get('/api/chapter/' + chapter.id + '/cache').then( () => {
-
-    // });
-  }
-  downloadChapter(chapter: Chapter) {
-    this.$bvToast.toast(`Cannot download chapter ${chapter.number}`, {
-      title: `Cannot download`,
-      variant: 'danger'
-    });
-    // axios.get('/api/chapter/' + chapter.id + '/download').then( () => {
-
-    // });
-  }
-
 }
 </script>

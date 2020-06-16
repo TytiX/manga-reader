@@ -1,45 +1,64 @@
 <template>
-  <div v-if="loaded">
-    <div>{{chapter.source.manga.name}} - {{chapter.source.name}} - {{chapter.number}}</div>
-    <img v-for="page of chapter.pages" :key="page.id"  :src="page.url" :alt="page.number">
+  <div>
+    <v-zoomer-gallery
+      style="width: 100vw; height: 100vh;"
+      :list="pages"
+      v-model="selIndex">
+    </v-zoomer-gallery>
+    
+    <div class="back pad"
+      @click="pageBack"></div>
+    <div class="next pad"
+      @click="pageNext"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import axios from 'axios';
-
-import { Chapter, ScanSource } from '@/models';
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
 @Component
 export default class MangaReader extends Vue {
   @Prop()
-  chapterId!: string;
+  pages!: string[];
+  @Prop({default: 0})
+  offset!: number;
+  selIndex = 0;
 
-  loaded = false;
-  chapter!: Chapter;
-
-  source!: ScanSource
-
-  mounted() {
-    axios.get<Chapter>('/api/chapter/' + this.chapterId).then( response => {
-      this.chapter = response.data;
-      this.loaded = true;
-
-      this.getAllChaptersFromSource(this.chapter.source);
-    });
+  @Watch('selIndex')
+  pageChange() {
+    this.$emit('page-change', this.selIndex);
   }
 
-  getAllChaptersFromSource(source: ScanSource) {
-    axios.get<ScanSource>('/api/source/' + source.id).then( response => {
-      this.source = response.data;
-      this.source.chapters.sort( (c1, c2) => { return c1.number - c2.number });
-    });
+  pageBack() {
+    if (this.selIndex > 0) {
+      this.selIndex--;
+    } else {
+      this.$emit('previous-chapter')
+    }
   }
-
+  pageNext() {
+    if (this.selIndex < this.pages.length-1) {
+      this.selIndex++;
+    } else {
+      this.$emit('next-chapter');
+    }
+  }
 }
 </script>
 
 <style>
-
+.pad {
+  height: 100%;
+  width: 50px;
+  position: absolute;
+  top: 0;
+}
+.back {
+  /* background-color: blue; */
+  left: 0;
+}
+.next {
+  /* background-color: red; */
+  right: 0;
+}
 </style>

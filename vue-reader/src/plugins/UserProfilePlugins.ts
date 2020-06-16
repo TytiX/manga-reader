@@ -7,8 +7,8 @@ declare module 'vue/types/vue' {
   interface Vue {
     $currentProfile: UserProfile;
     $setProfile: (profile: UserProfile) => void;
-    $addToFavorite: (mangaId: string) => void;
-    $removeFromFavorite: (mangaId: string) => void;
+    $addToFavorite: (mangaId: string) => Promise<void>;
+    $removeFromFavorite: (mangaId: string) => Promise<void>;
   }
 }
 
@@ -24,13 +24,9 @@ export default function UserProfilePlugin(Vue: typeof _Vue): void {
   Vue.prototype.$currentProfile = profileId;
 
   Vue.prototype.$addToFavorite = (mangaId: string) => {
-    axios.post('/api/userprofile/' + profileId + '/addfav/' + mangaId).then( () => {
-      //
-    });
+    return axios.post('/api/userprofile/' + profileId + '/addfav/' + mangaId);
   }
   Vue.prototype.$removeFromFavorite = (mangaId: string) => {
-    axios.post('/api/userprofile/' + profileId + '/rmfav/' + mangaId).then( () => {
-      //
-    });
+    return axios.post('/api/userprofile/' + profileId + '/rmfav/' + mangaId);
   }
 }

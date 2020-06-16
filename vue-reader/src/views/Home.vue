@@ -1,9 +1,12 @@
 <template>
   <div class="home">
-    <AppNavBar title="All"></AppNavBar>
+    <AppNavBar title="Mangas"></AppNavBar>
     <MangaList
       :mangas="mangas"
-      :favorites="favorites"></MangaList>
+      :favorites="favorites"
+      @fav="fav"
+      @unfav="unfav">
+    </MangaList>
   </div>
 </template>
 
@@ -28,8 +31,22 @@ export default class Home extends Vue {
     axios.get('/api/manga').then( response => {
       this.mangas = response.data;
     });
+    this.reloadFavorites();
+  }
+
+  reloadFavorites() {
     axios.get('/api/favorites/' + this.$currentProfile).then( response => {
       this.favorites = response.data;
+    });
+  }
+  fav(mangaId: string) {
+    this.$addToFavorite(mangaId).then( () => {
+      this.reloadFavorites();
+    });
+  }
+  unfav(mangaId: string) {
+    this.$removeFromFavorite(mangaId).then( () => {
+      this.reloadFavorites();
     });
   }
 }
