@@ -4,7 +4,7 @@ import * as walkSync from 'walk-sync';
 
 import { Scanner } from './Scanner';
 import { Database } from '../database/Database';
-import { ScannerConfig } from '../database/entity';
+import { ScannerConfig, Chapter } from '../database/entity';
 
 export default async (db: Database) => {
 
@@ -27,9 +27,9 @@ export function getDefaultConfigs() {
   return defaultConfigs;
 }
 
-export async function scanChapters(db: Database, chaptersIds: string[]) {
-  for (const id of chaptersIds) {
-    await scanChapter(db, id);
+export async function scanChapters(db: Database, chapters: Chapter[]) {
+  for (const chapter of chapters) {
+    await scanChapter(db, chapter.id);
   }
 }
 

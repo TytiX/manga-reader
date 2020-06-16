@@ -75,13 +75,8 @@ export default (db: Database) => {
     );
   });
   router.post('/chapter/scan', async function(req, res) {
+    console.log(req.body);
     scanChapters(db, req.body);
-    res.send({
-      status: 'running'
-    });
-  });
-  router.get('/chapter/:id/scan', async function(req, res) {
-    scanChapter(db, req.params.id);
     res.send({
       status: 'running'
     });
