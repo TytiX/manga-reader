@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "xmldom": "^0.3.0",
-    "xpath": "^0.0.27"
-  }
-}
