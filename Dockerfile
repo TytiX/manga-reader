@@ -10,7 +10,7 @@ RUN apk add --update-cache \
     python \
     python-dev \
     py-pip \
-    build-base \
+    build-base
 COPY ./node-server .
 RUN yarn install
 COPY --from=vue-builder /app/dist ./public
