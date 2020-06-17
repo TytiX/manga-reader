@@ -1,10 +1,11 @@
-import {createConnection, Connection, getRepository, Repository} from 'typeorm';
+import {createConnection, Connection, getRepository, Repository, In} from 'typeorm';
 
 import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
 import logger from '../logger';
 import { UserProfile } from './entity/UserProfile';
 import { Gender } from './entity/Gender';
 import { Tag } from './entity/Tag';
+import { Advancement } from './entity/Advancement';
 
 export class Database {
   connection?: Connection;
@@ -14,6 +15,7 @@ export class Database {
   pageRepository: Repository<Page>;
   configRepository: Repository<ScannerConfig>;
   userProfileRepository: Repository<UserProfile>;
+  advancementRepository: Repository<Advancement>;
 
   constructor() { }
 
@@ -22,6 +24,7 @@ export class Database {
       type: 'sqlite',
       database: './data/database.db',
       synchronize: true,
+      // logging: true,
       entities: [
         Manga,
         Gender,
@@ -30,7 +33,8 @@ export class Database {
         Chapter,
         Page,
         ScannerConfig,
-        UserProfile
+        UserProfile,
+        Advancement
       ]
     });
     this.mangaRepository = getRepository(Manga);
@@ -39,6 +43,7 @@ export class Database {
     this.pageRepository = getRepository(Page);
     this.configRepository = getRepository(ScannerConfig);
     this.userProfileRepository = getRepository(UserProfile);
+    this.advancementRepository = getRepository(Advancement);
     return this.connection;
   }
 
@@ -179,6 +184,59 @@ export class Database {
     return await this.sourceRepository.save(source);
   }
 
+  
+  /***************************************************************************
+   * Chapters
+   ***************************************************************************/
+  async findNextChapterById(chapterId: string) {
+    const chapter = await this.chapterRepository.findOne(chapterId, {
+      relations: ['source']
+    });
+    const chapters = await this.chapterRepository.find({
+      where: {
+        source: {
+          id: chapter.source.id
+        }
+      },
+      order: {
+        number: 'ASC'
+      }
+    });
+    let previous = undefined;
+    for (const c of chapters) {
+      if (c.number > chapter.number) {
+        previous = c;
+        break;
+      }
+    }
+    return previous;
+
+  }
+  async findPreviousChapterById(chapterId: string) {
+    const chapter = await this.chapterRepository.findOne(chapterId, {
+      relations: ['source']
+    });
+    const chapters = await this.chapterRepository.find({
+      where: {
+        source: {
+          id: chapter.source.id
+        }
+      },
+      order: {
+        number: 'ASC'
+      }
+    });
+    let previous = undefined;
+    for (const c of chapters) {
+      if (c.number < chapter.number) {
+        previous = c;
+      } else if (c.number >= chapter.number) {
+        break;
+      }
+    }
+    return previous;
+  }
+
   /***************************************************************************
    * Configurations
    ***************************************************************************/
@@ -267,5 +325,56 @@ export class Database {
       relations: [ 'favorites', 'favorites.sources', 'favorites.sources.scannerConfig' ]
     });
     return profile.favorites;
+  }
+  /***************************************************************************
+   * Advancement
+   ***************************************************************************/
+  async getAdvancements(profileId) {
+    return await this.advancementRepository.find({
+      relations: [ 'profile', 'source', 'source.manga', 'chapter' ],
+      where: {
+        profile: profileId
+      }
+    });
+  }
+  async getAdvancementsForManga(profileId: string, mangaId: string) {
+    logger.info(`p: ${profileId} --> m: ${mangaId}`);
+    const manga = await this.mangaRepository.findOne(mangaId, {
+      relations: ['sources']
+    });
+    const sourcesIds = manga.sources.map(s => s.id);
+    return await this.advancementRepository.find({
+      relations: [ 'profile', 'source', 'source.scannerConfig', 'chapter' ],
+      where: {
+        profile: profileId,
+        source: {
+          id: In(sourcesIds)
+        }
+      }
+    });
+  }
+  async updateAdvancement(profileId: string, sourceId: string, chapterId: string, pageNumber: number) {
+    let adv = await this.advancementRepository.findOne({
+      where: {
+        profile: {
+          id: profileId
+        },
+        source: {
+          id: sourceId
+        }
+      }
+    });
+    if (!adv) {
+      adv = new Advancement();
+      const profile = await this.findUserProfile(profileId);
+      const source = await this.findSourceById(sourceId);
+      adv.profile = profile;
+      adv.source = source;
+    }
+    const chapter = await this.findChapterById(chapterId);
+    adv.chapter = chapter;
+    adv.pageNumber = pageNumber;
+
+    await this.advancementRepository.save(adv);
   }
 }
