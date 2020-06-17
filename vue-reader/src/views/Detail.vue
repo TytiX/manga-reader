@@ -4,9 +4,10 @@
     <div v-if="manga.id !== ''">
       <b-container>
         <MangaDetailHeader :manga="manga"></MangaDetailHeader>
-        <MangaDetailAdvancement></MangaDetailAdvancement>
+        <MangaDetailAdvancement :advancements="advancements"></MangaDetailAdvancement>
         <MangaSourceChapters
           :manga="manga"
+          :isFavorite="isInFavorites"
           @scan-chapters="scanChapters"
           @cache-chapters-on-server="cacheOnServer"
           @download-chapters="downloadChapters">
@@ -25,7 +26,7 @@ import AppNavBar from '@/components/AppNavBar.vue';
 import MangaDetailHeader from '@/components/details/MangaDetailHeader.vue';
 import MangaDetailAdvancement from '@/components/details/MangaDetailAdvancement.vue';
 import MangaSourceChapters from '@/components/details/MangaSourceChapters.vue';
-import { Manga, Chapter } from '@/models';
+import { Manga, Chapter, Advancement } from '@/models';
 
 @Component({
   components: {
@@ -41,11 +42,23 @@ export default class Detail extends Vue {
     name: '',
     sources: []
   };
+  favorites: Manga[] = [];
+  advancements: Advancement[] = [];
 
   mounted() {
-    axios.get<Manga>('/api/manga/' + this.$route.params.id).then((res) => {
+    axios.get<Manga>(`/api/manga/${this.$route.params.id}`).then((res) => {
       this.manga = res.data;
     });
+    axios.get<Advancement[]>(`/api/userprofile/${this.$currentProfile}/advancement/${this.$route.params.id}`).then((res) => {
+      this.advancements = res.data;
+    });
+    axios.get('/api/favorites/' + this.$currentProfile).then( response => {
+      this.favorites = response.data;
+    });
+  }
+
+  get isInFavorites() {
+    return this.favorites && this.favorites.findIndex(m => this.manga.id === m.id) != -1;
   }
 
   scanChapters(chapters: Chapter[]) {

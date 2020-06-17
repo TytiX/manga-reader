@@ -14,7 +14,7 @@
             <div>
               chapitre: {{ advancement.chapter.number }}
               -
-              page: {{ advancement.page }}
+              page: {{ advancement.pageNumber }}
             </div>
           </div>
           <b-button @click="resume(advancement)">Continue <b-icon icon="chevron-right"></b-icon></b-button>
@@ -25,33 +25,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
-import { Manga, ScanSource, Chapter } from '@/models';
+import { Advancement } from '@/models';
 
 @Component
 export default class MangaDetailAdvancement extends Vue {
-  advancements: any[] = [{
-    id: '1',
-    source: {
-      name: 'scanfr',
-      scannerConfig: {
-        iconUrl: 'https://www.scan-vf.co/uploads/favicon.png'
-      }
-    },
-    chapter: {
-      id: '',
-      number: 40
-    },
-    page: 10
-  }];
+  @Prop()
+  advancements!: Advancement[];
 
-  mounted() {
-    // TODO:
-  }
-
-  resume(a: any) {
-    // TODO: contine
+  resume(adv: Advancement) {
+    // contine
+    this.$router.push(`/reader/${adv.chapter.id}/${adv.pageNumber}`);
   }
 }
 </script>

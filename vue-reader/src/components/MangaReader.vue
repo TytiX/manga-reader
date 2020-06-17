@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-zoomer-gallery
-      style="width: 100vw; height: 100vh;"
+      style="width: 100vw; height: calc(100vh - 56px);"
       :list="pages"
       v-model="selIndex">
     </v-zoomer-gallery>
@@ -22,11 +22,17 @@ export default class MangaReader extends Vue {
   pages!: string[];
   @Prop({default: 0})
   offset!: number;
+  @Prop()
+  loadPageIndex!: number;
   selIndex = 0;
 
   @Watch('selIndex')
   pageChange() {
     this.$emit('page-change', this.selIndex);
+  }
+  @Watch('loadPageIndex')
+  loadPageChanged() {
+    this.selIndex = this.loadPageIndex;
   }
 
   pageBack() {
@@ -48,10 +54,10 @@ export default class MangaReader extends Vue {
 
 <style>
 .pad {
-  height: 100%;
+  height: calc(100% - 56px);
   width: 50px;
   position: absolute;
-  top: 0;
+  top: 56px;
 }
 .back {
   /* background-color: blue; */

@@ -4,7 +4,7 @@
       <b-form-select v-model="selectedSource" :options="optionsSources"></b-form-select>
     </b-row>
     <b-row class="mb-3">
-      <b-button-group pill>
+      <b-button-group class="col" pill>
         <b-button
           @click.prevent="scanChapters(...chapters)"
           variant="warning">
@@ -19,6 +19,14 @@
           <b-icon icon="cloud-download"></b-icon>
         </b-button>
       </b-button-group>
+      <div class="col">
+        <b-button v-if="!isFavorite">
+          <b-icon @click="fav()" icon="heart"></b-icon>
+        </b-button>
+        <b-button v-else>
+          <b-icon @click="unfav()" icon="heart-fill"></b-icon>
+        </b-button>
+      </div>
     </b-row>
     <b-row class="mb-3">
       <b-list-group class="chapter-list w-100">
@@ -58,6 +66,8 @@ import { Manga, ScanSource, Chapter } from '@/models';
 export default class MangaDetailHeader extends Vue {
   @Prop()
   manga!: Manga;
+  @Prop({ default: false })
+  isFavorite!: boolean;
 
   chapters: Chapter[] = [];
   optionsSources: { value: ScanSource; text: string }[] = [];

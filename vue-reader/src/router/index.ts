@@ -25,7 +25,7 @@ Vue.use(VueRouter)
     component: Detail
   },
   {
-    path: '/reader/:chapterId',
+    path: '/reader/:chapterId/:page?',
     name: 'Reader',
     component: Reader
   },

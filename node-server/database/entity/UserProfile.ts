@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from "typeorm";
 
 import { Manga } from "./Manga";
+import { Advancement } from "./Advancement";
 
 @Entity()
 export class UserProfile {
@@ -15,4 +16,7 @@ export class UserProfile {
   @ManyToMany(type => Manga, manga => manga.userFavorites)
   @JoinTable()
   favorites: Manga[];
+
+  @OneToMany(type => Advancement, adv => adv.profile)
+  advancements: Advancement[];
 }

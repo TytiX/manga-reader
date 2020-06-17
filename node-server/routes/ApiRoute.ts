@@ -69,6 +69,16 @@ export default (db: Database) => {
       await db.findChapterById(req.params.id)
     );
   });
+  router.get('/chapter/:id/next', async function(req, res) {
+    res.send(
+      await db.findNextChapterById(req.params.id)
+    );
+  });
+  router.get('/chapter/:id/previous', async function(req, res) {
+    res.send(
+      await db.findPreviousChapterById(req.params.id)
+    );
+  });
   router.post('/chapter', async function(req, res) {
     res.send(
       await db.findChapterByLink((req.body as any).link)
@@ -124,6 +134,32 @@ export default (db: Database) => {
   router.post('/userprofile', async function(req, res) {
     const profile = await db.createOrUpdateUserProfile(req.body)
     res.send(profile);
+  });
+  router.get('/userprofile/:profileId/advancement', async function(req, res) {
+    res.send(
+      await db.getAdvancements(
+        req.params.profileId
+      )
+    );
+  });
+  router.get('/userprofile/:profileId/advancement/:mangaId', async function(req, res) {
+    res.send(
+      await db.getAdvancementsForManga(
+        req.params.profileId,
+        req.params.mangaId
+      )
+    );
+  });
+  router.post('/userprofile/:profileId/advancement', async function(req, res) {
+    await db.updateAdvancement(
+      req.params.profileId,
+      req.body.sourceId,
+      req.body.chapterId,
+      req.body.pageNumber
+    );
+    // req.body.chapterId
+    // req.body.pageNumber
+    res.send({status: 'ok'});
   });
   router.post('/userprofile/:profileId/addfav/:mangaId', async function(req, res) {
     res.send(
