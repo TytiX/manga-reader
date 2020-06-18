@@ -33,7 +33,7 @@ export class Scanner {
     this.database = db;
     this.config = config;
     this.queue = new PQueue({concurrency: 100});
-    this.notifier = new ScannerNotifier();
+    this.notifier = new ScannerNotifier(db);
   }
 
   async scanMangas(firstScan: boolean) {
@@ -59,11 +59,11 @@ export class Scanner {
       count ++;
       logger.debug(`Working on item #${count}.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`);
       logger.info(`Scanning advancement ${count}/${mangas.length}.`);
-      this.notifier.emit('progress', count/mangas.length);
+      this.notifier.emit('progress', count, mangas.length);
     });
     this.queue.on('idle', () => {
       logger.info(`Scanning complete: ${this.config.name}`);
-      this.notifier.emit('scan complete');
+      this.notifier.emit('scan complete', this.config);
     });
     for (const m of mangas) {
       this.queue.add(() => this.searchAndScanManga(m, firstScan));

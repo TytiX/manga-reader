@@ -104,3 +104,4 @@ dist
 .tern-port
 node-server/database.db
 node-server/data/database.db
+node-server/data/vapidkeys.keys

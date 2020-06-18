@@ -3,6 +3,7 @@ import { Database } from '../database/Database';
 import { scanChapter, scanChapters, getDefaultConfigs } from '../scanners/site-scanner';
 import { Scanner } from '../scanners/Scanner';
 import { Not } from 'typeorm';
+import { WebpushUtils } from '../utils/WebpushUtils';
 
 export default (db: Database) => {
 
@@ -157,8 +158,6 @@ export default (db: Database) => {
       req.body.chapterId,
       req.body.pageNumber
     );
-    // req.body.chapterId
-    // req.body.pageNumber
     res.send({status: 'ok'});
   });
   router.post('/userprofile/:profileId/addfav/:mangaId', async function(req, res) {
@@ -176,6 +175,38 @@ export default (db: Database) => {
         req.params.mangaId
       )
     );
+  });
+  /***************************************************************************
+   * Web push
+   ***************************************************************************/
+  router.get('/web-push/publickey', (req, res) => {
+    res.send( WebpushUtils.getPublicKey() );
+  });
+  router.get('/web-push/test/:subscriptionId', async (req, res) => {
+    const sub = await db.findSubscriptionById(req.params.subscriptionId);
+    WebpushUtils.getWebpush().sendNotification(
+      JSON.parse(sub.jsonData),
+      JSON.stringify({
+        title: 'Test',
+        body: 'this is a test',
+        icon: '/notification-icon.png'
+      })
+    );
+    res.send( { status: 'ok' } );
+  });
+  router.delete('/web-push/:subscriptionId', async (req, res) => {
+    await db.removeSubscription('', {id: req.params.subscriptionId});
+    res.send( { status: 'ok' } );
+  });
+  router.post('/userprofile/:profileId/subscribe', async function(req, res) {
+    let subscription = req.body;
+    subscription = await db.saveOrUpdateSubscription(req.params.profileId, subscription);
+    res.send(subscription);
+  });
+  router.post('/userprofile/:profileId/unsubscribe', async function(req, res) {
+    let subscription = req.body;
+    subscription = await db.removeSubscription(req.params.profileId, subscription);
+    res.send(subscription);
   });
 
   return router;

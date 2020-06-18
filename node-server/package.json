@@ -29,6 +29,7 @@
     "sqlite3": "^4.2.0",
     "typeorm": "^0.2.25",
     "walk-sync": "^2.1.0",
+    "web-push": "^3.4.4",
     "winston": "^3.2.1",
     "xmldom": "^0.3.0",
     "xpath": "^0.0.27"

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMan
 
 import { Manga } from "./Manga";
 import { Advancement } from "./Advancement";
+import { Subscription } from "./Subscription";
 
 @Entity()
 export class UserProfile {
@@ -19,4 +20,7 @@ export class UserProfile {
 
   @OneToMany(type => Advancement, adv => adv.profile)
   advancements: Advancement[];
+
+  @OneToMany(type => Subscription, sub => sub.profile)
+  subscriptions: Subscription[];
 }

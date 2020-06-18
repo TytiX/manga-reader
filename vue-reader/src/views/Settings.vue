@@ -9,7 +9,13 @@
     <div class="card container mt-3">
       <h3>User Profiles</h3>
       <b-button @click="createProfile">Create profile</b-button>
-      <UserProfileList :profiles="userprofiles" @saveClicked="updateProfile" @deleteClicked="deleteProfile"></UserProfileList>
+      <UserProfileList
+        :profiles="userprofiles"
+        @saveClicked="updateProfile"
+        @deleteClicked="deleteProfile"
+        @test-push="testPush"
+        @delete-push="deletePush">
+      </UserProfileList>
     </div>
   </div>
 </template>
@@ -56,20 +62,33 @@ export default class Settings extends Vue {
   }
 
   updateProfile(profile: UserProfile) {
-    axios.post('/api/userprofile', profile).then( response => {
+    axios.post('/api/userprofile', profile).then( () => {
       this.refreshUserProfile();
     });
   }
   deleteProfile(profileId: string) {
-    axios.delete('/api/userprofile/' + profileId).then( response => {
+    axios.delete('/api/userprofile/' + profileId).then( () => {
       this.refreshUserProfile();
     });
   }
 
   deleteConfig(configId: string) {
-    axios.delete('/api/configuration/' + configId).then( response => {
+    axios.delete('/api/configuration/' + configId).then( () => {
       this.refreshConfig();
     });
+  }
+
+  // eslint-disable-next-line
+  testPush(sub: any) {
+    axios.get(`/api/web-push/test/${sub.id}`).then( () => {
+      //
+    })
+  }
+  // eslint-disable-next-line
+  deletePush(sub: any) {
+    axios.delete(`/api/web-push/${sub.id}`).then( () => {
+      //
+    })
   }
 }
 </script>

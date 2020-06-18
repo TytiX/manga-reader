@@ -7,8 +7,15 @@
       <b-icon v-if="$currentProfile === profile.id" icon="check"></b-icon>
       <b-input v-model="profile.name"></b-input>
       <div>
-        <b-button variant="warn" @click.prevent="saveUserProfile(profile)"><b-icon icon="cloud-upload"></b-icon></b-button>
-        <b-button variant="danger" @click.prevent="deleteUserProfile(profile.id)"><b-icon icon="trash"></b-icon></b-button>
+        <div v-for="sub of profile.subscriptions" :key="sub.id">
+          {{sub.id}}
+          <b-button variant="warning" @click.stop="testPush(sub)">test</b-button>
+          <b-button variant="danger" @click.stop="deletePush(sub)">delete</b-button>
+        </div>
+      </div>
+      <div>
+        <b-button variant="warn" @click.stop="saveUserProfile(profile)"><b-icon icon="cloud-upload"></b-icon></b-button>
+        <b-button variant="danger" @click.stop="deleteUserProfile(profile.id)"><b-icon icon="trash"></b-icon></b-button>
       </div>
     </b-list-group-item>
   </b-list-group>
@@ -32,6 +39,14 @@ export default class ConfigurationList extends Vue {
   }
   deleteUserProfile(id: string) {
     this.$emit('deleteClicked', id);
+  }
+  // eslint-disable-next-line
+  testPush(sub: any) {
+    this.$emit('test-push', sub);
+  }
+  // eslint-disable-next-line
+  deletePush(sub: any) {
+    this.$emit('delete-push', sub);
   }
 }
 </script>

@@ -6,6 +6,7 @@ import { UserProfile } from './entity/UserProfile';
 import { Gender } from './entity/Gender';
 import { Tag } from './entity/Tag';
 import { Advancement } from './entity/Advancement';
+import { Subscription } from './entity/Subscription';
 
 export class Database {
   connection?: Connection;
@@ -16,6 +17,7 @@ export class Database {
   configRepository: Repository<ScannerConfig>;
   userProfileRepository: Repository<UserProfile>;
   advancementRepository: Repository<Advancement>;
+  subscriptionRepository: Repository<Subscription>;
 
   constructor() { }
 
@@ -34,7 +36,8 @@ export class Database {
         Page,
         ScannerConfig,
         UserProfile,
-        Advancement
+        Advancement,
+        Subscription
       ]
     });
     this.mangaRepository = getRepository(Manga);
@@ -44,6 +47,7 @@ export class Database {
     this.configRepository = getRepository(ScannerConfig);
     this.userProfileRepository = getRepository(UserProfile);
     this.advancementRepository = getRepository(Advancement);
+    this.subscriptionRepository = getRepository(Subscription);
     return this.connection;
   }
 
@@ -284,7 +288,9 @@ export class Database {
    * User profile
    ***************************************************************************/
   async allProfiles(): Promise<UserProfile[]> {
-    return await this.userProfileRepository.find();
+    return await this.userProfileRepository.find({
+      relations: [ 'subscriptions' ]
+    });
   }
   async findUserProfile(id: string): Promise<UserProfile> {
     return await this.userProfileRepository.findOne(id, {
@@ -376,5 +382,22 @@ export class Database {
     adv.pageNumber = pageNumber;
 
     await this.advancementRepository.save(adv);
+  }
+
+  /***************************************************************************
+   * Push subscriptions
+   ***************************************************************************/
+  async saveOrUpdateSubscription(profileId: string, sub: any) {
+    const profile = await this.userProfileRepository.findOne(profileId);
+    const subsciption = new Subscription();
+    subsciption.jsonData = JSON.stringify(sub);
+    subsciption.profile = profile;
+    return await this.subscriptionRepository.save(subsciption);
+  }
+  async removeSubscription(profileId: string, sub: any) {
+    await this.subscriptionRepository.delete(sub.id);
+  }
+  async findSubscriptionById(subId: string) {
+    return await this.subscriptionRepository.findOne(subId);
   }
 }

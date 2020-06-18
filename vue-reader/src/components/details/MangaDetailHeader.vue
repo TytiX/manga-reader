@@ -20,7 +20,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
-import { Manga, ScanSource, Chapter } from '@/models';
+import { Manga } from '@/models';
 
 @Component
 export default class MangaDetailHeader extends Vue {
