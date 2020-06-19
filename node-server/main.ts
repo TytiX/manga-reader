@@ -21,9 +21,10 @@ WebpushUtils.generateIfNotExist();
 
 const db = new Database();
 db.connect().then( () => {
-  scanAllSites(db);
+  // TODO: set to true
+  scanAllSites(db, false);
   cron.schedule('0 9,12,15,19 * * *', () => {
-    scanAllSites(db);
+    scanAllSites(db, false);
   }, {
     scheduled: true,
     timezone: 'Europe/Paris'

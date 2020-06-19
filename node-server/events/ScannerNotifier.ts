@@ -3,6 +3,9 @@ import { ScanSource, Chapter, Manga, ScannerConfig } from "../database/entity";
 import { WebpushUtils } from "../utils/WebpushUtils";
 import { scanChapter } from "../scanners/site-scanner";
 import logger from "../logger";
+import PQueue from "p-queue/dist";
+import * as Discord from 'discord.js';
+import { DiscordUtils } from "../utils/DiscordUtils";
 
 enum MessageType {
   progress = 'progress',
@@ -16,8 +19,23 @@ enum MessageType {
 export class ScannerNotifier {
   db: Database;
 
+  messageQueue: PQueue;
+  dClient: Discord.Client;
+
   constructor(db: Database) {
     this.db = db;
+    // queue
+    this.messageQueue = new PQueue({
+      concurrency: 1,
+      autoStart: false
+    });
+    // Discord
+    this.dClient = new Discord.Client();
+    this.dClient.on('ready', async () => {
+      // console.log(this.dClient.channels);
+      this.messageQueue.start();
+    });
+    this.dClient.login(DiscordUtils.getToken());
   }
 
   emit(msg: string, ...args: any[]) {
@@ -44,6 +62,13 @@ export class ScannerNotifier {
   }
 
   async newChapterNotif(source: ScanSource, chapter: Chapter) {
+    const embed = new Discord.MessageEmbed();
+    embed.setTitle(`Nouveau chapitre de ${source.manga.name}`)
+        .setDescription(`Chapitre ${chapter.number} disponible`)
+        .setImage(source.coverLink)
+        .setURL(`http://172.22.22.52:3000/#/manga/${source.manga.id}`);
+    this.messageQueue.add(() => this.sendNotificationMessage(DiscordUtils.ALL_UPDATE_CHANNEL_ID, embed));
+
     try {
       const profiles = await this.db.userProfileRepository.find({
         relations: [ 'favorites', 'subsciptions' ]
@@ -58,14 +83,17 @@ export class ScannerNotifier {
         }
       };
       for (const profile of profiles) {
-        const find = profile.favorites.find( m => {
-          return source.manga.id === m.id;
-        });
-        if (find) {
-          for (const subscription of profile.subscriptions) {
-            WebpushUtils.getWebpush().sendNotification(JSON.parse(subscription.jsonData), payloads);
+        if (profile.name === 'TytiX') {
+          const find = profile.favorites.find( m => {
+            return source.manga.id === m.id;
+          });
+          if (find) {
+            for (const subscription of profile.subscriptions) {
+              WebpushUtils.getWebpush().sendNotification(JSON.parse(subscription.jsonData), payloads);
+            }
+            this.messageQueue.add(() => this.sendNotificationMessage(DiscordUtils.MY_UPDATE_CHANNEL_ID, embed));
+            scanChapter(this.db, chapter.id);
           }
-          scanChapter(this.db, chapter.id);
         }
       }
     } catch(e) {
@@ -74,9 +102,19 @@ export class ScannerNotifier {
   }
 
   newMangaSource(manga: Manga, source: ScanSource) {
+    const embed = new Discord.MessageEmbed();
+    embed.setTitle(`Nouvelle source de ${source.manga.name}`)
+        .setDescription(`Source ${source.name} disponible`)
+        .setImage(source.coverLink)
+        .setURL(`http://172.22.22.52:3000/#/manga/${source.manga.id}`);
+    this.messageQueue.add(() => this.sendNotificationMessage(DiscordUtils.ALL_UPDATE_CHANNEL_ID, embed));
   }
 
   newManga(manga: Manga) {
+    const embed = new Discord.MessageEmbed();
+    embed.setTitle(`Nouveau Manga : ${manga.name}`)
+        .setURL(`http://172.22.22.52:3000/#/manga/${manga.id}`);
+    this.messageQueue.add(() => this.sendNotificationMessage(DiscordUtils.ALL_UPDATE_CHANNEL_ID, embed));
   }
 
   chapterScanFinish(chapter: Chapter) {
@@ -86,6 +124,13 @@ export class ScannerNotifier {
   }
 
   progress(progress: number, length: number) {
+  }
+
+  async sendNotificationMessage(channelId: string, embed: Discord.MessageEmbed) {
+    const channel = await this.dClient.channels.fetch(channelId);
+    if (channel) {
+      channel.send(embed);
+    }
   }
 
 }

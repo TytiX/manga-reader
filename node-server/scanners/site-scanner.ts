@@ -6,12 +6,12 @@ import { Scanner } from './Scanner';
 import { Database } from '../database/Database';
 import { ScannerConfig, Chapter } from '../database/entity';
 
-export default async (db: Database) => {
+export default async (db: Database, firstScan: boolean) => {
 
   const configs = await db.allConfigs()
   for (const scanerConfig of configs) {
     const scanner = new Scanner(db, scanerConfig);
-    scanner.scanMangas(false);
+    scanner.scanMangas(firstScan);
   }
 }
 

@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { Database } from '../database/Database';
 import { scanChapter, scanChapters, getDefaultConfigs } from '../scanners/site-scanner';
 import { Scanner } from '../scanners/Scanner';
-import { Not } from 'typeorm';
 import { WebpushUtils } from '../utils/WebpushUtils';
 
 export default (db: Database) => {
