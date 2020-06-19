@@ -25,6 +25,11 @@ export class ScannerConfig {
   @Column({ nullable: true })
   mangaCoverXpath: string;
   @Column({ nullable: true })
+  mangaCategoriesXpath: string;
+  @Column({ nullable: true })
+  mangaTagsXpath: string;
+
+  @Column({ nullable: true })
   chapterEnclosingXpath: string;
   @Column({ nullable: true })
   chapterLinkRelativeXpath: string;

@@ -9,6 +9,7 @@ import { Database } from '../database/Database';
 import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
 import { UrlUtils } from '../utils/UrlUtils';
 import { ScannerNotifier } from '../events/ScannerNotifier';
+import { text } from 'body-parser';
 
 export class Scanner {
   config: ScannerConfig;
@@ -87,7 +88,7 @@ export class Scanner {
 
     const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
 
-    await this.updateScanSource(source, doc, false);
+    await this.updateScanSource(source, doc, true);
 
     await this.scanMangaChapters(manga, source, doc, true, firstScan);
   }
@@ -114,16 +115,27 @@ export class Scanner {
     }
 
     if (updateTags) {
+      const tags: string[] = [];
       // manga genders
-      const genderNodes = xpath.select('/html/body/div[1]/div/div[1]/div/div[1]/div[2]/dl/dd[7]/a/text()', doc);
-      for (const genderNode of genderNodes) {
-        logger.debug(`gender: ${genderNode.nodeValue}`);
+      if (this.config.mangaCategoriesXpath && this.config.mangaCategoriesXpath !== '') {
+        const genderNodes = xpath.select(this.config.mangaCategoriesXpath, doc);
+        for (const genderNode of genderNodes) {
+          // logger.debug(`gender: ${genderNode.nodeValue}`);
+          // TODO: cleanup value...
+          tags.push(genderNode.nodeValue);
+        }
       }
       // get manga tags
-      const tagNodes = xpath.select('//dd[@class=\'tag-links\']/a/text()', doc);
-      for (const tagNode of tagNodes) {
-        logger.debug(`tags: ${tagNode.nodeValue}`);
+      if (this.config.mangaTagsXpath && this.config.mangaTagsXpath !== '') {
+        const tagNodes = xpath.select(this.config.mangaTagsXpath, doc);
+        for (const tagNode of tagNodes) {
+          // logger.debug(`tags: ${tagNode.nodeValue}`);
+          // TODO: cleanup value...
+          tags.push(tagNode.nodeValue);
+        }
       }
+
+      console.log(tags);
     }
 
     if (updated) {

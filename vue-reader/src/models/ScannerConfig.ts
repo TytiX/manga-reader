@@ -12,6 +12,9 @@ export interface ScannerConfig {
 
   mangaDescriptionXpath?: string;
   mangaCoverXpath?: string;
+  mangaCategoriesXpath?: string;
+  mangaTagsXpath?: string;
+
   chapterEnclosingXpath?: string;
   chapterLinkRelativeXpath?: string;
   chapterNumberTextRelativeXpath?: string;

@@ -3,7 +3,6 @@ import {createConnection, Connection, getRepository, Repository, In} from 'typeo
 import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
 import logger from '../logger';
 import { UserProfile } from './entity/UserProfile';
-import { Gender } from './entity/Gender';
 import { Tag } from './entity/Tag';
 import { Advancement } from './entity/Advancement';
 import { Subscription } from './entity/Subscription';
@@ -29,7 +28,6 @@ export class Database {
       // logging: true,
       entities: [
         Manga,
-        Gender,
         Tag,
         ScanSource,
         Chapter,

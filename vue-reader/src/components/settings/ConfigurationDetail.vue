@@ -37,6 +37,15 @@
         <b-form-input v-model="config.mangaCoverXpath" trim></b-form-input>
       </b-form-group>
       <b-form-group
+        label="Manga Name Relative Xpath">
+        <b-form-input v-model="config.mangaCategoriesXpath" trim></b-form-input>
+      </b-form-group>
+      <b-form-group
+        label="Manga Name Relative Xpath">
+        <b-form-input v-model="config.mangaTagsXpath" trim></b-form-input>
+      </b-form-group>
+
+      <b-form-group
         label="Chapter Enclosing Xpath">
         <b-form-input v-model="config.chapterEnclosingXpath" trim></b-form-input>
       </b-form-group>

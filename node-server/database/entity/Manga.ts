@@ -8,7 +8,6 @@ import {
 
 import { ScanSource } from './Sources';
 import { Tag } from './Tag';
-import { Gender } from './Gender';
 import { UserProfile } from './UserProfile';
 
 @Entity()
@@ -30,8 +29,4 @@ export class Manga {
   @ManyToMany(type => Tag, tag => tag.mangas)
   @JoinTable()
   tags: Tag[];
-
-  @ManyToMany(type => Gender, gender => gender.mangas)
-  @JoinTable()
-  genders: Gender[];
 }
