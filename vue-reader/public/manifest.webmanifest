@@ -1,0 +1,17 @@
+{
+  "short_name": "Manga Reader",
+  "name": "Manga Reader",
+  "description": "Application pour lecture de manga",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#343a40",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#343a40"
+}
