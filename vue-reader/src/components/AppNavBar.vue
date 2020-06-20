@@ -19,6 +19,7 @@
         <b-list-group class="w-100">
           <b-list-group-item to="/">Favoris</b-list-group-item>
           <b-list-group-item to="/mangas">All mangas</b-list-group-item>
+          <b-list-group-item to="/filtres">Filtres</b-list-group-item>
         </b-list-group>
       </div>
     </b-sidebar>

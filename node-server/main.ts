@@ -20,7 +20,7 @@ app.use( '/', express.static('public'));
 WebpushUtils.generateIfNotExist();
 
 const db = new Database();
-db.connect().then( () => {
+db.connect().then( async () => {
   // TODO: set to true
   scanAllSites(db, false);
   cron.schedule('0 9,12,15,19 * * *', () => {
@@ -31,6 +31,9 @@ db.connect().then( () => {
   });
 
   app.use('/api', apiRoutes(db));
+
+  const tags = await db.findTagsByValues(['Action'])
+  console.log(tags);
 });
 
 // start the express server

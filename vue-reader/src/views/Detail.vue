@@ -40,6 +40,7 @@ export default class Detail extends Vue {
   manga: Manga = {
     id: '',
     name: '',
+    tags: [],
     sources: []
   };
   favorites: Manga[] = [];

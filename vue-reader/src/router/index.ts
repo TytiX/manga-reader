@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 
 import Favorites from '../views/Favorites.vue'
+import Filters from '../views/Filters.vue'
 import Home from '../views/Home.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
@@ -13,6 +14,11 @@ Vue.use(VueRouter)
     path: '/',
     name: 'Fav',
     component: Favorites
+  },
+  {
+    path: '/filtres',
+    name: 'Filtre',
+    component: Filters
   },
   {
     path: '/mangas',
@@ -36,6 +42,14 @@ Vue.use(VueRouter)
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/Settings.vue')
+  },
+  {
+    path: '/manage-tags',
+    name: 'ManageTags',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../components/settings/TagsListEditor.vue')
   },
   {
     path: '/settings/:id',

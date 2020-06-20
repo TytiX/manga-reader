@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  OneToMany,
+  ManyToOne } from 'typeorm';
 import { Manga } from './Manga';
 
 @Entity()
@@ -7,6 +13,25 @@ export class Tag {
   id: number;
   @Column({ unique: true })
   name: string;
+
+  @OneToMany(type => TagValue, value => value.tag, {
+    onDelete: 'CASCADE'
+  })
+  values: TagValue[];
+
   @ManyToMany(type => Manga, manga => manga.tags)
   mangas: Manga[];
+}
+
+@Entity()
+export class TagValue {
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
+  value: string;
+
+  @ManyToOne(type => Tag, tag => tag.values, {
+    onDelete: 'CASCADE'
+  })
+  tag: Tag;
 }

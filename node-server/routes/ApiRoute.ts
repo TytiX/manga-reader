@@ -3,6 +3,7 @@ import { Database } from '../database/Database';
 import { scanChapter, scanChapters, getDefaultConfigs } from '../scanners/site-scanner';
 import { Scanner } from '../scanners/Scanner';
 import { WebpushUtils } from '../utils/WebpushUtils';
+import { IsNull } from 'typeorm';
 
 export default (db: Database) => {
 
@@ -206,6 +207,39 @@ export default (db: Database) => {
     let subscription = req.body;
     subscription = await db.removeSubscription(req.params.profileId, subscription);
     res.send(subscription);
+  });
+  /***************************************************************************
+   * Tags
+   ***************************************************************************/
+  router.get('/tag', async (req, res) => {
+    res.send(
+      await db.findTags()
+     );
+  });
+  router.post('/tag', async (req, res) => {
+    const tags = req.body;
+    for (const tag of tags) {
+      await db.tagRepository.save(tag);
+    }
+    res.send({ status: 'ok'});
+  });
+  router.get('/tag/cleanup', async (req, res) => {
+    const tags = await db.findTags();
+    for (const tag of tags) {
+      if (tag.values.length === 0) {
+        const del = await db.tagRepository.delete(tag.id);
+      }
+    }
+    const del = await db.tagValueRepository.delete({
+      tag: IsNull()
+    });
+    res.send({
+      status: 'ok',
+      tag: await db.findTags(),
+      tagValue: await db.tagValueRepository.find({
+        relations: [ 'tag' ]
+      })
+    });
   });
 
   return router;

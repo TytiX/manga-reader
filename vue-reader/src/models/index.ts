@@ -6,3 +6,4 @@ export * from './ScannerConfig';
 export * from './Advancement';
 export * from './UserProfile';
 export * from './Subscription';
+export * from './Tag';

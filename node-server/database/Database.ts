@@ -1,9 +1,9 @@
-import {createConnection, Connection, getRepository, Repository, In} from 'typeorm';
+import {createConnection, Connection, getRepository, Repository, In, Equal, createQueryBuilder} from 'typeorm';
 
 import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
 import logger from '../logger';
 import { UserProfile } from './entity/UserProfile';
-import { Tag } from './entity/Tag';
+import { Tag, TagValue } from './entity/Tag';
 import { Advancement } from './entity/Advancement';
 import { Subscription } from './entity/Subscription';
 
@@ -17,6 +17,8 @@ export class Database {
   userProfileRepository: Repository<UserProfile>;
   advancementRepository: Repository<Advancement>;
   subscriptionRepository: Repository<Subscription>;
+  tagRepository: Repository<Tag>;
+  tagValueRepository: Repository<TagValue>;
 
   constructor() { }
 
@@ -29,6 +31,7 @@ export class Database {
       entities: [
         Manga,
         Tag,
+        TagValue,
         ScanSource,
         Chapter,
         Page,
@@ -46,6 +49,8 @@ export class Database {
     this.userProfileRepository = getRepository(UserProfile);
     this.advancementRepository = getRepository(Advancement);
     this.subscriptionRepository = getRepository(Subscription);
+    this.tagRepository = getRepository(Tag);
+    this.tagValueRepository = getRepository(TagValue);
     return this.connection;
   }
 
@@ -397,5 +402,56 @@ export class Database {
   }
   async findSubscriptionById(subId: string) {
     return await this.subscriptionRepository.findOne(subId);
+  }
+  
+  /***************************************************************************
+   * Tags
+   ***************************************************************************/
+  async findTags() {
+    return await this.tagRepository.find({
+      relations: [ 'values' ]
+    });
+  }
+  async associateMangaWithTags(m: Manga, values: string[]) {
+    const manga = await this.mangaRepository.findOne(m.id, {
+      relations: [ 'tags' ]
+    });
+    const tags = await this.findTagsByValues(values);
+    console.log(tags);
+    for (const tag of tags) {
+      const found = manga.tags.find(t => t.id === tag.id);
+      if (!found) {
+        manga.tags.push(tag);
+      }
+    }
+    return await this.mangaRepository.save(manga);
+  }
+  async findTagsByValues(values: string[]) {
+    const tags: Tag[] = []
+    for (const value of values) {
+      let tag = await this.findTagByValue(value);
+      if (!tag) {
+        tag = await this.createTagFromValue(value);
+      }
+      tags.push(tag);
+    }
+    return tags;
+  }
+  async findTagByValue(value: string) {
+    const tag = await createQueryBuilder<Tag>('Tag', 'tag')
+                  .leftJoinAndSelect('tag.values', 'tag_value')
+                  .where('tag_value.value = :name', { name: value })
+                  .getOne();
+    return tag;
+  }
+  async createTagFromValue(value: string) {
+    let tag = new Tag();
+    tag.name = value;
+    tag = await this.tagRepository.save(tag);
+    let tagValue = new TagValue();
+    tagValue.value = value;
+    tagValue.tag = tag;
+    tagValue = await this.tagValueRepository.save(tagValue);
+    return this.tagRepository.findOne(tag.id);
   }
 }

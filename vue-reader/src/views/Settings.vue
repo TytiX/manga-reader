@@ -17,6 +17,10 @@
         @delete-push="deletePush">
       </UserProfileList>
     </div>
+    <div class="card container mt-3">
+      <h3>Tags</h3>
+      <b-button to="/manage-tags">Manage tags</b-button>
+    </div>
   </div>
 </template>
 

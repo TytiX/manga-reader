@@ -33,7 +33,7 @@ export class ScannerNotifier {
     this.dClient = new Discord.Client();
     this.dClient.on('ready', async () => {
       // console.log(this.dClient.channels);
-      this.messageQueue.start();
+      // this.messageQueue.start();
     });
     this.dClient.login(DiscordUtils.getToken());
   }
