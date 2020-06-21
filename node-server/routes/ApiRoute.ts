@@ -3,7 +3,8 @@ import { Database } from '../database/Database';
 import { scanChapter, scanChapters, getDefaultConfigs } from '../scanners/site-scanner';
 import { Scanner } from '../scanners/Scanner';
 import { WebpushUtils } from '../utils/WebpushUtils';
-import { IsNull } from 'typeorm';
+import { IsNull, In } from 'typeorm';
+import { Tag } from '../database/entity/Tag';
 
 export default (db: Database) => {
 
@@ -16,6 +17,11 @@ export default (db: Database) => {
     res.send(
       await db.allMangas()
     );
+  });
+  router.post('/manga/search', async function(req, res) {
+    res.send(
+      await db.mangaByTags(req.body.tags)
+    )
   });
   router.get('/manga/:id', async function(req, res) {
     res.send(
@@ -86,7 +92,6 @@ export default (db: Database) => {
     );
   });
   router.post('/chapter/scan', async function(req, res) {
-    console.log(req.body);
     scanChapters(db, req.body);
     res.send({
       status: 'running'
@@ -213,15 +218,20 @@ export default (db: Database) => {
    ***************************************************************************/
   router.get('/tag', async (req, res) => {
     res.send(
+      await db.allTags()
+     );
+  });
+  router.get('/tag/values', async (req, res) => {
+    res.send(
       await db.findTags()
      );
   });
   router.post('/tag', async (req, res) => {
-    const tags = req.body;
+    const tags: Tag[] = req.body;
     for (const tag of tags) {
       await db.tagRepository.save(tag);
     }
-    res.send({ status: 'ok'});
+    res.send( {status: 'ok'} );
   });
   router.get('/tag/cleanup', async (req, res) => {
     const tags = await db.findTags();

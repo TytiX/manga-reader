@@ -15,6 +15,7 @@ export class Tag {
   name: string;
 
   @OneToMany(type => TagValue, value => value.tag, {
+    onUpdate: 'CASCADE',
     onDelete: 'CASCADE'
   })
   values: TagValue[];
@@ -30,8 +31,6 @@ export class TagValue {
   @Column()
   value: string;
 
-  @ManyToOne(type => Tag, tag => tag.values, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(type => Tag, tag => tag.values)
   tag: Tag;
 }

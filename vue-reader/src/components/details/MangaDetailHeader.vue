@@ -14,13 +14,18 @@
       </b-col>
       <b-col class="chapter-desc">{{description}}</b-col>
     </b-row>
+    <b-row>
+      <b-col>
+        <span class="tag" v-for="tag of tags" :key="tag.id">{{tag.name}}</span>
+      </b-col>
+    </b-row>
   </b-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
-import { Manga } from '@/models';
+import { Manga, Tag } from '@/models';
 
 @Component
 export default class MangaDetailHeader extends Vue {
@@ -29,6 +34,7 @@ export default class MangaDetailHeader extends Vue {
 
   covers: string[] = [];
   description = '';
+  tags: Tag[] = [];
 
   created() {
     this.reinit();
@@ -42,7 +48,11 @@ export default class MangaDetailHeader extends Vue {
     this.covers = this.manga.sources.map( s => {
       return s.coverLink;
     });
+    if (this.covers.length === 0) {
+      this.covers = ['assets/no-cover.png'];
+    }
     this.pickRandomDesc();
+    this.tags = this.manga.tags;
   }
 
   pickRandomDesc() {
@@ -62,5 +72,17 @@ export default class MangaDetailHeader extends Vue {
 .chapter-desc {
   max-height: 350px;
   overflow: auto;
+}
+.tag {
+  background-color: #767676;
+  border-radius: 0 2px 2px 0;
+  color: #fff;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2727272727;
+  margin: 2px 4px 2px 10px;
+  padding: 3px 7px;
+  position: relative;
 }
 </style>

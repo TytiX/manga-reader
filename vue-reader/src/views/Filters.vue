@@ -1,13 +1,15 @@
 <template>
   <div>
     <AppNavBar title="Search"></AppNavBar>
-    <TagList :tags="tags"></TagList>
-    <!-- <MangaList
+    <TagList
+      :tags="tags"
+      @selected-tags="selectTags"></TagList>
+    <MangaList
       :mangas="mangas"
-      :favorites="mangas"
+      :favorites="favorites"
       @fav="fav"
       @unfav="unfav">
-    </MangaList> -->
+    </MangaList>
   </div>
 </template>
 
@@ -17,22 +19,57 @@ import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
 import TagList from '@/components/TagList.vue';
-import { Tag } from '@/models';
+import MangaList from '@/components/MangaList.vue';
+import { Tag, Manga } from '@/models';
 
 @Component({
   components: {
     AppNavBar,
-    TagList
+    TagList,
+    MangaList
   }
 })
 export default class Favorites extends Vue {
   tags: Tag[] = [];
+  mangas: Manga[] = [];
+  favorites: Manga[] = [];
+
+  selectedTags: Tag[] = [];
+
   mounted() {
     this.reloadTags();
   }
   reloadTags() {
     axios.get('/api/tag').then( response => {
       this.tags = response.data;
+    });
+  }
+  reloadFavorites() {
+    axios.get('/api/favorites/' + this.$currentProfile).then( response => {
+      this.favorites = response.data;
+    });
+  }
+
+  reloadMangas() {
+    axios.post('/api/manga/search', { tags: this.selectedTags }).then( res => {
+      this.mangas = res.data;
+    });
+  }
+
+  selectTags(tags: Tag[]) {
+    this.selectedTags = tags;
+    console.log(this.selectedTags);
+    this.reloadMangas();
+  }
+
+  fav(mangaId: string) {
+    this.$addToFavorite(mangaId).then( () => {
+      this.reloadFavorites();
+    });
+  }
+  unfav(mangaId: string) {
+    this.$removeFromFavorite(mangaId).then( () => {
+      this.reloadFavorites();
     });
   }
 }

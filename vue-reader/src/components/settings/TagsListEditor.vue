@@ -16,6 +16,7 @@
                   v-for="value of tag.values"
                   :key="tag.id + '-' + value.id">
                   {{value.value}}
+                  <i @click="deleteValueFromTag(tag, value)"><b-icon icon="x"></b-icon></i>
                 </div>
               </draggable>
             </b-row>
@@ -32,7 +33,7 @@ import axios from 'axios';
 import draggable from 'vuedraggable'
 
 import AppNavBar from '@/components/AppNavBar.vue';
-import { Tag } from '@/models/Tag';
+import { Tag, TagValue } from '@/models';
 
 @Component({
   components: {
@@ -48,7 +49,7 @@ export default class TagsListEditor extends Vue {
   }
 
   realoadTags() {
-    axios.get('/api/tag').then( res => {
+    axios.get('/api/tag/values').then( res => {
       this.tags = res.data;
     });
   }
@@ -60,6 +61,13 @@ export default class TagsListEditor extends Vue {
         this.realoadTags();
       });
     });
+  }
+
+  deleteValueFromTag(tag: Tag, value: TagValue) {
+    const index = tag.values.findIndex(v => v.id === value.id);
+    if (index > -1) {
+      tag.values.splice(index, 1);
+    }
   }
 }
 </script>

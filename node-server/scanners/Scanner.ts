@@ -134,10 +134,7 @@ export class Scanner {
           tags.push(tagNode.nodeValue);
         }
       }
-
-      console.log(source.manga, tags);
-      const m = await this.database.associateMangaWithTags(source.manga, tags);
-      console.log(m);
+      await this.database.associateMangaWithTags(source.manga, tags);
     }
 
     if (updated) {

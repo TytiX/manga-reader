@@ -29,20 +29,27 @@ export default class MangaListItem extends Vue {
 
   try = 0;
   coverUrl!: string;
+  static readonly CoverNotFoundUrl = 'assets/no-cover.png';
 
   created() {
     this.pickRandomCoverUrl();
   }
 
   pickRandomCoverUrl() {
-    const sourceLength = this.manga.sources.length;
-    const index = Math.floor( Math.random() * sourceLength );
-    const url = this.manga.sources[index].coverLink;
-    if (this.isURL(url)) {
-      this.coverUrl = url;
-    } else if (this.try < 5) {
-      this.try++;
-      this.pickRandomCoverUrl();
+    if (this.manga.sources && this.manga.sources.length > 0) {
+      const sourceLength = this.manga.sources.length;
+      const index = Math.floor( Math.random() * sourceLength );
+      const url = this.manga.sources[index].coverLink;
+      if (url && this.isURL(url)) {
+        this.coverUrl = url;
+      } else if (this.try < 5) {
+        this.try++;
+        this.pickRandomCoverUrl();
+      } else {
+        this.coverUrl = MangaListItem.CoverNotFoundUrl;
+      }
+    } else {
+      this.coverUrl = MangaListItem.CoverNotFoundUrl;
     }
   }
 

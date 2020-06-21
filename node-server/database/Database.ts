@@ -54,20 +54,64 @@ export class Database {
     return this.connection;
   }
 
+  /***************************************************************************
+   * Mangas
+   ***************************************************************************/
   async allMangas(): Promise<Manga[]> {
     return await this.mangaRepository.find({
-      relations: ['sources', 'sources.scannerConfig'],
+      relations: ['sources', 'sources.scannerConfig', 'tags'],
       order: {
         'name': 'ASC'
       }
     });
   }
+  async mangaByTags(tags: Tag[]): Promise<Manga[]> {
+    const ids = tags.map(t => t.id);
+    const query = createQueryBuilder<Manga>('Manga', 'manga')
+                  .innerJoinAndSelect('manga.tags', 'tag')
+                  .leftJoinAndSelect('manga.sources', 'source')
+                  .leftJoinAndSelect('source.scannerConfig', 'scannerConfig')
+                  .orderBy('manga.name', 'ASC');
+    for (const [pos, tag] of tags.entries()) {
+      if (pos === 0) {
+        query.where('tag.id = (:'+pos+')', { [pos]: tag.id });
+      } else {
+        query.andWhere('tag.id = (:'+pos+')', { [pos]: tag.id });
+      }
+    }
+    const mangas = await query.getMany();
+    return mangas;
+  }
   async findMangaById(id: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
-      relations: ['sources', 'sources.chapters'],
-      where: { id: id }
+      relations: ['sources', 'sources.chapters', 'tags'],
+      where: { id }
     });
   }
+  async createManga(name: string, source: { name: string; link: string; }, config: ScannerConfig): Promise<[Manga, ScanSource]> {
+    let manga = new Manga();
+    manga.name = name;
+    manga = await this.mangaRepository.save(manga);
+
+    let scanSource = new ScanSource();
+    scanSource.name = source.name;
+    scanSource.link = source.link;
+    scanSource.manga = manga;
+    scanSource.scannerConfig = config;
+    try {
+      scanSource = await this.sourceRepository.save(scanSource);
+    } catch (e) {
+      logger.error(e);
+    }
+
+    manga.sources = [scanSource];
+    manga = await this.mangaRepository.save(manga);
+
+    return [manga, scanSource];
+  }
+  /***************************************************************************
+   * Sources
+   ***************************************************************************/
   async findSourceById(id: string): Promise<ScanSource> {
     return await this.sourceRepository.findOne({
       relations: ['chapters', 'manga'],
@@ -94,27 +138,6 @@ export class Database {
     }
     return [manga, source];
   }
-  async createManga(name: string, source: { name: string; link: string; }, config: ScannerConfig): Promise<[Manga, ScanSource]> {
-    let manga = new Manga();
-    manga.name = name;
-    manga = await this.mangaRepository.save(manga);
-
-    let scanSource = new ScanSource();
-    scanSource.name = source.name;
-    scanSource.link = source.link;
-    scanSource.manga = manga;
-    scanSource.scannerConfig = config;
-    try {
-      scanSource = await this.sourceRepository.save(scanSource);
-    } catch (e) {
-      logger.error(e);
-    }
-
-    manga.sources = [scanSource];
-    manga = await this.mangaRepository.save(manga);
-
-    return [manga, scanSource];
-  }
   async addScanSourceToManga(manga: Manga, source: { name: string; link: string; }, config: ScannerConfig): Promise<[Manga, ScanSource]> {
     let scanSource = new ScanSource();
     scanSource.name = source.name;
@@ -125,6 +148,12 @@ export class Database {
     manga.sources.push(scanSource);
     return [await this.mangaRepository.save(manga), scanSource];
   }
+  async updateScanSource(source: ScanSource): Promise<ScanSource> {
+    return await this.sourceRepository.save(source);
+  }
+  /***************************************************************************
+   * Chapters
+   ***************************************************************************/
   async findChapterById(id: string): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne({
       relations: ['pages', 'source', 'source.manga'],
@@ -186,12 +215,7 @@ export class Database {
     chapter.scanned = true;
     return await this.chapterRepository.save(chapter);
   }
-  
-  async updateScanSource(source: ScanSource): Promise<ScanSource> {
-    return await this.sourceRepository.save(source);
-  }
 
-  
   /***************************************************************************
    * Chapters
    ***************************************************************************/
@@ -217,7 +241,6 @@ export class Database {
       }
     }
     return previous;
-
   }
   async findPreviousChapterById(chapterId: string) {
     const chapter = await this.chapterRepository.findOne(chapterId, {
@@ -407,9 +430,19 @@ export class Database {
   /***************************************************************************
    * Tags
    ***************************************************************************/
+  async allTags() {
+    return await this.tagRepository.find({
+      order: {
+        name: 'ASC'
+      }
+    });
+  }
   async findTags() {
     return await this.tagRepository.find({
-      relations: [ 'values' ]
+      relations: [ 'values' ],
+      order: {
+        name: 'ASC'
+      }
     });
   }
   async associateMangaWithTags(m: Manga, values: string[]) {
@@ -417,7 +450,6 @@ export class Database {
       relations: [ 'tags' ]
     });
     const tags = await this.findTagsByValues(values);
-    console.log(tags);
     for (const tag of tags) {
       const found = manga.tags.find(t => t.id === tag.id);
       if (!found) {

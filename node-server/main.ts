@@ -21,8 +21,8 @@ WebpushUtils.generateIfNotExist();
 
 const db = new Database();
 db.connect().then( async () => {
-  // TODO: set to true
-  scanAllSites(db, false);
+  // start on boot
+  // scanAllSites(db, false);
   cron.schedule('0 9,12,15,19 * * *', () => {
     scanAllSites(db, false);
   }, {
@@ -31,9 +31,6 @@ db.connect().then( async () => {
   });
 
   app.use('/api', apiRoutes(db));
-
-  const tags = await db.findTagsByValues(['Action'])
-  console.log(tags);
 });
 
 // start the express server
