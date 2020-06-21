@@ -32,7 +32,6 @@ export class ScannerNotifier {
     // Discord
     this.dClient = new Discord.Client();
     this.dClient.on('ready', async () => {
-      // TODO: do not commit comment
       this.messageQueue.start();
     });
     this.dClient.login(DiscordUtils.getToken());
@@ -71,7 +70,7 @@ export class ScannerNotifier {
 
     try {
       const profiles = await this.db.userProfileRepository.find({
-        relations: [ 'favorites', 'subsciptions' ]
+        relations: [ 'favorites', 'subscriptions' ]
       });
       const payloads = {
         title: `Nouveau chapitre de ${source.manga.name}`,
