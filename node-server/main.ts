@@ -22,7 +22,7 @@ WebpushUtils.generateIfNotExist();
 const db = new Database();
 db.connect().then( async () => {
   // start on boot
-  // scanAllSites(db, false);
+  scanAllSites(db, false);
   cron.schedule('0 9,12,15,19 * * *', () => {
     scanAllSites(db, false);
   }, {
