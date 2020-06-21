@@ -32,8 +32,8 @@ export class ScannerNotifier {
     // Discord
     this.dClient = new Discord.Client();
     this.dClient.on('ready', async () => {
-      // console.log(this.dClient.channels);
-      // this.messageQueue.start();
+      // TODO: do not commit comment
+      this.messageQueue.start();
     });
     this.dClient.login(DiscordUtils.getToken());
   }
