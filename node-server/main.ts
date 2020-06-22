@@ -21,6 +21,8 @@ WebpushUtils.generateIfNotExist();
 
 const db = new Database();
 db.connect().then( async () => {
+  app.use('/api', apiRoutes(db));
+
   // start on boot
   scanAllSites(db, false);
   cron.schedule('0 9,12,15,19 * * *', () => {
@@ -30,7 +32,6 @@ db.connect().then( async () => {
     timezone: 'Europe/Paris'
   });
 
-  app.use('/api', apiRoutes(db));
 });
 
 // start the express server
