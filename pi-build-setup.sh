@@ -4,7 +4,7 @@ docker build . -t abelliard/manga-reader:pi
 docker stop manga-reader
 docker rm manga-reader
 
-cp ~/manga-reader-pi/data/database.db ~/manga-reader-pi/data/database.db.bak
+cp /home/pi/manga-reader-pi/data/database.db /home/pi/manga-reader-pi/data/database.db.bak
 
 docker create \
   --name=manga-reader \
