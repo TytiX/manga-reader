@@ -12,15 +12,16 @@ module.exports = {
     name: 'Manga Reader',
     themeColor: '#343a40',
     msTileColor: '#343a40',
+    manifestPath: 'manifest.json',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
 
     // configure the workbox plugin
-    workboxPluginMode: 'InjectManifest',
-    workboxOptions: {
+    // workboxPluginMode: 'InjectManifest',
+    // workboxOptions: {
       // swSrc is required in InjectManifest mode.
-      swSrc: 'dev/sw.js',
+      // swSrc: 'dev/sw.js',
       // ...other Workbox options...
-    }
+    // }
   }
 };
