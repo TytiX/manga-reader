@@ -24,7 +24,7 @@ db.connect().then( async () => {
   app.use('/api', apiRoutes(db));
 
   // start on boot
-  scanAllSites(db, false);
+  scanAllSites(db, true);
   cron.schedule('0 9,12,15,19 * * *', () => {
     scanAllSites(db, false);
   }, {
