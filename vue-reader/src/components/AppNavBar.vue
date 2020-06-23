@@ -6,7 +6,7 @@
         <b-nav-item v-else @click="$router.back()"><b-icon icon="arrow-left-short"></b-icon></b-nav-item>
         <!-- <b-nav-item v-if="!isHome" to="/"><b-icon icon="house"></b-icon></b-nav-item> -->
       </b-navbar-nav>
-      <b-navbar-brand>{{title}}</b-navbar-brand>
+      <b-navbar-brand class="bar-title">{{title}}</b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <b-nav-form v-if="enableSearch">
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
@@ -46,5 +46,9 @@ export default class AppNavBar extends Vue {
 </script>
 
 <style>
-
+.bar-title {
+  max-width: calc( 100% - 36px - 36px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>

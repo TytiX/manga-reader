@@ -91,7 +91,6 @@ export default class Reader extends Vue {
 <style>
 .manga-title {
   max-width: calc( 100% - 183px - 16px - 36px);
-  /* width: calc( 100% - 183px - 16px - 36px); */
   overflow: hidden;
   text-overflow: ellipsis;
 }
