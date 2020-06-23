@@ -9,7 +9,6 @@ import { Database } from '../database/Database';
 import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
 import { UrlUtils } from '../utils/UrlUtils';
 import { ScannerNotifier } from '../events/ScannerNotifier';
-import { text } from 'body-parser';
 
 export class Scanner {
   config: ScannerConfig;
