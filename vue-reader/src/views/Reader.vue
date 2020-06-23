@@ -1,8 +1,11 @@
 <template>
   <div>
     <b-navbar type="dark" variant="dark">
+      <b-navbar-brand v-if="loaded" class="manga-title">
+        {{chapter.source.manga.name}} 
+      </b-navbar-brand>
       <b-navbar-brand v-if="loaded">
-        {{chapter.source.manga.name}} - chapter {{chapter.number}} - {{page + 1}} / {{pages.length}}
+        - chapter {{chapter.number}} - {{page + 1}} / {{pages.length}}
       </b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <b-nav-item @click="closeReader"><b-icon icon="x"></b-icon></b-nav-item>
@@ -86,6 +89,12 @@ export default class Reader extends Vue {
 </script>
 
 <style>
+.manga-title {
+  max-width: calc( 100% - 183px - 16px - 36px);
+  /* width: calc( 100% - 183px - 16px - 36px); */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .close {
   position: absolute;
   top: 5px;
