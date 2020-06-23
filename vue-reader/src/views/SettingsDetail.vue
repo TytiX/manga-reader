@@ -39,7 +39,7 @@ export default class SettingsDetail extends Vue {
         this.config = response.data;
       });
     } else {
-      axios.get('/api/default/configuration').then( response => {
+      axios.get('/api/configuration/default').then( response => {
         this.defaultConfigs = response.data.map( (c: ScannerConfig) => {
           return { value: c, text: c.name};
         });
