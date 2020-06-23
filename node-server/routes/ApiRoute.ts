@@ -37,7 +37,7 @@ export default (db: Database) => {
     router.get('/favorites/:profileId', async (req, res) => {
       res.send(await db.getFavorites(req.params.profileId));
     });
-    router.use('userprofile', UserProfileRoutes(db));
+    router.use('/userprofile', UserProfileRoutes(db));
     /***************************************************************************
      * Web push
      ***************************************************************************/
