@@ -4,7 +4,7 @@
       <b-form-select v-model="selectedSource" :options="optionsSources"></b-form-select>
     </b-row>
     <b-row class="mb-3">
-      <b-button-group class="col" pill>
+      <b-button-group class="col-5" pill>
         <b-button
           @click.prevent="scanChapters(...chapters)"
           variant="warning">
@@ -19,7 +19,10 @@
           <b-icon icon="cloud-download"></b-icon>
         </b-button>
       </b-button-group>
-      <div class="col">
+      <div class="col-5">
+        <b-form-select v-model="selectedReadMode" :options="readingOptions"></b-form-select>
+      </div>
+      <div class="col-2">
         <b-button v-if="!isFavorite">
           <b-icon @click="fav()" icon="heart"></b-icon>
         </b-button>
@@ -63,19 +66,27 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import { Manga, ScanSource, Chapter } from '@/models';
 
 @Component
-export default class MangaDetailHeader extends Vue {
+export default class MangaSourceChapters extends Vue {
   @Prop()
   manga!: Manga;
   @Prop({ default: false })
   isFavorite!: boolean;
 
   chapters: Chapter[] = [];
-  optionsSources: { value: ScanSource; text: string }[] = [];
+
   selectedSource!: ScanSource;
+  optionsSources: { value: ScanSource; text: string }[] = [];
+
+  selectedReadMode!: string;
+  readingOptions = [
+    {value: 'normal', text: 'normal'},
+    {value: 'vertical', text: 'vertical'}
+  ]
 
   created() {
     this.reinit();
   }
+
   @Watch('manga')
   mangaChange() {
     this.reinit();
@@ -84,6 +95,11 @@ export default class MangaDetailHeader extends Vue {
   changeScanSource() {
     this.reloadChapters();
   }
+  @Watch('selectedReadMode')
+  changeReadMode() {
+    console.log(this.selectedSource, this.selectedReadMode);
+    this.$emit('read-mode', this.selectedSource, this.selectedReadMode);
+  }
 
   reinit() {
     this.optionsSources = this.manga.sources.map( s => {
@@ -91,6 +107,7 @@ export default class MangaDetailHeader extends Vue {
     });
     this.selectedSource = this.manga.sources[0];
     this.reloadChapters();
+    this.selectedReadMode = this.selectedSource.reading;
   }
 
   reloadChapters() {
@@ -114,6 +131,13 @@ export default class MangaDetailHeader extends Vue {
   }
   downloadChapters(...chapters: Chapter[]) {
     this.$emit('download-chapters', chapters);
+  }
+
+  fav() {
+    this.$emit('fav')
+  }
+  unfav() {
+    this.$emit('unfav')
   }
 
 }

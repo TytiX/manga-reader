@@ -9,32 +9,20 @@ export class ScanSource {
   id: string;
   @Column()
   name: string;
-  @Column({
-    unique: true
-  })
+  @Column({ unique: true })
   link: string;
 
-  @Column({
-    nullable: true
-  })
+  @Column({ nullable: true })
   coverLink: string;
-  @Column({
-    nullable: true
-  })
+  @Column({ nullable: true })
   description: string;
+  @Column({ default: 'normal' })
+  reading: string;
 
-  @ManyToOne(type => Manga, manga => manga.sources, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(type => Manga, manga => manga.sources, { onDelete: 'CASCADE' })
   manga: Manga;
-
-  @ManyToOne(type => ScannerConfig, config => config.sources, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(type => ScannerConfig, config => config.sources, { onDelete: 'CASCADE' })
   scannerConfig: ScannerConfig;
-  
-  @OneToMany(type => Chapter, chapter => chapter.source, {
-    onDelete: 'DEFAULT'
-  })
+  @OneToMany(type => Chapter, chapter => chapter.source, { onDelete: 'DEFAULT' })
   chapters: Chapter[];
 }

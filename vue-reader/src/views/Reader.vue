@@ -14,6 +14,7 @@
     <MangaReader
       :pages="pages"
       :loadPageIndex="loadPage"
+      :readingMode="chapter.source.reading"
       @next-chapter="nextChapter"
       @previous-chapter="previousChapter"
       @page-change="pageChanged">

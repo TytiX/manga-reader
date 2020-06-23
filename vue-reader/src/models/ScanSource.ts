@@ -9,6 +9,8 @@ export interface ScanSource {
   coverLink: string;
   description: string;
 
+  reading: string;
+
   manga: Manga;
   scannerConfig: ScannerConfig;
   chapters: Chapter[];

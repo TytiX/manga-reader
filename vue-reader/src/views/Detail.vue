@@ -8,6 +8,9 @@
         <MangaSourceChapters
           :manga="manga"
           :isFavorite="isInFavorites"
+          @fav="fav"
+          @unfav="unfav"
+          @read-mode="changeReadMode"
           @scan-chapters="scanChapters"
           @cache-chapters-on-server="cacheOnServer"
           @download-chapters="downloadChapters">
@@ -26,7 +29,7 @@ import AppNavBar from '@/components/AppNavBar.vue';
 import MangaDetailHeader from '@/components/details/MangaDetailHeader.vue';
 import MangaDetailAdvancement from '@/components/details/MangaDetailAdvancement.vue';
 import MangaSourceChapters from '@/components/details/MangaSourceChapters.vue';
-import { Manga, Chapter, Advancement } from '@/models';
+import { Manga, ScanSource, Chapter, Advancement } from '@/models';
 
 @Component({
   components: {
@@ -60,6 +63,13 @@ export default class Detail extends Vue {
 
   get isInFavorites() {
     return this.favorites && this.favorites.findIndex(m => this.manga.id === m.id) != -1;
+  }
+
+  changeReadMode(source: ScanSource, mode: string) {
+    console.log(source, mode);
+    axios.post(`/api/source/${source.id}/readmode`, mode).then( () => {
+      // readmode changed
+    });
   }
 
   scanChapters(chapters: Chapter[]) {

@@ -1,15 +1,22 @@
 <template>
   <div>
-    <v-zoomer-gallery
-      style="width: 100vw; height: calc(100vh - 56px);"
-      :list="pages"
-      v-model="selIndex">
-    </v-zoomer-gallery>
-    
-    <div class="back pad"
-      @click="pageBack"></div>
-    <div class="next pad"
-      @click="pageNext"></div>
+    <div v-if="readingMode === 'normal'">
+      <v-zoomer-gallery
+        style="width: 100vw; height: calc(100vh - 56px);"
+        :list="pages"
+        v-model="selIndex">
+      </v-zoomer-gallery>
+      
+      <div class="back pad"
+        @click="pageBack"></div>
+      <div class="next pad"
+        @click="pageNext"></div>
+    </div>
+    <div v-else-if="readingMode === 'vertical'">
+      <img v-for="page of pages"
+        :key="page"
+        :src="page"/>
+    </div>
   </div>
 </template>
 
@@ -25,6 +32,8 @@ export default class MangaReader extends Vue {
   @Prop()
   loadPageIndex!: number;
   selIndex = 0;
+  @Prop({ default: 'normal' })
+  readingMode!: string;
 
   @Watch('selIndex')
   pageChange() {
