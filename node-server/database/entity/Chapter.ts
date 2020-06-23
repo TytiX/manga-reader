@@ -2,11 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   ManyToOne,
-  CreateDateColumn, 
+  CreateDateColumn,
   UpdateDateColumn} from 'typeorm';
-import { Page } from './Page';
 import { ScanSource } from './Sources';
 
 @Entity()
@@ -43,6 +41,10 @@ export class Chapter {
   })
   source: ScanSource;
 
-  @OneToMany(type => Page, page => page.chapter)
-  pages: Page[];
+  @Column({ nullable: true })
+  jsonPages: string;
+
+  get pages() {
+    return this.jsonPages ? JSON.parse(this.jsonPages) : null;
+  }
 }

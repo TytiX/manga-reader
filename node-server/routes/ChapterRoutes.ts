@@ -29,9 +29,11 @@ export default (db: Database) => {
     );
   });
   router.get('/:id', async function(req, res) {
-    res.send(
-      await db.findChapterById(req.params.id)
-    );
+    const chapter = await db.findChapterById(req.params.id)
+    res.send( {
+      ...chapter,
+      pages: chapter.pages
+    } );
   });
   router.get('/:id/next', async function(req, res) {
     res.send(
@@ -49,7 +51,7 @@ export default (db: Database) => {
     );
   });
   router.post('/scan', async function(req, res) {
-    scanChapters(db, req.body);
+    scanChapters(req.body);
     res.send({
       status: 'running'
     });

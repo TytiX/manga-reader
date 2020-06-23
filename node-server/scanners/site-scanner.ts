@@ -1,10 +1,17 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as walkSync from 'walk-sync';
+import { DOMParser } from 'xmldom';
+import * as xpath from 'xpath';
+import axios from 'axios';
+
+import logger from '../logger';
+import { UrlUtils } from '../utils/UrlUtils';
 
 import { Scanner } from './Scanner';
 import { Database } from '../database/Database';
-import { ScannerConfig, Chapter } from '../database/entity';
+import { ScannerConfig, Chapter, Page } from '../database/entity';
+import { ScannerNotifier } from '../events/ScannerNotifier';
 
 export default async (firstScan: boolean) => {
   // get all configuration on a new connection...
@@ -33,16 +40,42 @@ export function getDefaultConfigs() {
 export async function scanChapters(chapters: Chapter[]) {
   const db = new Database();
   db.connect().then( async () => {
+    const notifier = new ScannerNotifier(db);
     for (const chapter of chapters) {
-      await scanChapter(db, chapter.id);
+      await scanChapter(db, notifier, chapter.id);
     }
   });
 }
 
-export async function scanChapter(db: Database, chapterId: string) {
-  const scanner = new Scanner(db);
+export async function scanChapter(db: Database, notifier: ScannerNotifier, chapterId: string) {
+  const chapter = await db.findChapterById(chapterId);
 
-  const chapter = await scanner.database.findChapterById(chapterId);
+  let foundPage = true;
+  let currentPage = 1;
+  const pages: Page[] = [];
+  // iterate over pages until not found
+  do {
+    const response = await axios.get(chapter.link + '/' + currentPage);
+    const doc = new DOMParser({
+      locator:{},
+      errorHandler:{warning: () => {}, error: () => {}, fatalError: () => {}}
+    }).parseFromString(response.data);
+    const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
+    if (nodeImageLink) {
+      logger.debug(nodeImageLink.value);
+      const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
+      pages.push({
+        number: currentPage,
+        url: imgLink
+      })
+      currentPage++;
+    } else {
+      foundPage = false;
+    }
+  } while(foundPage);
 
-  await scanner.scanChapter(chapter);
+  const dbChapter = await db.addPagesToChapter(chapter.id, pages);
+  // const dbChapter = await db.markChapterAsScanned(chapter.id);
+  notifier.emit('end parsing chapter', dbChapter);
+  logger.info('end parsing chapter');
 }

@@ -1,4 +1,4 @@
-import {createConnection, Connection, getRepository, Repository, In, createQueryBuilder} from 'typeorm';
+import { Connection, getRepository, Repository, In, createQueryBuilder } from 'typeorm';
 
 import {
   Manga,
@@ -21,7 +21,6 @@ export class Database {
   mangaRepository: Repository<Manga>;
   sourceRepository: Repository<ScanSource>;
   chapterRepository: Repository<Chapter>;
-  pageRepository: Repository<Page>;
   configRepository: Repository<ScannerConfig>;
   userProfileRepository: Repository<UserProfile>;
   advancementRepository: Repository<Advancement>;
@@ -37,7 +36,6 @@ export class Database {
     this.mangaRepository = getRepository(Manga);
     this.sourceRepository = getRepository(ScanSource);
     this.chapterRepository = getRepository(Chapter);
-    this.pageRepository = getRepository(Page);
     this.configRepository = getRepository(ScannerConfig);
     this.userProfileRepository = getRepository(UserProfile);
     this.advancementRepository = getRepository(Advancement);
@@ -149,7 +147,7 @@ export class Database {
    ***************************************************************************/
   async findChapterById(id: string): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne({
-      relations: ['pages', 'source', 'source.manga'],
+      relations: [ 'source', 'source.manga' ],
       where: { id }
     });
     return chapter;
@@ -186,29 +184,12 @@ export class Database {
     }
     return [await this.sourceRepository.save(sourceEntity), chapterEntity];
   }
-
-  async addPagesToChapter(chapterId: string, pages: { number: number; url: any; }[]) {
+  async addPagesToChapter(chapterId: string, pages: Page[]) {
     const chapter = await this.chapterRepository.findOne(chapterId);
-
-    const pagesEntities = [];
-    for (const page of pages) {
-      let pageEntity = new Page();
-      pageEntity.number = page.number;
-      pageEntity.url = page.url;
-      pageEntity.chapter = chapter;
-      pagesEntities.push(pageEntity);
-    }
-    const dbPages = await this.pageRepository.save(pagesEntities);
-
-    chapter.pages = dbPages;
+    chapter.scanned = true;
+    chapter.jsonPages = JSON.stringify(pages);
     await this.chapterRepository.save(chapter);
   }
-  async markChapterAsScanned(id: string) {
-    const chapter = await this.chapterRepository.findOne(id);
-    chapter.scanned = true;
-    return await this.chapterRepository.save(chapter);
-  }
-
   /***************************************************************************
    * Chapters
    ***************************************************************************/
@@ -342,7 +323,6 @@ export class Database {
       const toRemove = profile.favorites.findIndex( f => f.id === sourceId);
       profile.favorites.splice(toRemove, 1);
     }
-    
     return await this.userProfileRepository.save(profile);
   }
   async getFavorites(profileId: string): Promise<Manga[]> {

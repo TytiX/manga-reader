@@ -6,7 +6,7 @@ import PQueue from 'p-queue';
 import logger from '../logger';
 import { Database } from '../database/Database';
 
-import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
+import { ScannerConfig, Manga, ScanSource, Chapter, Page } from '../database/entity';
 import { UrlUtils } from '../utils/UrlUtils';
 import { ScannerNotifier } from '../events/ScannerNotifier';
 
@@ -94,7 +94,6 @@ export class Scanner {
     const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
 
     await this.updateScanSource(source, doc, true);
-
     await this.scanMangaChapters(manga, source, doc, true, firstScan);
   }
 
@@ -192,37 +191,6 @@ export class Scanner {
         logger.info(`Progress: ${++count}/${chapters.length} --> ${manga.name} - ${source.name}`);
       }
     }
-  }
-
-  // TODO: parametrize
-  async scanChapter(chapter: Chapter) {
-    let foundPage = true;
-    let currentPage = 1;
-    const pages: { number: number; url: string; }[] = [];
-    // iterate over pages until not found
-    do {
-      const response = await axios.get(chapter.link + '/' + currentPage);
-      
-      const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-      const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
-
-      if (nodeImageLink) {
-        logger.debug(nodeImageLink.value);
-        const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
-        pages.push({
-          number: currentPage,
-          url: imgLink
-        })
-        currentPage++;
-      } else {
-        foundPage = false;
-      }
-
-    } while(foundPage);
-    await this.database.addPagesToChapter(chapter.id, pages);
-    const dbChapter = await this.database.markChapterAsScanned(chapter.id);
-    this.notifier.emit('end parsing chapter', dbChapter);
-    logger.info('end parsing chapter');
   }
 
   private async searchOrCreate(name: string, link: string): Promise<[Manga, ScanSource]> {
