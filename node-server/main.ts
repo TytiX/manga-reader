@@ -3,9 +3,8 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cron from 'node-cron';
 
-import scanAllSites, { scanChapter } from './scanners/site-scanner';
+import scanAllSites from './scanners/site-scanner';
 import apiRoutes from './routes/ApiRoute';
-import { Database } from './database/Database';
 import { WebpushUtils } from './utils/WebpushUtils';
 
 const app = express();
@@ -19,19 +18,15 @@ app.use( '/', express.static('public'));
 
 WebpushUtils.generateIfNotExist();
 
-const db = new Database();
-db.connect().then( async () => {
-  app.use('/api', apiRoutes(db));
+app.use('/api', apiRoutes());
 
-  // start on boot
-  scanAllSites(db, true);
-  cron.schedule('0 9,12,15,19 * * *', () => {
-    scanAllSites(db, false);
-  }, {
-    scheduled: true,
-    timezone: 'Europe/Paris'
-  });
-
+// start on boot
+scanAllSites(true);
+cron.schedule('0 9,12,15,19 * * *', () => {
+  scanAllSites(false);
+}, {
+  scheduled: true,
+  timezone: 'Europe/Paris'
 });
 
 // start the express server

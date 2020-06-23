@@ -29,11 +29,17 @@ export class Scanner {
   queue: PQueue;
   notifier: ScannerNotifier;
 
-  constructor(db: Database, config?: ScannerConfig) {
-    this.database = db;
+  constructor(config?: ScannerConfig) {
+    this.queue = new PQueue({
+      concurrency: 100,
+      autoStart: false
+    });
+    this.database = new Database();
+    this.database.connect().then( () => {
+      this.queue.start();
+      this.notifier = new ScannerNotifier(this.database);
+    })
     this.config = config;
-    this.queue = new PQueue({concurrency: 100});
-    this.notifier = new ScannerNotifier(db);
   }
 
   async scanMangas(firstScan: boolean) {

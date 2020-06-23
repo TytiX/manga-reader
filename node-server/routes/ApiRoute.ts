@@ -9,12 +9,12 @@ import UserProfileRoutes from './UserProfileRoutes';
 import PushRoutes from './PushRoutes';
 import TagRoutes from './TagRoutes';
 
-export default (db: Database) => {
+export default () => {
 
   const router = Router();
 
-  // const database = new Database();
-  // database.connect().then( () => {
+  const db = new Database();
+  db.connect().then( () => {
     /***************************************************************************
      * Mangas
      ***************************************************************************/
@@ -46,7 +46,7 @@ export default (db: Database) => {
      * Tags
      ***************************************************************************/
     router.use('/tag', TagRoutes(db));
-  // });
+  });
 
   return router;
 }

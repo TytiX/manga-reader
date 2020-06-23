@@ -1,14 +1,23 @@
-import {createConnection, Connection, getRepository, Repository, In, Equal, createQueryBuilder} from 'typeorm';
+import {createConnection, Connection, getRepository, Repository, In, createQueryBuilder} from 'typeorm';
 
-import { Manga, ScanSource, Chapter, Page, ScannerConfig } from './entity';
+import {
+  Manga,
+  Tag,
+  TagValue,
+  ScanSource,
+  Chapter,
+  Page,
+  ScannerConfig,
+  UserProfile,
+  Advancement,
+  Subscription } from './entity';
 import logger from '../logger';
-import { UserProfile } from './entity/UserProfile';
-import { Tag, TagValue } from './entity/Tag';
-import { Advancement } from './entity/Advancement';
-import { Subscription } from './entity/Subscription';
+
+import { DatabaseConnectionManager } from './DatabaseConnectionManager';
 
 export class Database {
   connection?: Connection;
+
   mangaRepository: Repository<Manga>;
   sourceRepository: Repository<ScanSource>;
   chapterRepository: Repository<Chapter>;
@@ -23,24 +32,8 @@ export class Database {
   constructor() { }
 
   async connect() {
-    this.connection = await createConnection({
-      type: 'sqlite',
-      database: './data/database.db',
-      synchronize: true,
-      // logging: true,
-      entities: [
-        Manga,
-        Tag,
-        TagValue,
-        ScanSource,
-        Chapter,
-        Page,
-        ScannerConfig,
-        UserProfile,
-        Advancement,
-        Subscription
-      ]
-    });
+    this.connection = await DatabaseConnectionManager.getOrCreate();
+
     this.mangaRepository = getRepository(Manga);
     this.sourceRepository = getRepository(ScanSource);
     this.chapterRepository = getRepository(Chapter);
