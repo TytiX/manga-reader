@@ -34,7 +34,10 @@ export class ScannerNotifier {
     this.dClient.on('ready', async () => {
       this.messageQueue.start();
     });
-    this.dClient.login(DiscordUtils.getToken());
+    const token = DiscordUtils.getToken();
+    if (token) {
+      this.dClient.login(token);
+    }
   }
 
   emit(msg: string, ...args: any[]) {

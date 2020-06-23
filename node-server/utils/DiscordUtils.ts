@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { Client } from "discord.js";
+import logger from "../logger";
 
 export class DiscordUtils {
 
@@ -9,8 +10,13 @@ export class DiscordUtils {
   static readonly MANGA_URL = 'http://172.22.22.52:3000/#/manga';
 
   static getToken() {
-    const key = fs.readFileSync('./data/discordkey');
-    return key.toString();
+    try {
+      const key = fs.readFileSync('./data/discordkey');
+      return key.toString();
+    } catch (e) {
+      logger.error(e);
+      return undefined;
+    }
   }
 
   static findIdByName(client: Client, name: string) {
