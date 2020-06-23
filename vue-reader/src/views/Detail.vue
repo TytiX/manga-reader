@@ -21,8 +21,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
@@ -50,6 +49,15 @@ export default class Detail extends Vue {
   advancements: Advancement[] = [];
 
   mounted() {
+    this.reload()
+  }
+
+  @Watch('$route.params.id')
+  changeMangaId() {
+    this.reload();
+  }
+
+  reload() {
     axios.get<Manga>(`/api/manga/${this.$route.params.id}`).then((res) => {
       this.manga = res.data;
     });
@@ -66,8 +74,8 @@ export default class Detail extends Vue {
   }
 
   changeReadMode(source: ScanSource, mode: string) {
-    console.log(source, mode);
-    axios.post(`/api/source/${source.id}/readmode`, mode).then( () => {
+    // console.log(source, mode);
+    axios.post(`/api/source/${source.id}/readmode`, {mode}).then( () => {
       // readmode changed
     });
   }

@@ -20,6 +20,11 @@ export default (db: Database) => {
       await db.findSourceById(req.params.id)
     );
   });
+  router.post('/:id/readmode', async function(req, res) {
+    res.send(
+      await db.updateReadMode(req.params.id, req.body.mode)
+    );
+  });
 
   return router;
 }

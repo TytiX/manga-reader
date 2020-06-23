@@ -142,6 +142,11 @@ export class Database {
   async updateScanSource(source: ScanSource): Promise<ScanSource> {
     return await this.sourceRepository.save(source);
   }
+  async updateReadMode(id: string, mode: string) {
+    const source = await this.sourceRepository.findOne(id);
+    source.reading = mode;
+    return await this.sourceRepository.save(source);
+  }
   /***************************************************************************
    * Chapters
    ***************************************************************************/
@@ -222,13 +227,9 @@ export class Database {
     });
     const chapters = await this.chapterRepository.find({
       where: {
-        source: {
-          id: chapter.source.id
-        }
+        source: { id: chapter.source.id }
       },
-      order: {
-        number: 'ASC'
-      }
+      order: { number: 'ASC' }
     });
     let previous = undefined;
     for (const c of chapters) {

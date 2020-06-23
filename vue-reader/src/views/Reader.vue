@@ -12,6 +12,7 @@
       </b-navbar-nav>
     </b-navbar>
     <MangaReader
+      v-if="loaded"
       :pages="pages"
       :loadPageIndex="loadPage"
       :readingMode="chapter.source.reading"

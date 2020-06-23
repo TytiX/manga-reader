@@ -23,7 +23,7 @@ export default (db: Database) => {
   });
   router.post('/', async function(req, res) {
     const config = await db.createOrUpdateScanConfig(req.body)
-    const scanner = new Scanner(db, config);
+    const scanner = new Scanner(config);
     scanner.scanMangas(true);
     res.send(config);
   });

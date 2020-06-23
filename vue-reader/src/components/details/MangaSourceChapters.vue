@@ -20,7 +20,7 @@
         </b-button>
       </b-button-group>
       <div class="col-5">
-        <b-form-select v-model="selectedReadMode" :options="readingOptions"></b-form-select>
+        <b-form-select v-model="selectedSource.reading" :options="readingOptions"></b-form-select>
       </div>
       <div class="col-2">
         <b-button v-if="!isFavorite">
@@ -74,10 +74,25 @@ export default class MangaSourceChapters extends Vue {
 
   chapters: Chapter[] = [];
 
-  selectedSource!: ScanSource;
+  selectedSource: ScanSource = {
+    id: '',
+    name: '',
+    link: '',
+    coverLink: '',
+    description: '',
+    reading: 'normal',
+    manga: {
+      id: '',
+      name: '',
+      tags: [],
+      sources: []
+    },
+    scannerConfig: {
+      id: ''
+    },
+    chapters: []
+  }
   optionsSources: { value: ScanSource; text: string }[] = [];
-
-  selectedReadMode!: string;
   readingOptions = [
     {value: 'normal', text: 'normal'},
     {value: 'vertical', text: 'vertical'}
@@ -91,14 +106,14 @@ export default class MangaSourceChapters extends Vue {
   mangaChange() {
     this.reinit();
   }
+  @Watch('selectedSource.reading')
+  changeReadMode() {
+    this.$emit('read-mode', this.selectedSource, this.selectedSource.reading);
+    this.reloadChapters();
+  }
   @Watch('selectedSource')
   changeScanSource() {
     this.reloadChapters();
-  }
-  @Watch('selectedReadMode')
-  changeReadMode() {
-    console.log(this.selectedSource, this.selectedReadMode);
-    this.$emit('read-mode', this.selectedSource, this.selectedReadMode);
   }
 
   reinit() {
@@ -107,7 +122,6 @@ export default class MangaSourceChapters extends Vue {
     });
     this.selectedSource = this.manga.sources[0];
     this.reloadChapters();
-    this.selectedReadMode = this.selectedSource.reading;
   }
 
   reloadChapters() {
