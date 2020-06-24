@@ -95,9 +95,8 @@ export class ScannerNotifier {
             WebpushUtils.getWebpush().sendNotification(JSON.parse(subscription.jsonData), payloads);
           }
           if (channelId) this.messageQueue.add(() => this.sendNotificationMessage(channelId, embed));
-          scanChapter(this.db, chapter.id);
+          scanChapter(this.db, this, chapter.id);
         }
-        
       }
     } catch(e) {
       logger.error(e);
