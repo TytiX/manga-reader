@@ -1,12 +1,16 @@
 <template>
   <div class="home">
     <AppNavBar title="Mangas"></AppNavBar>
-    <MangaList
-      :mangas="mangas"
-      :favorites="favorites"
-      @fav="fav"
-      @unfav="unfav">
-    </MangaList>
+    <div
+      style="height: calc(100% - 56px);"
+      class="scrollable">
+      <MangaList
+        :mangas="mangas"
+        :favorites="favorites"
+        @fav="fav"
+        @unfav="unfav">
+      </MangaList>
+    </div>
   </div>
 </template>
 
@@ -51,3 +55,13 @@ export default class Home extends Vue {
   }
 }
 </script>
+
+<style lang="css" scoped>
+.home {
+  width: 100vw;
+  height: 100vh;
+}
+.scrollable {
+  overflow-y: auto;
+}
+</style>

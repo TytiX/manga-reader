@@ -1,25 +1,27 @@
 <template>
   <div>
-    <AppNavBar title="Settings"></AppNavBar>
+    <AppNavBar title="Settings" :showSetting="false"></AppNavBar>
     <div class="card container mt-3">
       <h3>Configurations</h3>
       <b-button to="/settings/new">Create config</b-button>
       <ConfigurationList :configs="configs" @deleteClicked="deleteConfig"></ConfigurationList>
     </div>
-    <div class="card container mt-3">
-      <h3>User Profiles</h3>
-      <b-button @click="createProfile">Create profile</b-button>
-      <UserProfileList
-        :profiles="userprofiles"
-        @saveClicked="updateProfile"
-        @deleteClicked="deleteProfile"
-        @test-push="testPush"
-        @delete-push="deletePush">
-      </UserProfileList>
-    </div>
-    <div class="card container mt-3">
-      <h3>Tags</h3>
-      <b-button to="/manage-tags">Manage tags</b-button>
+    <div >
+      <div class="card container mt-3">
+        <h3>User Profiles</h3>
+        <b-button @click="createProfile">Create profile</b-button>
+        <UserProfileList
+          :profiles="userprofiles"
+          @saveClicked="updateProfile"
+          @deleteClicked="deleteProfile"
+          @test-push="testPush"
+          @delete-push="deletePush">
+        </UserProfileList>
+      </div>
+      <div class="card container mt-3">
+        <h3>Tags</h3>
+        <b-button to="/manage-tags">Manage tags</b-button>
+      </div>
     </div>
   </div>
 </template>

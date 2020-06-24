@@ -1,18 +1,26 @@
 <template>
-  <div>
-    <AppNavBar title="Settings"></AppNavBar>
+  <div style="width: 100vw; height: 100vh;">
+    <AppNavBar title="Settings" back="true" :showSetting="false">
+      <!-- <b-nav-item @click="submitConfig"><b-icon icon="file-earmark-arrow-down"></b-icon></b-nav-item> -->
+    </AppNavBar>
 
-    <div
-      v-if="$route.params.id === 'new'"
-      class="container mt-3 mb-3">
-      <h3>Default presets</h3>
-      <b-form-select
-        v-model="config"
-        :options="defaultConfigs">
-      </b-form-select>
+    <div style="height: calc(100% - 56px);" class="scrollable">
+      <div
+        v-if="$route.params.id === 'new'"
+        class="container mt-3 mb-3">
+        <h3>Default presets</h3>
+        <b-form-select
+          v-model="config"
+          :options="defaultConfigs">
+        </b-form-select>
+      </div>
+
+      <ConfigurationDetail
+        :config="config"
+        @submit-config="submitConfig"
+        @reset-config="resetConfig">
+      </ConfigurationDetail>
     </div>
-
-    <ConfigurationDetail :config="config"></ConfigurationDetail>
   </div>
 </template>
 
@@ -33,6 +41,7 @@ import { ScannerConfig } from '@/models';
 export default class SettingsDetail extends Vue {
   config: ScannerConfig = {};
   defaultConfigs: ScannerConfig[] = [];
+
   mounted() {
     if (this.$route.params.id !== 'new') {
       axios.get('/api/configuration/' + this.$route.params.id).then( response => {
@@ -45,6 +54,16 @@ export default class SettingsDetail extends Vue {
         });
       });
     }
+  }
+
+  submitConfig(config: ScannerConfig) {
+    console.log(this.config);
+    axios.post('/api/configuration', config).then( () => {
+      this.$router.go(-1);
+    });
+  }
+  resetConfig() {
+    this.config = {};
   }
 }
 </script>

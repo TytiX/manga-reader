@@ -1,7 +1,9 @@
 <template>
-  <div>
+  <div class="detail">
     <AppNavBar :title="manga ? manga.name : ''" back="true"></AppNavBar>
-    <div v-if="manga.id !== ''">
+    <div v-if="manga.id !== ''"
+      style="height: calc(100% - 56px);"
+      class="scrollable">
       <b-container>
         <MangaDetailHeader :manga="manga"></MangaDetailHeader>
         <MangaDetailAdvancement :advancements="advancements"></MangaDetailAdvancement>
@@ -112,5 +114,11 @@ export default class Detail extends Vue {
 </script>
 
 <style>
-
+.detail {
+  width: 100vw;
+  height: 100vh;
+}
+.scrollable {
+  overflow-y: auto;
+}
 </style>

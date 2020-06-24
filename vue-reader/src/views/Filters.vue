@@ -1,15 +1,19 @@
 <template>
-  <div>
+  <div class="filter">
     <AppNavBar title="Search"></AppNavBar>
-    <TagList
-      :tags="tags"
-      @selected-tags="selectTags"></TagList>
-    <MangaList
-      :mangas="mangas"
-      :favorites="favorites"
-      @fav="fav"
-      @unfav="unfav">
-    </MangaList>
+    <div
+      style="height: calc(100% - 56px);"
+      class="scrollable">
+      <TagList
+        :tags="tags"
+        @selected-tags="selectTags"></TagList>
+      <MangaList
+        :mangas="mangas"
+        :favorites="favorites"
+        @fav="fav"
+        @unfav="unfav">
+      </MangaList>
+    </div>
   </div>
 </template>
 
@@ -76,5 +80,11 @@ export default class Favorites extends Vue {
 </script>
 
 <style>
-
+.filter {
+  width: 100vw;
+  height: 100vh;
+}
+.scrollable {
+  overflow-y: auto;
+}
 </style>

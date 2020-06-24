@@ -1,12 +1,16 @@
 <template>
   <div>
     <AppNavBar title="Favoris"></AppNavBar>
-    <MangaList
-      :mangas="mangas"
-      :favorites="mangas"
-      @fav="fav"
-      @unfav="unfav">
-    </MangaList>
+    <div
+      style="height: calc(100% - 56px);"
+      class="scrollable">
+      <MangaList
+        :mangas="mangas"
+        :favorites="mangas"
+        @fav="fav"
+        @unfav="unfav">
+      </MangaList>
+    </div>
   </div>
 </template>
 

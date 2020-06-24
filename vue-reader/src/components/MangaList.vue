@@ -46,3 +46,7 @@ export default class MangaList extends Vue {
   }
 }
 </script>
+
+<style scoped>
+
+</style>

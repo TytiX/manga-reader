@@ -1,29 +1,33 @@
 <template>
-  <div>
-    <AppNavBar title="Manage Tags" back="true"></AppNavBar>
-    <b-container class="align-l">
-      <b-row>
-        <b-button variant="success" @click="saveTags">Save</b-button>
-      </b-row>
-      <b-row>
-        <b-list-group class="w-100">
-          <b-list-group-item v-for="tag of tags" :key="tag.id">
-            <b-row>
-              <b-input class="col-6" type="text" v-model="tag.name"></b-input>
-              <draggable class="col-6 list-group" :list="tag.values" group="people">
-                <div
-                  class="list-group-item"
-                  v-for="value of tag.values"
-                  :key="tag.id + '-' + value.id">
-                  {{value.value}}
-                  <i @click="deleteValueFromTag(tag, value)"><b-icon icon="x"></b-icon></i>
-                </div>
-              </draggable>
-            </b-row>
-          </b-list-group-item>
-        </b-list-group>
-      </b-row>
-    </b-container>
+  <div style="width: 100vw; height: 100vh;">
+    <AppNavBar title="Manage Tags" back="true" :showSetting="false">
+        <b-nav-item @click="saveTags"><b-icon icon="file-earmark-arrow-down"></b-icon></b-nav-item>
+    </AppNavBar>
+    <div style="height: calc(100% - 56px);" class="scrollable">
+      <b-container class="align-l">
+        <!-- <b-row>
+          <b-button variant="success" @click="saveTags">Save</b-button>
+        </b-row> -->
+        <b-row class="mt-3 mb-3">
+          <b-list-group class="w-100">
+            <b-list-group-item v-for="tag of tags" :key="tag.id">
+              <b-row>
+                <b-input class="col-6" type="text" v-model="tag.name"></b-input>
+                <draggable class="col-6 list-group" :list="tag.values" group="people">
+                  <div
+                    class="list-group-item"
+                    v-for="value of tag.values"
+                    :key="tag.id + '-' + value.id">
+                    {{value.value}}
+                    <i @click="deleteValueFromTag(tag, value)"><b-icon icon="x"></b-icon></i>
+                  </div>
+                </draggable>
+              </b-row>
+            </b-list-group-item>
+          </b-list-group>
+        </b-row>
+      </b-container>
+    </div>
   </div>
 </template>
 
@@ -73,6 +77,9 @@ export default class TagsListEditor extends Vue {
 </script>
 
 <style>
+.scrollable {
+  overflow-y: auto;
+}
 .align-l {
   text-align: left;
 }

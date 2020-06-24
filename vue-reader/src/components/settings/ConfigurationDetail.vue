@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container mt-3">
     <b-form @submit="onSubmit" @reset="onReset">
       <b-form-group
         label="Site name">
@@ -71,7 +71,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import axios from 'axios';
 
 import { ScannerConfig } from '@/models';
 
@@ -81,12 +80,10 @@ export default class ConfigurationDetail extends Vue {
   config!: ScannerConfig;
 
   onSubmit() {
-    axios.post('/api/configuration', this.config).then( () => {
-      this.$router.go(-1);
-    });
+    this.$emit('submit-config', this.config);
   }
   onReset() {
-    this.config = {};
+    this.$emit('reset-config', this.config);
   }
 }
 </script>
