@@ -38,8 +38,6 @@ export class ScannerConfig {
   @Column({ nullable: true })
   chapterNameRelativeXpath: string;
 
-  @OneToMany(type => ScanSource, source => source.scannerConfig, {
-    onDelete: 'CASCADE'
-  })
+  @OneToMany(type => ScanSource, source => source.scannerConfig, { onDelete: 'CASCADE' })
   sources: ScanSource[];
 }

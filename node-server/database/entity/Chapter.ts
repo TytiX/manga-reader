@@ -17,17 +17,13 @@ export class Chapter {
   })
   name: string;
 
-  @Column()
+  @Column('double')
   number: number;
 
-  @Column({
-    unique: true
-  })
+  @Column({ unique: true })
   link: string;
 
-  @Column({
-    default: false
-  })
+  @Column({ default: false })
   scanned: boolean
 
   @CreateDateColumn()
@@ -36,9 +32,7 @@ export class Chapter {
   @UpdateDateColumn()
   updateDate: Date;
 
-  @ManyToOne(type => ScanSource, source => source.chapters, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(type => ScanSource, source => source.chapters, { onDelete: 'CASCADE' })
   source: ScanSource;
 
   @Column({ nullable: true })
