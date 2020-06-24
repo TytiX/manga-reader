@@ -13,3 +13,5 @@ docker create \
   -v ~/manga-reader-pi/logs:/app/logs \
   --restart unless-stopped \
   abelliard/manga-reader:pi
+
+docker start manga-reader
