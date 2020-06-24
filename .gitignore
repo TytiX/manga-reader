@@ -107,3 +107,5 @@ node-server/data/database.db
 node-server/data/vapidkeys.keys
 node-server/data/database.db-journal
 node-server/data/discordkey
+database.db
+node-server/data/databaseconfig.json
