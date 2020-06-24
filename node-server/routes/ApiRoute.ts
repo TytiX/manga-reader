@@ -14,7 +14,7 @@ export default () => {
   const router = Router();
 
   const db = new Database();
-  db.connect().then( () => {
+  db.connect('api-connection').then( () => {
     /***************************************************************************
      * Mangas
      ***************************************************************************/

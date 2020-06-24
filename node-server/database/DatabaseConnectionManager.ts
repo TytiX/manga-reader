@@ -1,4 +1,5 @@
-import { createConnection, Connection, ConnectionOptions } from "typeorm";
+import { createConnection, Connection, ConnectionOptions, getConnection } from "typeorm";
+import { existsSync, readFileSync } from 'fs';
 
 import {
   Manga,
@@ -6,7 +7,6 @@ import {
   TagValue,
   ScanSource,
   Chapter,
-  Page,
   ScannerConfig,
   UserProfile,
   Advancement,
@@ -23,40 +23,60 @@ export class DatabaseConnectionManager {
   static async getInstance() {
     if (!DatabaseConnectionManager.connection) {
       return DatabaseConnectionManager.connection = await createConnection(
-        DatabaseConnectionManager.getConnectionOptions()
+        DatabaseConnectionManager.getConnectionOptions('default')
       )
     }
     return DatabaseConnectionManager.connection;
   }
 
-  static async getOrCreate() {
-    const opts = DatabaseConnectionManager.getConnectionOptions();
+  static async getOrCreate(name: string) {
+    const opts = DatabaseConnectionManager.getConnectionOptions(name);
     if (opts.type === 'sqlite') {
-      return await DatabaseConnectionManager.getInstance()
+      try {
+        return getConnection();
+      } catch(e) {
+        return await createConnection({
+          ...opts,
+          name: 'default'
+        });
+      }
     } else {
-      return await createConnection(opts);
+      try {
+        return getConnection(name);
+      } catch(e) {
+        return await createConnection(opts);
+      }
     }
   }
 
-  static getConnectionOptions(): ConnectionOptions {
-    // TODO: postgres - prepare configuration
+  static getConnectionOptions(name: string): ConnectionOptions {
+    const entries = [
+      Manga,
+      Tag,
+      TagValue,
+      ScanSource,
+      Chapter,
+      ScannerConfig,
+      UserProfile,
+      Advancement,
+      Subscription
+    ]
+    const databaseConfigPath = './data/databaseconfig.json';
+    if (existsSync(databaseConfigPath)) {
+      const configJSON = readFileSync(databaseConfigPath);
+      const config = JSON.parse(configJSON.toString('utf-8'));
+      return {
+        ...config,
+        name,
+        entities: entries
+      }
+    }
     return {
       type: 'sqlite',
       database: './data/database.db',
       synchronize: true,
       // logging: true,
-      entities: [
-        Manga,
-        Tag,
-        TagValue,
-        ScanSource,
-        Chapter,
-        Page,
-        ScannerConfig,
-        UserProfile,
-        Advancement,
-        Subscription
-      ]
+      entities: entries
     }
   }
 

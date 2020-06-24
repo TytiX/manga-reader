@@ -16,7 +16,7 @@ import { ScannerNotifier } from '../events/ScannerNotifier';
 export default async (firstScan: boolean) => {
   // get all configuration on a new connection...
   const db = new Database();
-  db.connect().then( async () => {
+  db.connect('site-scanner').then( async () => {
     const configs = await db.allConfigs();
     for (const scanerConfig of configs) {
       const scanner = new Scanner(scanerConfig);
@@ -39,7 +39,7 @@ export function getDefaultConfigs() {
 
 export async function scanChapters(chapters: Chapter[]) {
   const db = new Database();
-  db.connect().then( async () => {
+  db.connect(chapters[0].id).then( async () => {
     const notifier = new ScannerNotifier(db);
     for (const chapter of chapters) {
       await scanChapter(db, notifier, chapter.id);

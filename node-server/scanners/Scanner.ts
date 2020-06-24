@@ -35,9 +35,9 @@ export class Scanner {
       autoStart: false
     });
     this.database = new Database();
-    this.database.connect().then( () => {
-      this.queue.start();
+    this.database.connect(config.name).then( () => {
       this.notifier = new ScannerNotifier(this.database);
+      this.queue.start();
     })
     this.config = config;
   }

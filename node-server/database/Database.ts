@@ -30,18 +30,19 @@ export class Database {
 
   constructor() { }
 
-  async connect() {
-    this.connection = await DatabaseConnectionManager.getOrCreate();
+  async connect(connectionName: string) {
+    this.connection = await DatabaseConnectionManager.getOrCreate(connectionName);
 
-    this.mangaRepository = getRepository(Manga);
-    this.sourceRepository = getRepository(ScanSource);
-    this.chapterRepository = getRepository(Chapter);
-    this.configRepository = getRepository(ScannerConfig);
-    this.userProfileRepository = getRepository(UserProfile);
-    this.advancementRepository = getRepository(Advancement);
-    this.subscriptionRepository = getRepository(Subscription);
-    this.tagRepository = getRepository(Tag);
-    this.tagValueRepository = getRepository(TagValue);
+    this.mangaRepository = getRepository(Manga, this.connection.name);
+    this.sourceRepository = getRepository(ScanSource, this.connection.name);
+    this.chapterRepository = getRepository(Chapter, this.connection.name);
+    this.configRepository = getRepository(ScannerConfig, this.connection.name);
+    this.userProfileRepository = getRepository(UserProfile, this.connection.name);
+    this.advancementRepository = getRepository(Advancement, this.connection.name);
+    this.subscriptionRepository = getRepository(Subscription, this.connection.name);
+    this.tagRepository = getRepository(Tag, this.connection.name);
+    this.tagValueRepository = getRepository(TagValue, this.connection.name);
+
     return this.connection;
   }
 
