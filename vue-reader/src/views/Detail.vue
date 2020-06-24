@@ -1,6 +1,6 @@
 <template>
   <div class="detail">
-    <AppNavBar :title="manga ? manga.name : ''" back="true"></AppNavBar>
+    <AppNavBar :title="manga ? manga.name : ''" back="true" :showSetting="false"></AppNavBar>
     <div v-if="manga.id !== ''"
       style="height: calc(100% - 56px);"
       class="scrollable">

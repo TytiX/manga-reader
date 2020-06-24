@@ -6,7 +6,9 @@
       <b-img-lazy
         v-for="source of manga.sources"
         :key="source.id"
-        :src="source.scannerConfig.iconUrl"></b-img-lazy>
+        :src="source.scannerConfig.iconUrl"
+        class="source-icon">
+      </b-img-lazy>
     </div>
     <div class="actions">
       <b-icon v-if="!isFavorite" @click.prevent="fav()" icon="heart"></b-icon>
@@ -73,14 +75,18 @@ export default class MangaListItem extends Vue {
 .card:hover .img-fluid {
   opacity: 0.3;
 }
-.manga-name {
-  /* height: 3rem; */
+.source-icon {
+  max-height: 32px;
+  max-width: 32px;
 }
+/* .manga-name {
+  height: 3rem;
+} */
 .actions {
   position: absolute;
   margin: 5px;
 }
-.sources {
-  /* height: 20px; */
-}
+/* .sources {
+  height: 20px;
+} */
 </style>

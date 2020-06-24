@@ -8,7 +8,10 @@
           class="d-flex justify-content-between align-items-center">
           <div>
             <div>
-              <img :src="advancement.source.scannerConfig.iconUrl"/>
+              <b-img
+                class="source-icon"
+                :src="advancement.source.scannerConfig.iconUrl">
+              </b-img>
               {{ advancement.source.name }}
             </div>
             <div>
@@ -42,5 +45,8 @@ export default class MangaDetailAdvancement extends Vue {
 </script>
 
 <style>
-
+.source-icon {
+  max-height: 32px;
+  max-width: 32px;
+}
 </style>

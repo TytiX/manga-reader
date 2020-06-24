@@ -113,6 +113,7 @@ export default class MangaSourceChapters extends Vue {
   }
   @Watch('selectedSource')
   changeScanSource() {
+    console.log('change source');
     this.reloadChapters();
   }
 
