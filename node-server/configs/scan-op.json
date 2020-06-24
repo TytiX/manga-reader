@@ -1,0 +1,22 @@
+{
+  "name": "scan-op",
+  "iconUrl": "https://scan-op.com/favicon.ico",
+  "mangasUrl": "https://scan-op.com/manga-list",
+
+  "mangasListUrl": "https://scan-op.com/changeMangaList?type=text",
+
+  "mangaEnclosingXpath": "//ul[@class='manga-list']/li",
+  "mangaLinkRelativeXpath": "/li/a/@href",
+  "mangaNameRelativeXpath": "/li/a/h6/text()",
+
+  "mangaDescriptionXpath": "/html/body/div[1]/div/div[1]/div/div[2]/div/div/p/text()",
+  "mangaCoverXpath": "/html/body/div[1]/div/div[1]/div/div[1]/div[1]/div/img/@src",
+
+  "mangaCategoriesXpath": "",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "//ul[@class='chapters']/li/h5",
+  "chapterLinkRelativeXpath": "/h5/a/@href",
+  "chapterNumberTextRelativeXpath": "/h5/a/text()",
+  "chapterNameRelativeXpath": "/h5/em/text()"
+}
