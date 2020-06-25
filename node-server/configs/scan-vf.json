@@ -12,7 +12,7 @@
   "mangaDescriptionXpath": "/html/body/div[1]/div/div[1]/div/div[2]/div/div/p/text()",
   "mangaCoverXpath": "/html/body/div[1]/div/div[1]/div/div[1]/div[1]/div/img/@src",
 
-  "mangaCategoriesXpath": "/html/body/div[1]/div/div[1]/div/div[1]/div[2]/dl/dd[5]/a/text()",
+  "mangaCategoriesXpath": "//dl/dd[5]/a/text()",
   "mangaTagsXpath": "",
 
   "chapterEnclosingXpath": "//ul[@class='chapters']/li/h5",
