@@ -1,27 +1,32 @@
 <template>
-  <div >
-    <div v-if="readingMode === 'normal'">
-      <v-zoomer-gallery
-        style="width: 100vw; height: calc(100vh - 56px);"
-        :list="pages"
-        v-model="selIndex">
-      </v-zoomer-gallery>
-      
-      <div class="back pad"
-        @click="pageBack"></div>
-      <div class="next pad"
-        @click="pageNext"></div>
+  <div>
+    <div v-if="pages.length === 0">
+      <h3>nothing...</h3>
     </div>
-    <div v-else-if="readingMode === 'vertical'"
-      class="comic-strip">
-      <b-button @click="chapterBack">Previous chapter</b-button>
-      <ComicPage v-for="[index, page] of pageEntites"
-        :key="page"
-        :ref="index"
-        :page="page"
-        @page-show="visiblePage"
-        class="page"/>
-      <b-button @click="chapterNext">Next chapter</b-button>
+    <div v-else>
+      <div v-if="readingMode === 'normal'">
+        <v-zoomer-gallery
+          style="width: 100vw; height: calc(100vh - 56px);"
+          :list="pages"
+          v-model="selIndex">
+        </v-zoomer-gallery>
+        
+        <div class="back pad"
+          @click="pageBack"></div>
+        <div class="next pad"
+          @click="pageNext"></div>
+      </div>
+      <div v-else-if="readingMode === 'vertical'"
+        class="comic-strip">
+        <b-button @click="chapterBack">Previous chapter</b-button>
+        <ComicPage v-for="[index, page] of pageEntites"
+          :key="page"
+          :ref="index"
+          :page="page"
+          @page-show="visiblePage"
+          class="page"/>
+        <b-button @click="chapterNext">Next chapter</b-button>
+      </div>
     </div>
   </div>
 </template>
@@ -124,6 +129,7 @@ export default class MangaReader extends Vue {
 .comic-strip {
   overflow-y: scroll;
   height: calc(100vh - 56px);
+  background-color: rgb(51, 51, 51);
 }
 .page {
   width: 90%;

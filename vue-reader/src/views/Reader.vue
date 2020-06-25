@@ -2,7 +2,7 @@
   <div>
     <b-navbar type="dark" variant="dark">
       <b-navbar-brand v-if="loaded" class="manga-title">
-        {{chapter.source.manga.name}} 
+        {{chapter.source.manga.name}}
       </b-navbar-brand>
       <b-navbar-brand v-if="loaded">
         - chapter {{chapter.number}} - {{page + 1}} / {{pages.length}}
@@ -54,8 +54,10 @@ export default class Reader extends Vue {
     axios.get<Chapter>('/api/chapter/' + this.$route.params.chapterId).then( response => {
       this.chapter = response.data;
       this.loadPage = this.$route.params.page ? Number(this.$route.params.page) : 0;
-      this.pages = this.chapter.pages.map(p => p.url);
-      this.pageChanged(this.loadPage);
+      if (this.chapter.pages) {
+        this.pages = this.chapter.pages.map(p => p.url);
+        this.pageChanged(this.loadPage);
+      }
       this.loaded =true;
     });
   }
