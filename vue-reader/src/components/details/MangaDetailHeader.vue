@@ -45,14 +45,22 @@ export default class MangaDetailHeader extends Vue {
   }
 
   reinit() {
-    this.covers = this.manga.sources.map( s => {
+    this.covers = this.manga.sources.filter( s => {
+      return s.coverLink && this.isURL(s.coverLink);
+    }).map( s => {
       return s.coverLink;
     });
-    if (this.covers.length === 0) {
+    if ( !this.covers || this.covers.length === 0 ) {
       this.covers = ['assets/no-cover.png'];
     }
     this.pickRandomDesc();
     this.tags = this.manga.tags;
+  }
+
+  isURL(str: string): boolean {
+    const urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+    const url = new RegExp(urlRegex, 'i');
+    return str.length < 2083 && url.test(str);
   }
 
   pickRandomDesc() {

@@ -38,13 +38,14 @@ export default class MangaListItem extends Vue {
   }
 
   pickRandomCoverUrl() {
-    if (this.manga.sources && this.manga.sources.length > 0) {
-      const sourceLength = this.manga.sources.length;
-      const index = Math.floor( Math.random() * sourceLength );
-      const url = this.manga.sources[index].coverLink;
+    if ( this.manga.sources &&
+        this.manga.sources.length > 0 &&
+        this.manga.sources[this.try] ) {
+      // pick first...
+      const url = this.manga.sources[this.try].coverLink;
       if (url && this.isURL(url)) {
         this.coverUrl = url;
-      } else if (this.try < 5) {
+      } else if (this.try < this.manga.sources.length) {
         this.try++;
         this.pickRandomCoverUrl();
       } else {
