@@ -9,14 +9,15 @@
           <div v-for="(manga, index) of scanResult.mangas" :key="manga.link">{{ index }} -- {{ manga.name }}</div>
         </div>
 
-        <div class="scrolling-container">
-          {{scanResult.tags}}
-          <!-- <div v-for="tag of scanResult.tags" :key="tag">{{tag}}</div> -->
-        </div>
 
         <b-form-select v-model="mangaIndex" :options="mangaOptions" size="sm" class="mt-3"></b-form-select>
 
         <div v-if="mangaIndex > -1 && scanResult.source">
+
+          <div class="scrolling-container">
+            {{scanResult.tags}}
+            <!-- <div v-for="tag of scanResult.tags" :key="tag">{{tag}}</div> -->
+          </div>
 
           <div>
             <h2>{{scanResult.source.manga.name}}</h2>

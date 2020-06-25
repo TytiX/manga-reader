@@ -1,7 +1,8 @@
 <template>
   <div style="width: 100vw; height: 100vh;">
     <AppNavBar title="Settings" back="true" :showSetting="false">
-      <!-- <b-nav-item @click="submitConfig"><b-icon icon="file-earmark-arrow-down"></b-icon></b-nav-item> -->
+      <b-nav-item @click="submitConfig()"><b-icon icon="file-earmark-arrow-down"></b-icon></b-nav-item>
+      <b-nav-item @click="resetConfig"><b-icon icon="trash"></b-icon></b-nav-item>
     </AppNavBar>
 
     <div style="height: calc(100% - 56px);" class="scrollable">
@@ -108,7 +109,8 @@ export default class SettingsDetail extends Vue {
   }
 
   submitConfig(config: ScannerConfig) {
-    axios.post('/api/configuration', config).then( () => {
+    console.log(config || this.config);
+    axios.post('/api/configuration', config || this.config ).then( () => {
       this.$router.back();
     });
   }
