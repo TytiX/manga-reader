@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn} from 'typeorm';
 import { ScanSource } from './Sources';
+import { Page } from './Page';
 
 @Entity()
 export class Chapter {
@@ -17,7 +18,7 @@ export class Chapter {
   })
   name: string;
 
-  @Column('double')
+  @Column('numeric')
   number: number;
 
   @Column({ unique: true })
@@ -35,10 +36,10 @@ export class Chapter {
   @ManyToOne(type => ScanSource, source => source.chapters, { onDelete: 'CASCADE' })
   source: ScanSource;
 
-  @Column({ nullable: true })
-  jsonPages: string;
+  @Column({ type: 'simple-json', nullable: true })
+  pages: Page[];
 
-  get pages() {
-    return this.jsonPages ? JSON.parse(this.jsonPages) : null;
-  }
+  // get pages() {
+  //   return this.jsonPages ? JSON.parse(this.jsonPages) : null;
+  // }
 }

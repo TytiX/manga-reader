@@ -193,7 +193,7 @@ export class Database {
   async addPagesToChapter(chapterId: string, pages: Page[]) {
     const chapter = await this.chapterRepository.findOne(chapterId);
     chapter.scanned = true;
-    chapter.jsonPages = JSON.stringify(pages);
+    chapter.pages = pages;
     await this.chapterRepository.save(chapter);
   }
   /***************************************************************************
