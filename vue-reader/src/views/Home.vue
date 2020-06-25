@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <AppNavBar title="Mangas"></AppNavBar>
-    <div
+    <div v-if="loaded"
       style="height: calc(100% - 56px);"
       class="scrollable">
       <MangaList
@@ -11,6 +11,7 @@
         @unfav="unfav">
       </MangaList>
     </div>
+    <Loading v-else></Loading>
   </div>
 </template>
 
@@ -19,21 +20,27 @@ import { Vue, Component } from 'vue-property-decorator';
 import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
+import Loading from '@/components/Loading.vue';
 import MangaList from '@/components/MangaList.vue';
 import { Manga } from '@/models';
 
 @Component({
   components: {
     AppNavBar,
+    Loading,
     MangaList
   }
 })
 export default class Home extends Vue {
   mangas: Manga[] = [];
   favorites: Manga[] = [];
+  loaded = false;
+
   mounted() {
+    this.loaded = false;
     axios.get('/api/manga').then( response => {
       this.mangas = response.data;
+      this.loaded = true;
     });
     this.reloadFavorites();
   }

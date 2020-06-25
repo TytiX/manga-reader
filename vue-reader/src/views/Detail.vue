@@ -1,7 +1,7 @@
 <template>
   <div class="detail">
     <AppNavBar :title="manga ? manga.name : ''" back="true" :showSetting="false"></AppNavBar>
-    <div v-if="manga.id !== ''"
+    <div v-if="loaded"
       style="height: calc(100% - 56px);"
       class="scrollable">
       <b-container>
@@ -19,6 +19,7 @@
         </MangaSourceChapters>
       </b-container>
     </div>
+    <Loading v-else></Loading>
   </div>
 </template>
 
@@ -27,6 +28,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
+import Loading from '@/components/Loading.vue';
 import MangaDetailHeader from '@/components/details/MangaDetailHeader.vue';
 import MangaDetailAdvancement from '@/components/details/MangaDetailAdvancement.vue';
 import MangaSourceChapters from '@/components/details/MangaSourceChapters.vue';
@@ -35,6 +37,7 @@ import { Manga, ScanSource, Chapter, Advancement } from '@/models';
 @Component({
   components: {
     AppNavBar,
+    Loading,
     MangaDetailHeader,
     MangaDetailAdvancement,
     MangaSourceChapters
@@ -49,6 +52,7 @@ export default class Detail extends Vue {
   };
   favorites: Manga[] = [];
   advancements: Advancement[] = [];
+  loaded = false;
 
   mounted() {
     this.reload()
@@ -60,15 +64,17 @@ export default class Detail extends Vue {
   }
 
   reload() {
-    axios.get<Manga>(`/api/manga/${this.$route.params.id}`).then((res) => {
-      this.manga = res.data;
-    });
-    axios.get<Advancement[]>(`/api/userprofile/${this.$currentProfile}/advancement/${this.$route.params.id}`).then((res) => {
-      this.advancements = res.data;
-    });
-    axios.get('/api/favorites/' + this.$currentProfile).then( response => {
-      this.favorites = response.data;
-    });
+    this.loaded = false;
+    Promise.all([
+      axios.get<Manga>(`/api/manga/${this.$route.params.id}`),
+      axios.get<Advancement[]>(`/api/userprofile/${this.$currentProfile}/advancement/${this.$route.params.id}`),
+      axios.get<Manga[]>('/api/favorites/' + this.$currentProfile)
+    ]).then( values => {
+      this.manga = values[0].data;
+      this.advancements = values[1].data;
+      this.favorites = values[2].data;
+      this.loaded = true;
+    })
   }
 
   get isInFavorites() {
