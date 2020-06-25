@@ -4,6 +4,7 @@
       <b-col>
         <b-carousel
           class="chapter-covers"
+          img-height="350"
           indicators>
           <b-carousel-slide v-for="cover of covers" :key="cover"
             :img-src="cover"
