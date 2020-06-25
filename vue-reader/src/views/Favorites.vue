@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="favorites">
     <AppNavBar title="Favoris"></AppNavBar>
     <div
       style="height: calc(100% - 56px);"
@@ -52,5 +52,11 @@ export default class Favorites extends Vue {
 </script>
 
 <style>
-
+.favorites {
+  width: 100vw;
+  height: 100vh;
+}
+.scrollable {
+  overflow-y: auto;
+}
 </style>
