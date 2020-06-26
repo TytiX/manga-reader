@@ -65,11 +65,11 @@ export class Scanner {
       count ++;
       logger.debug(`Working on item #${count}.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`);
       logger.info(`Scanning advancement ${count}/${mangas.length}.`);
-      this.notifier.emit('progress', count, mangas.length);
+      this.notifier.progress(count, mangas.length);
     });
     this.queue.on('idle', () => {
       logger.info(`Scanning complete: ${this.config.name}`);
-      this.notifier.emit('scan complete', this.config);
+      this.notifier.scanComplete(this.config);
     });
     for (const m of mangas) {
       this.queue.add(() => this.searchAndScanManga(m, firstScan));
@@ -201,30 +201,30 @@ export class Scanner {
       logger.debug('manga by name: ', manga);
       if (!manga) { // create manga
         [manga, source] = await this.database.createManga(name, { name: this.config.name, link: link }, this.config);
-        this.notifier.emit('create manga', manga);
+        this.notifier.newManga(manga);
       } else { // add scan source to existing manga
         [manga, source] = await this.database.addScanSourceToManga(manga, { name: this.config.name, link: link }, this.config);
-        this.notifier.emit('add source manga', manga, source);
+        this.notifier.newMangaSource(manga, source);
       }
     }
     return [manga, source];
   }
 
   private async searchOrCreateChapter(source: ScanSource, chapter: { name: string; link: string; number: number; }, firstScan: boolean): Promise<[ScanSource, Chapter]> {
-    let [retSource, retChapter] = await this.database.findChapterByLink(chapter.link);
+    let retChapter = await this.database.findChapterByLink(chapter.link);
     logger.debug('chapter by link: ', retChapter);
     if (!retChapter) {
-      retSource = await this.database.findSourceById(source.id);
-      [retSource, retChapter] = await this.database.addChapterToSource(retSource, {
+      let retSource = await this.database.findSourceById(source.id);
+      retChapter = await this.database.addChapterToSource(retSource, {
         name: chapter.name? chapter.name : null,
         number: chapter.number,
         link: chapter.link
       });
       logger.info(`new chapter : ${retSource.manga.name} - ${retChapter.number}`);
       if (!firstScan) {
-        this.notifier.emit('new chapter', retSource, retChapter);
+        this.notifier.newChapterNotif(retSource, retChapter);
       }
     }
-    return [retSource, retChapter];
+    return [await this.database.findSourceById(source.id), retChapter];
   }
 }
