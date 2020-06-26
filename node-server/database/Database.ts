@@ -59,7 +59,7 @@ export class Database {
   }
   async mangaByTags(tags: Tag[]): Promise<Manga[]> {
     const ids = tags.map(t => t.id);
-    const query = createQueryBuilder<Manga>('Manga', 'manga')
+    const query = createQueryBuilder<Manga>('Manga', 'manga', this.connection.name)
                   .innerJoinAndSelect('manga.tags', 'tag')
                   .leftJoinAndSelect('manga.sources', 'source')
                   .leftJoinAndSelect('source.scannerConfig', 'scannerConfig')
@@ -101,6 +101,14 @@ export class Database {
 
     return [manga, scanSource];
   }
+  async createMangaAndSource(source: ScanSource) {
+    const manga = new Manga();
+    manga.name = source.manga.name;
+    const dbManga = await this.mangaRepository.save(manga);
+
+    source.manga = dbManga;
+    return await this.sourceRepository.save(source);
+  }
   /***************************************************************************
    * Sources
    ***************************************************************************/
@@ -112,7 +120,7 @@ export class Database {
   }
   async findMangaByName(name: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
-      relations: ['sources'],
+      relations: ['sources', 'tags'],
       where: { name }
     });
   }
@@ -130,6 +138,12 @@ export class Database {
     }
     return [manga, source];
   }
+  async findSourceByLink(link: string): Promise<ScanSource> {
+    return await this.sourceRepository.findOne({
+      relations: ['manga', 'manga.tags'],
+      where: { link }
+    })
+  }
   async addScanSourceToManga(manga: Manga, source: { name: string; link: string; }, config: ScannerConfig): Promise<[Manga, ScanSource]> {
     let scanSource = new ScanSource();
     scanSource.name = source.name;
@@ -139,6 +153,10 @@ export class Database {
 
     manga.sources.push(scanSource);
     return [await this.mangaRepository.save(manga), scanSource];
+  }
+  async addSourceToManga(manga: Manga, source: ScanSource): Promise<ScanSource> {
+    source.manga = manga;
+    return await this.sourceRepository.save(source);
   }
   async updateScanSource(source: ScanSource): Promise<ScanSource> {
     return await this.sourceRepository.save(source);
@@ -158,37 +176,30 @@ export class Database {
     });
     return chapter;
   }
-  async findChapterByLink(link: string): Promise<[ScanSource, Chapter]> {
+  async findChapterByLink(link: string): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne({
       relations: ['source'],
       where: { link: link }
     });
     if (chapter) {
       if (chapter.source) {
-        const source = await this.sourceRepository.findOne(chapter.source.id);
-        return [source, chapter];
+        // const source = await this.sourceRepository.findOne(chapter.source.id);
+        return chapter;
       } else {
         await this.chapterRepository.remove(chapter);
       }
     }
-    return [undefined, undefined];
+    return undefined;
   }
-  async addChapterToSource(source: ScanSource, chapter: { name: string; number: number; link: string; }): Promise<[ScanSource, Chapter]> {
+  async addChapterToSource(source: ScanSource, chapter: { name: string; number: number; link: string; }): Promise<Chapter> {
     let chapterEntity = new Chapter();
     chapterEntity.name = chapter.name;
     chapterEntity.number = chapter.number;
     chapterEntity.link = chapter.link;
+    chapterEntity.source = source;
     chapterEntity = await this.chapterRepository.save(chapterEntity);
 
-    let sourceEntity = await this.sourceRepository.findOne(source.id, {
-      relations: ['chapters', 'manga']
-    });
-    if (sourceEntity.chapters) {
-      sourceEntity.chapters.push(chapterEntity);
-    } else {
-      sourceEntity.chapters = [chapterEntity];
-    }
-    return [await this.sourceRepository.save(sourceEntity), chapterEntity];
+    return chapterEntity;
   }
   async addPagesToChapter(chapterId: string, pages: Page[]) {
     const chapter = await this.chapterRepository.findOne(chapterId);
@@ -445,7 +456,7 @@ export class Database {
     return tags;
   }
   async findTagByValue(value: string) {
-    const tag = await createQueryBuilder<Tag>('Tag', 'tag')
+    const tag = await createQueryBuilder<Tag>('Tag', 'tag', this.connection.name)
                   .leftJoinAndSelect('tag.values', 'tag_value')
                   .where('tag_value.value = :name', { name: value })
                   .getOne();

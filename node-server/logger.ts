@@ -3,17 +3,18 @@ import * as winston from 'winston';
 const logger: winston.Logger = winston.createLogger({
   transports: [
     // new winston.transports.Console({
-    //   level: 'debug',
-    //   format: winston.format.simple()
+    //   level: 'info',
+    //   format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.message}`)
     // }),
     new winston.transports.File({
       level: 'info',
-      filename: './logs/info.log'
+      filename: './logs/info.log',
+      format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.message}`)
     }),
     new winston.transports.File({
-      format: winston.format.simple(),
       level: 'warn',
-      filename: './logs/warning.log'
+      filename: './logs/warning.log',
+      format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.message}`)
     })
   ]
 });

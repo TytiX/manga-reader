@@ -1,10 +1,10 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
-import { getDefaultConfigs } from "../scanners/site-scanner";
-import { Scanner } from "../scanners/Scanner";
-import { ScannerV2 } from "../scanners/ScannerV2";
-import { ScanSource, Manga } from "../database/entity";
+import { Database } from '../database/Database';
+import { getDefaultConfigs } from '../scanners/site-scanner';
+import { ScannerV2 } from '../scanners/ScannerV2';
+import { ScanSource, Manga } from '../database/entity';
+import { scanAndStore } from '../scanners/scanner-store';
 
 export default (db: Database) => {
   const router = Router();
@@ -29,7 +29,7 @@ export default (db: Database) => {
 
   router.post('/test-config/chapterScan', async (req, res) => {
     const scanner = new ScannerV2();
-    const pages = await scanner.scanChapter(req.body);
+    const pages = await scanner.scanPages(req.body);
     res.send({
       status: 'ok',
       pages
@@ -60,9 +60,8 @@ export default (db: Database) => {
     res.send(await db.deleteConfig(req.params.id));
   });
   router.post('/', async function(req, res) {
-    const config = await db.createOrUpdateScanConfig(req.body)
-    const scanner = new Scanner(config);
-    scanner.scanMangas(true);
+    const config = await db.createOrUpdateScanConfig(req.body);
+    scanAndStore(config);
     res.send(config);
   });
 

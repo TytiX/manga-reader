@@ -1,7 +1,7 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
-import { scanChapters } from "../scanners/site-scanner";
+import { Database } from '../database/Database';
+import { scanChapterPages } from '../scanners/scanner-store';
 
 export default (db: Database) => {
   const router = Router();
@@ -51,7 +51,7 @@ export default (db: Database) => {
     );
   });
   router.post('/scan', async function(req, res) {
-    scanChapters(req.body);
+    scanChapterPages(req.body);
     res.send({
       status: 'running'
     });

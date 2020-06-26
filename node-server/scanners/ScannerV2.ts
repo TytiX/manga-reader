@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import logger from '../logger';
 
-import { ScannerConfig, ScanSource, Chapter, Page } from '../database/entity';
+import { ScannerConfig, ScanSource, Page } from '../database/entity';
 import { UrlUtils } from '../utils/UrlUtils';
 
 export class ScannerV2 {
@@ -37,13 +37,13 @@ export class ScannerV2 {
     return mangas;
   }
 
-  async scanMangaSource(pSource: ScanSource, scanChapters: boolean) {
+  async scanMangaSource(pSource: ScanSource, scanChaptersPages: boolean) {
     const response = await axios.get(pSource.link);
 
     const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
 
     const [source, tags] = this.updateScanSource(pSource, doc);
-    const chapters = await this.scanMangaChapters(source, doc, scanChapters);
+    const chapters = await this.scanMangaChapters(source, doc, scanChaptersPages);
     source.chapters = chapters;
 
     return [source, tags];
@@ -73,7 +73,7 @@ export class ScannerV2 {
     if (this.config.mangaCategoriesXpath && this.config.mangaCategoriesXpath !== '') {
       const genderNodes = xpath.select(this.config.mangaCategoriesXpath, doc);
       for (const genderNode of genderNodes) {
-        // logger.debug(`gender: ${genderNode.nodeValue}`);
+        logger.debug(`gender: ${genderNode.nodeValue}`);
         // TODO: cleanup value...
         tags.push(genderNode.nodeValue);
       }
@@ -82,7 +82,7 @@ export class ScannerV2 {
     if (this.config.mangaTagsXpath && this.config.mangaTagsXpath !== '') {
       const tagNodes = xpath.select(this.config.mangaTagsXpath, doc);
       for (const tagNode of tagNodes) {
-        // logger.debug(`tags: ${tagNode.nodeValue}`);
+        logger.debug(`tags: ${tagNode.nodeValue}`);
         // TODO: cleanup value...
         tags.push(tagNode.nodeValue);
       }
@@ -91,7 +91,7 @@ export class ScannerV2 {
     return [source, tags];
   }
 
-  private async scanMangaChapters(source: ScanSource, doc: any, scanChapters: boolean) {
+  private async scanMangaChapters(source: ScanSource, doc: any, scanPages: boolean) {
     const chaptersEncloseNodes = xpath.select(this.config.chapterEnclosingXpath, doc);
 
     const chapters = [];
@@ -115,13 +115,14 @@ export class ScannerV2 {
           number: chapterN
         });
       }
+    }
 
-      logger.info(`Found ${chapters.length} chapters --> ${source.manga.name} - ${source.name}`);
-      if (scanChapters) {
-        for (const chapter of chapters) {
-          const pages = await this.scanChapter(chapter);
-          chapter.pages = pages;
-        }
+    // scan chapters pages
+    logger.info(`${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
+    if (scanPages) {
+      for (const chapter of chapters) {
+        const pages = await this.scanPages(chapter.link);
+        chapter.pages = pages;
       }
     }
 
@@ -133,25 +134,31 @@ export class ScannerV2 {
     const urlSplit = url.split('/');
     let lastPartUrl = urlSplit[urlSplit.length-1];
     lastPartUrl = lastPartUrl.split('-')[0];
-    lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-    let chapterN: number = Number(lastPartUrl);
+    let chapterN: number;
+    if (lastPartUrl) {
+      lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
+      chapterN = Number(lastPartUrl);
+    }
 
     if (Number.isNaN(chapterN)) {
       lastPartUrl = urlSplit[urlSplit.length-1];
       lastPartUrl = lastPartUrl.split('-')[1];
-      lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-      chapterN = Number(lastPartUrl);
+      if (lastPartUrl) {
+        lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
+        chapterN = Number(lastPartUrl);
+      }
     }
     return [chapterN, lastPartUrl];
   }
 
-  async scanChapter(chapter: Chapter) {
+  // TODO: parametrize chapter scanner config...
+  async scanPages(chapterLink: string) {
     let foundPage = true;
     let currentPage = 1;
     const pages: Page[] = [];
     // iterate over pages until not found
     do {
-      const response = await axios.get(chapter.link + '/' + currentPage);
+      const response = await axios.get(chapterLink + '/' + currentPage);
       const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
 
       const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
