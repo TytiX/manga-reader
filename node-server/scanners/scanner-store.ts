@@ -140,7 +140,11 @@ export async function scanChapterPages(chapters: Chapter[]) {
   
     for (const chapter of chapters) {
       const dbChapter = await db.findChapterById(chapter.id);
-      scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
+      if (dbChapter) {
+        scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
+      } else {
+        logger.warn(`chapter not found: ${chapter.link}`);
+      }
     }
     scanQueue.onEmpty().then( () => {
       db.connection.close();
