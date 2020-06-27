@@ -97,7 +97,7 @@ async function updateOrAddChapter(database: Database, notifier: ScannerNotifier,
       // send update...
       const scanPages = await notifier.newChapterNotif(source, dbChapter);
       if (scanPages) {
-        await scanChapterPages([dbChapter.id]);
+        await scanChapterPages([dbChapter]);
       }
     }
   }
