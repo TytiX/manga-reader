@@ -115,9 +115,9 @@ async function updateTags(database: Database, manga: Manga, tags: string[]) {
 
 /**
  * Parse pages for specified chapters
- * @param chaptersIds ids of chapters to parse
+ * @param chapters chapters to parse
  */
-export async function scanChapterPages(chaptersIds: string[]) {
+export async function scanChapterPages(chapters: Chapter[]) {
   // TODO: add config
   const scanner = new ScannerV2();
   const scanQueue = new PQueue({
@@ -125,12 +125,12 @@ export async function scanChapterPages(chaptersIds: string[]) {
     autoStart: false
   })
   const db = new Database();
-  await db.connect(chaptersIds[0]);
+  await db.connect(chapters[0].id);
 
   const notifier = new ScannerNotifier(db);
 
-  for (const id of chaptersIds) {
-    const dbChapter = await db.findChapterById(id);
+  for (const chapter of chapters) {
+    const dbChapter = await db.findChapterById(chapter.id);
     scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
   }
   scanQueue.onEmpty().then( () => {
