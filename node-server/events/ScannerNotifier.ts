@@ -1,10 +1,10 @@
-import { Database } from "../database/Database";
-import { ScanSource, Chapter, Manga, ScannerConfig } from "../database/entity";
-import { WebpushUtils } from "../utils/WebpushUtils";
-import logger from "../logger";
-import PQueue from "p-queue/dist";
+import { Database } from '../database/Database';
+import { ScanSource, Chapter, Manga, ScannerConfig } from '../database/entity';
+import { WebpushUtils } from '../utils/WebpushUtils';
+import logger from '../logger';
+import PQueue from 'p-queue/dist';
 import * as Discord from 'discord.js';
-import { DiscordUtils } from "../utils/DiscordUtils";
+import { DiscordUtils } from '../utils/DiscordUtils';
 
 export class ScannerNotifier {
   db: Database;

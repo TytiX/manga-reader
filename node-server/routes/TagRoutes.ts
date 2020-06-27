@@ -1,8 +1,8 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
-import { IsNull } from "typeorm";
-import { Tag } from "../database/entity/Tag";
+import { Database } from '../database/Database';
+import { IsNull } from 'typeorm';
+import { Tag } from '../database/entity/Tag';
 
 export default (db: Database) => {
   const router = Router();

@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import { Client } from "discord.js";
-import logger from "../logger";
+import * as fs from 'fs';
+import { Client } from 'discord.js';
+import logger from '../logger';
 
 export class DiscordUtils {
 

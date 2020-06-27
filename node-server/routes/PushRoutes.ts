@@ -1,7 +1,7 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
-import { WebpushUtils } from "../utils/WebpushUtils";
+import { Database } from '../database/Database';
+import { WebpushUtils } from '../utils/WebpushUtils';
 
 export default (db: Database) => {
   const router = Router();

@@ -1,8 +1,8 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
-import { getDefaultConfigs } from "../scanners/site-scanner";
-import { Scanner } from "../scanners/Scanner";
+import { Database } from '../database/Database';
+import { getDefaultConfigs } from '../scanners/site-scanner';
+import { Scanner } from '../scanners/Scanner';
 
 export default (db: Database) => {
   const router = Router();

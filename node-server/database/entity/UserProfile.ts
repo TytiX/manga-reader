@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 
-import { Manga } from "./Manga";
-import { Advancement } from "./Advancement";
-import { Subscription } from "./Subscription";
+import { Manga } from './Manga';
+import { Advancement } from './Advancement';
+import { Subscription } from './Subscription';
 
 @Entity()
 export class UserProfile {

@@ -1,4 +1,4 @@
-import { createConnection, Connection, ConnectionOptions, getConnection } from "typeorm";
+import { createConnection, Connection, ConnectionOptions, getConnection } from 'typeorm';
 import { existsSync, readFileSync } from 'fs';
 
 import {

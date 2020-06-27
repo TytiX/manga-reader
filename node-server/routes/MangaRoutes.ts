@@ -1,6 +1,6 @@
-import { Router } from "express";
+import { Router } from 'express';
 
-import { Database } from "../database/Database";
+import { Database } from '../database/Database';
 
 export default (db: Database) => {
   const router = Router();
