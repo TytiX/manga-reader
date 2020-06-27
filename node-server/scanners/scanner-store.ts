@@ -19,48 +19,56 @@ export async function scanAndStore(config: ScannerConfig) {
   const db = new Database();
   db.connect(config.name).then( () => {
     storageQueue.start();
+  }).catch(e => {
+    logger.error(e);
   });
-  const notifier = new ScannerNotifier(db);
-  
-  const startTime = new Date().getTime();
 
-  const mangas = await scanner.listMangas();
+  try {
+    const notifier = new ScannerNotifier(db);
+    const startTime = new Date().getTime();
+    const mangas = await scanner.listMangas();
 
-  for (const manga of mangas) {
-    const m = new Manga();
-    m.name = manga.name;
-    const s = new ScanSource();
-    s.name = config.name;
-    s.scannerConfig = config;
-    s.link = manga.link;
-    s.manga = m;
-    const [source, tags] = await scanner.scanMangaSource(s, false);
-    // logger.info('scanned manga : ', source, tags);
-    storageQueue.add( () => createOrUpdate(
-      db,
-      notifier,
-      source as ScanSource,
-      tags as string[])
-    );
-  }
-
-  // close after usage
-  storageQueue.onEmpty().then( () => {
-    if ( db.connection ) {
-      db.connection.close();
-      logger.info(`config scann finished ${config.name} in : ${(new Date().getTime() - startTime) / 1000}s`)
+    for (const manga of mangas) {
+      const m = new Manga();
+      m.name = manga.name;
+      const s = new ScanSource();
+      s.name = config.name;
+      s.scannerConfig = config;
+      s.link = manga.link;
+      s.manga = m;
+      const [source, tags] = await scanner.scanMangaSource(s, false);
+      // logger.info('scanned manga : ', source, tags);
+      storageQueue.add( () => createOrUpdate(
+        db,
+        notifier,
+        source as ScanSource,
+        tags as string[])
+      );
     }
-  });
+
+    // close after usage
+    storageQueue.onEmpty().then( () => {
+      if ( db.connection ) {
+        db.connection.close();
+        logger.info(`config scann finished ${config.name} in : ${(new Date().getTime() - startTime) / 1000}s`)
+      }
+    });
+  } catch(e) {
+    logger.error(e);
+  }
 }
 
-
 async function createOrUpdate(database: Database, notifier: ScannerNotifier, source: ScanSource, tags: string[]) {
-  const dbSource = await retrieveSource(database, notifier, source);
-  logger.info(`source updated : ${dbSource.manga.name}`);
-  await updateOrAddChapter(database, notifier, dbSource, source.chapters);
-  logger.info(`chapters updated : ${dbSource.manga.name}`);
-  await updateTags(database, source.manga, tags);
-  logger.info(`tags updated : ${dbSource.manga.name}`);
+  try {
+    const dbSource = await retrieveSource(database, notifier, source);
+    logger.info(`source updated : ${dbSource.manga.name}`);
+    await updateOrAddChapter(database, notifier, dbSource, source.chapters);
+    logger.info(`chapters updated : ${dbSource.manga.name}`);
+    await updateTags(database, source.manga, tags);
+    logger.info(`tags updated : ${dbSource.manga.name}`);
+  } catch (e) {
+    console.warn(e);
+  }
 }
 
 /**
@@ -124,19 +132,23 @@ export async function scanChapterPages(chapters: Chapter[]) {
     concurrency: 10,
     autoStart: false
   })
-  const db = new Database();
-  await db.connect(chapters[0].id);
-
-  const notifier = new ScannerNotifier(db);
-
-  for (const chapter of chapters) {
-    const dbChapter = await db.findChapterById(chapter.id);
-    scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
+  try {
+    const db = new Database();
+    await db.connect(chapters[0].id);
+  
+    const notifier = new ScannerNotifier(db);
+  
+    for (const chapter of chapters) {
+      const dbChapter = await db.findChapterById(chapter.id);
+      scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
+    }
+    scanQueue.onEmpty().then( () => {
+      db.connection.close();
+    });
+    scanQueue.start();
+  } catch (e) {
+    logger.error(e);
   }
-  scanQueue.onEmpty().then( () => {
-    db.connection.close();
-  });
-  scanQueue.start();
 }
 
 /**
@@ -146,10 +158,13 @@ export async function scanChapterPages(chapters: Chapter[]) {
  * @param chapter the chapter to scan
  */
 async function scanPagesAndUpdateChapter(database: Database, scanner: ScannerV2, notifier: ScannerNotifier, chapter: Chapter) {
-  // const notifier = new ScannerNotifier(database);
-  const pages = await scanner.scanPages(chapter.link);
-  chapter.pages = pages;
-  chapter.scanned = true;
-  await database.chapterRepository.save(chapter);
-  notifier.chapterScanFinish(chapter);
+  try {
+    const pages = await scanner.scanPages(chapter.link);
+    chapter.pages = pages;
+    chapter.scanned = true;
+    await database.chapterRepository.save(chapter);
+    notifier.chapterScanFinish(chapter);
+  } catch (e) {
+    logger.error(e);
+  }
 }
