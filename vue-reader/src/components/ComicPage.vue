@@ -1,6 +1,7 @@
 <template>
   <b-img
     :src="page"
+    @load="loaded"
     v-b-visible="visibleHandler">
   </b-img>
 </template>
@@ -13,10 +14,23 @@ export default class ComicPage extends Vue {
   @Prop()
   page!: string;
 
+  load = false;
+  visible = false;
+
   visibleHandler(visible: boolean) {
-    if (visible) {
-      this.$emit('page-show', this.page);
+    this.visible = visible;
+    if (visible && this.load) {
+      this.send();
     }
+  }
+  loaded() {
+    this.load = true;
+    if (this.visible) {
+      this.send();
+    }
+  }
+  send() {
+    this.$emit('page-show', this.page);
   }
 }
 </script>

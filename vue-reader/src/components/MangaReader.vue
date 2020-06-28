@@ -17,11 +17,13 @@
           @click="pageNext"></div>
       </div>
       <div v-else-if="readingMode === 'vertical'"
+        ref="container"
         class="comic-strip">
         <b-button @click="chapterBack">Previous chapter</b-button>
         <ComicPage v-for="[index, page] of pageEntites"
           :key="page"
           :ref="index"
+          :id="'page-' + index"
           :page="page"
           @page-show="visiblePage"
           class="page"/>
@@ -52,6 +54,8 @@ export default class MangaReader extends Vue {
   @Prop({ default: 'normal' })
   readingMode!: string;
 
+  timeout: any;
+
   mounted() {
     this.loadPageChanged();
   }
@@ -64,8 +68,9 @@ export default class MangaReader extends Vue {
   loadPageChanged() {
     this.selIndex = this.loadPageIndex;
     if (this.readingMode === 'vertical') {
+      const scrollTo = '' + this.selIndex;
       setTimeout( () => {
-        this.scrollMeTo('' + this.selIndex);
+        this.scrollMeTo(scrollTo);
       }, 1500);
     }
   }
@@ -74,8 +79,7 @@ export default class MangaReader extends Vue {
     const element = this.$refs[refName];
     // eslint-disable-next-line
     const top = (element as any)[0].$el.offsetTop;
-    // console.log(element);
-    window.scrollTo(0, top);
+    (this.$refs['container'] as any).scrollTo(0, top);
   }
 
   get pageEntites() {
@@ -83,8 +87,13 @@ export default class MangaReader extends Vue {
   }
 
   visiblePage(page: string) {
-    this.selIndex = this.pages.indexOf(page);
-    this.$emit('page-change', this.selIndex);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.timeout = setTimeout( () => {
+      this.selIndex = this.pages.indexOf(page);
+      this.$emit('page-change', this.selIndex);
+    }, 1000);
   }
 
   pageBack() {
