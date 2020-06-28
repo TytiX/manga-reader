@@ -54,6 +54,7 @@ export default class MangaReader extends Vue {
   @Prop({ default: 'normal' })
   readingMode!: string;
 
+  // eslint-disable-next-line
   timeout: any;
 
   mounted() {
@@ -79,6 +80,7 @@ export default class MangaReader extends Vue {
     const element = this.$refs[refName];
     // eslint-disable-next-line
     const top = (element as any)[0].$el.offsetTop;
+    // eslint-disable-next-line
     (this.$refs['container'] as any).scrollTo(0, top);
   }
 
