@@ -20,7 +20,7 @@ export async function scanAndStore(config: ScannerConfig) {
   db.connect(config.name).then( () => {
     storageQueue.start();
   }).catch(e => {
-    logger.error(e);
+    logger.error(`${e}`);
   });
 
   try {
@@ -54,7 +54,7 @@ export async function scanAndStore(config: ScannerConfig) {
       }
     });
   } catch(e) {
-    logger.error(e);
+    logger.error(`${e}`);
   }
 }
 
@@ -151,7 +151,7 @@ export async function scanChapterPages(chapters: Chapter[]) {
     });
     scanQueue.start();
   } catch (e) {
-    logger.error(e);
+    logger.error(`${e}`);
   }
 }
 
@@ -169,6 +169,6 @@ async function scanPagesAndUpdateChapter(database: Database, scanner: ScannerV2,
     await database.chapterRepository.save(chapter);
     notifier.chapterScanFinish(chapter);
   } catch (e) {
-    logger.error(e);
+    logger.error(`${e}`);
   }
 }
