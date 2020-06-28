@@ -1,4 +1,4 @@
-import { Connection, getRepository, Repository, In, createQueryBuilder } from 'typeorm';
+import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan } from 'typeorm';
 
 import {
   Manga,
@@ -183,7 +183,6 @@ export class Database {
     });
     if (chapter) {
       if (chapter.source) {
-        // const source = await this.sourceRepository.findOne(chapter.source.id);
         return chapter;
       } else {
         await this.chapterRepository.remove(chapter);
@@ -214,8 +213,9 @@ export class Database {
     const chapter = await this.chapterRepository.findOne(chapterId, {
       relations: ['source']
     });
-    const chapters = await this.chapterRepository.find({
+    const previous = await this.chapterRepository.findOne({
       where: {
+        number: MoreThan(chapter.number),
         source: {
           id: chapter.source.id
         }
@@ -224,33 +224,19 @@ export class Database {
         number: 'ASC'
       }
     });
-    let previous = undefined;
-    for (const c of chapters) {
-      if (c.number > chapter.number) {
-        previous = c;
-        break;
-      }
-    }
     return previous;
   }
   async findPreviousChapterById(chapterId: string) {
     const chapter = await this.chapterRepository.findOne(chapterId, {
       relations: ['source']
     });
-    const chapters = await this.chapterRepository.find({
+    const previous = await this.chapterRepository.findOne({
       where: {
+        number: LessThan(chapter.number),
         source: { id: chapter.source.id }
       },
-      order: { number: 'ASC' }
+      order: { number: 'DESC' }
     });
-    let previous = undefined;
-    for (const c of chapters) {
-      if (c.number < chapter.number) {
-        previous = c;
-      } else if (c.number >= chapter.number) {
-        break;
-      }
-    }
     return previous;
   }
 
