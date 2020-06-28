@@ -129,27 +129,22 @@ export async function scanChapterPages(chapters: Chapter[]) {
   // TODO: add config
   const scanner = new ScannerV2();
   const scanQueue = new PQueue({
-    concurrency: 10,
-    autoStart: false
+    concurrency: 10
   })
   try {
     const db = new Database();
-    await db.connect(chapters[0].id);
-  
-    const notifier = new ScannerNotifier(db);
-  
-    for (const chapter of chapters) {
-      const dbChapter = await db.findChapterById(chapter.id);
-      if (dbChapter) {
-        scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
-      } else {
-        logger.warn(`chapter not found: ${chapter.link}`);
+    db.connect('chapter-scanner').then( async () => {
+      const notifier = new ScannerNotifier(db);
+    
+      for (const chapter of chapters) {
+        const dbChapter = await db.findChapterById(chapter.id);
+        if (dbChapter) {
+          await scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter);
+        } else {
+          logger.warn(`chapter not found: ${chapter.link}`);
+        }
       }
-    }
-    scanQueue.onEmpty().then( () => {
-      db.connection.close();
     });
-    scanQueue.start();
   } catch (e) {
     logger.error(`${e}`);
   }
@@ -162,13 +157,9 @@ export async function scanChapterPages(chapters: Chapter[]) {
  * @param chapter the chapter to scan
  */
 async function scanPagesAndUpdateChapter(database: Database, scanner: ScannerV2, notifier: ScannerNotifier, chapter: Chapter) {
-  try {
-    const pages = await scanner.scanPages(chapter.link);
-    chapter.pages = pages;
-    chapter.scanned = true;
-    await database.chapterRepository.save(chapter);
-    notifier.chapterScanFinish(chapter);
-  } catch (e) {
-    logger.error(`${e}`);
-  }
+  const pages = await scanner.scanPages(chapter.link);
+  chapter.pages = pages;
+  chapter.scanned = true;
+  await database.chapterRepository.save(chapter);
+  notifier.chapterScanFinish(chapter);
 }
