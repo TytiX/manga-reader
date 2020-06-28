@@ -64,7 +64,7 @@ async function createOrUpdate(database: Database, notifier: ScannerNotifier, sou
     logger.info(`source updated : ${dbSource.manga.name}`);
     await updateOrAddChapter(database, notifier, dbSource, source.chapters);
     logger.info(`chapters updated : ${dbSource.manga.name}`);
-    await updateTags(database, source.manga, tags);
+    await updateTags(database, dbSource.manga, tags);
     logger.info(`tags updated : ${dbSource.manga.name}`);
   } catch (e) {
     console.warn(e);
