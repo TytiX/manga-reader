@@ -3,31 +3,40 @@
     <AppNavBar title="Manage Tags" back="true" :showSetting="false">
         <b-nav-item @click="saveTags"><b-icon icon="file-earmark-arrow-down"></b-icon></b-nav-item>
     </AppNavBar>
-    <div style="height: calc(100% - 56px);" class="scrollable">
-      <b-container class="align-l">
-        <!-- <b-row>
-          <b-button variant="success" @click="saveTags">Save</b-button>
-        </b-row> -->
-        <b-row class="mt-3 mb-3">
-          <b-list-group class="w-100">
-            <b-list-group-item v-for="tag of tags" :key="tag.id">
-              <b-row>
-                <b-input class="col-6" type="text" v-model="tag.name"></b-input>
-                <draggable class="col-6 list-group" :list="tag.values" group="people">
-                  <div
-                    class="list-group-item"
-                    v-for="value of tag.values"
-                    :key="tag.id + '-' + value.id">
-                    {{value.value}}
-                    <i @click="deleteValueFromTag(tag, value)"><b-icon icon="x"></b-icon></i>
-                  </div>
-                </draggable>
-              </b-row>
-            </b-list-group-item>
-          </b-list-group>
-        </b-row>
-      </b-container>
-    </div>
+    <b-container class="align-l" style="height: calc(100% - 56px - 2rem);">
+      <b-row class="mt-3 mb-3" style="height: 100%">
+        <!-- Values -->
+        <draggable class="col-6 list-group scrollable h-100"
+          :list="values"
+          :group="{ name: 'people', clone: 'clone', put: false }">
+          <div class="list-group-item"
+            v-for="value of values"
+            :key="'value-' + value.id">
+            {{value.value}}
+          </div>
+        </draggable>
+        <!-- Tags -->
+        <b-list-group class="col-6 scrollable h-100">
+          <b-list-group-item v-for="tag of tags" :key="tag.id">
+            <b-row>
+              <b-input class="col-6" type="text" v-model="tag.name"></b-input>
+              <draggable class="col-6 list-group"
+                :list="tag.values"
+                @add="dropValue(tag)"
+                group="people">
+                <div
+                  class="list-group-item"
+                  v-for="value of tag.values"
+                  :key="tag.id + '-' + value.id">
+                  {{value.value}}
+                  <i @click="deleteValueFromTag(tag, value)"><b-icon icon="x"></b-icon></i>
+                </div>
+              </draggable>
+            </b-row>
+          </b-list-group-item>
+        </b-list-group>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -46,6 +55,7 @@ import { Tag, TagValue } from '@/models';
   }
 })
 export default class TagsListEditor extends Vue {
+  values: TagValue[] = [];
   tags: Tag[] = [];
 
   mounted() {
@@ -55,7 +65,29 @@ export default class TagsListEditor extends Vue {
   realoadTags() {
     axios.get('/api/tag/values').then( res => {
       this.tags = res.data;
+      this.values = [];
+      for (const tag of this.tags) {
+        this.values.push(...tag.values);
+      }
     });
+  }
+
+  dropValue(tag: Tag) {
+    // cleanupOtherTags
+    const tagsToClean: Tag[] = this.tags.filter(t => {
+      return t.id !== tag.id;
+    });
+    console.log(tag);
+    console.log(tagsToClean);
+    for (const t of tagsToClean) {
+      for (const v of tag.values) {
+        const delIndex = t.values.findIndex((val) => val.id === v.id);
+        if (delIndex > -1) {
+          console.log('find in', t);
+          t.values.splice(delIndex, 1);
+        }
+      }
+    }
   }
 
   saveTags() {
