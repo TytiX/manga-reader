@@ -4,6 +4,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Favorites from '../views/Favorites.vue'
 import Filters from '../views/Filters.vue'
 import Home from '../views/Home.vue'
+import Recents from '../views/Recents.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
 
@@ -24,6 +25,16 @@ Vue.use(VueRouter)
     path: '/mangas',
     name: 'All',
     component: Home
+  },
+  {
+    path: '/updated-today',
+    name: 'Today',
+    component: Recents
+  },
+  {
+    path: '/updated-weekly',
+    name: 'This Week',
+    component: Recents
   },
   {
     path: '/manga/:id',
