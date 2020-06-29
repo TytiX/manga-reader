@@ -77,8 +77,6 @@ export default class TagsListEditor extends Vue {
     const tagsToClean: Tag[] = this.tags.filter(t => {
       return t.id !== tag.id;
     });
-    console.log(tag);
-    console.log(tagsToClean);
     for (const t of tagsToClean) {
       for (const v of tag.values) {
         const delIndex = t.values.findIndex((val) => val.id === v.id);

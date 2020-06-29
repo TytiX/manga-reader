@@ -52,6 +52,14 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "about" */ '../components/settings/TagsListEditor.vue')
   },
   {
+    path: '/manage-mangas',
+    name: 'ManageMangas',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../components/settings/MangaMergeEditor.vue')
+  },
+  {
     path: '/settings/:id',
     name: 'SettingsDetail',
     // route level code-splitting
