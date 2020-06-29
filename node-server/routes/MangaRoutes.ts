@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { createQueryBuilder } from 'typeorm';
+import * as moment from 'moment';
+import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
-import { ScanSource } from '../database/entity';
 
 export default (db: Database) => {
   const router = Router();
@@ -50,6 +50,27 @@ export default (db: Database) => {
     } catch (e) {
       res.send(e);
     }
+  });
+  router.get('/latelly/:number-:period', async (req, res) => {
+    let chapters = await db.chapterRepository.find({
+      relations: [ 'source', 'source.manga' ],
+      where: {
+        createDate: MoreThanOrEqual(
+          moment().subtract( //5, 'hours')
+            Number(req.params.number),
+            req.params.period as any
+          )
+        )
+      }
+    });
+    res.send(
+      await db.mangaRepository.findByIds(
+        chapters.map( c => c.source.manga),
+        {
+          relations: [ 'sources', 'sources.scannerConfig' ]
+        }
+      )
+    );
   });
   router.get('/:id', async function(req, res) {
     res.send(
