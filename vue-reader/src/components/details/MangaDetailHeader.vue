@@ -73,7 +73,7 @@ export default class MangaDetailHeader extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .img-cover {
   width: auto;
   max-height: 350px;

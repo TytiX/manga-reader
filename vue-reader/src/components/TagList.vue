@@ -71,7 +71,7 @@ export default class TagList extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .tag {
   /* background-color: #767676; */
   border-radius: 0 2px 2px 0;
