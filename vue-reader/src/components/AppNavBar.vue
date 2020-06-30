@@ -10,7 +10,10 @@
 
       <b-navbar-nav class="ml-auto">
         <b-nav-form v-if="enableSearch">
-          <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+          <b-form-input size="sm" class="mr-sm-2"
+            placeholder="Search"
+            v-model="searchText">
+          </b-form-input>
         </b-nav-form>
         <b-nav-item v-show="showSetting" to="/settings"><b-icon icon="gear"></b-icon></b-nav-item>
         <slot></slot>
@@ -32,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component
 export default class AppNavBar extends Vue {
@@ -45,9 +48,16 @@ export default class AppNavBar extends Vue {
   @Prop({ default: true })
   showSetting!: boolean;
 
+  searchText = '';
+
   isHome = false;
   mounted() {
     this.isHome = this.$route.path === '/';
+  }
+
+  @Watch('searchText')
+  searchChange() {
+    this.$emit('search', this.searchText);
   }
 }
 </script>

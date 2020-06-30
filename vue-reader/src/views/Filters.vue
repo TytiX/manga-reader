@@ -1,6 +1,9 @@
 <template>
   <div class="filter">
-    <AppNavBar title="Search"></AppNavBar>
+    <AppNavBar title="Search"
+      :enableSearch="true"
+      @search="searchText">
+    </AppNavBar>
     <div
       style="height: calc(100% - 56px);"
       class="scrollable">
@@ -9,7 +12,7 @@
         @selected-tags="selectTags"></TagList>
       <Loading v-else></Loading>
       <MangaList v-if="loaded"
-        :mangas="mangas"
+        :mangas="displayMangas"
         :favorites="favorites"
         @fav="fav"
         @unfav="unfav">
@@ -40,6 +43,7 @@ import { Tag, Manga } from '@/models';
 export default class Favorites extends Vue {
   tags: Tag[] = [];
   mangas: Manga[] = [];
+  displayMangas: Manga[] = [];
   favorites: Manga[] = [];
 
   selectedTags: Tag[] = [];
@@ -72,7 +76,13 @@ export default class Favorites extends Vue {
     this.loaded = false;
     axios.post('/api/manga/search', { tags: this.selectedTags }).then( res => {
       this.mangas = res.data;
+      this.searchText('')
       this.loaded = true;
+    });
+  }
+  searchText(text: string) {
+    this.displayMangas = this.mangas.filter( (m: Manga) => {
+      return m.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
     });
   }
 
