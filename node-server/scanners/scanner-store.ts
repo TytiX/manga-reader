@@ -128,22 +128,20 @@ async function updateTags(database: Database, manga: Manga, tags: string[]) {
 export async function scanChapterPages(chapters: Chapter[]) {
   // TODO: add config
   const scanner = new ScannerV2();
-  const scanQueue = new PQueue({
-    concurrency: 10
-  })
+  const scanQueue = new PQueue({ concurrency: 10 });
   try {
     const db = new Database();
     db.connect('chapter-scanner').then( async () => {
       const notifier = new ScannerNotifier(db);
-    
       for (const chapter of chapters) {
         const dbChapter = await db.findChapterById(chapter.id);
         if (dbChapter) {
-          await scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter);
+          scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
         } else {
           logger.warn(`chapter not found: ${chapter.link}`);
         }
       }
+      scanQueue.start();
     });
   } catch (e) {
     logger.error(`${e}`);
