@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { Database } from '../database/Database';
+import { scanMangaPages } from '../scanners/site-scanner';
 
 export default (db: Database) => {
   const router = Router();
@@ -43,12 +44,12 @@ export default (db: Database) => {
     res.send({status: 'ok'});
   });
   router.post('/:profileId/addfav/:mangaId', async function(req, res) {
-    res.send(
-      await db.addFavoriteToProfile(
-        req.params.profileId,
-        req.params.mangaId
-      )
+    const p = await db.addFavoriteToProfile(
+      req.params.profileId,
+      req.params.mangaId
     );
+    scanMangaPages([req.params.mangaId]);
+    res.send( p );
   });
   router.post('/:profileId/rmfav/:mangaId', async function(req, res) {
     res.send(
