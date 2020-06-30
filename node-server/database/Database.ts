@@ -256,25 +256,6 @@ export class Database {
   
   async deleteConfig(id: string): Promise<boolean> {
     try {
-      // const config = await this.configRepository.findOne(id, {
-      //   relations: ['sources', 'sources.chapters', 'sources.chapters.pages']
-      // });
-      // const sourcesIds: string[] = [];
-      // for (const source of config.sources) {
-      //   const chaptersIds: string[] = [];
-      //   for (const chapter of source.chapters) {
-      //     const pageIds: string[] = [];
-      //     for (const page of chapter.pages) {
-      //       pageIds.push(page.id);
-      //     }
-      //     if (pageIds.length > 0) await this.pageRepository.delete(pageIds);
-      //     chaptersIds.push(chapter.id);
-      //   }
-      //   if (chaptersIds.length > 0) await this.chapterRepository.delete(chaptersIds);
-      //   sourcesIds.push(source.id);
-      // }
-      // if (sourcesIds.length > 0) await this.sourceRepository.delete(sourcesIds);
-
       await this.configRepository.delete(id);
       return true;
     } catch(e) {
