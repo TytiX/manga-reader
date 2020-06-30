@@ -3,8 +3,9 @@ import * as path from 'path';
 import * as walkSync from 'walk-sync';
 
 import { Database } from '../database/Database';
-import { ScannerConfig } from '../database/entity';
-import { scanAndStore } from './scanner-store';
+import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
+import { scanAndStore, scanChapterPages } from './scanner-store';
+import { Equal } from 'typeorm';
 
 export default async (firstScan: boolean) => {
   // get all configuration on a new connection...
@@ -28,4 +29,37 @@ export function getDefaultConfigs() {
     }
   }
   return defaultConfigs;
+}
+
+export function scanfavoritesPages() {
+  const db = new Database();
+  db.connect('manga-favorit-page-scanner').then( async () => {
+    const profiles = await db.userProfileRepository.find({
+      relations: [ 'favorites' ]
+    });
+    const favs = [];
+    for (const p of profiles) {
+      favs.push(... p.favorites);
+    }
+    scanMangaPages(favs.map(f => f.id));
+  });
+}
+
+export function scanMangaPages(mangaIds: string[]) {
+  const db = new Database();
+  db.connect('manga-page-scanner').then( async () => {
+    // const mangas = await db.mangaRepository.findByIds(mangaIds);
+    const chapters: Chapter[] = []
+    for (const mangaId of mangaIds) {
+      const toScanChapters = await db.connection.createQueryBuilder()
+        .from(Chapter, 'chapter')
+        .innerJoin(ScanSource, 'source', 'source.id = chapter."sourceId"')
+        .innerJoin(Manga, 'manga', 'source."mangaId" = manga.id')
+        .where('scanned = false')
+        .andWhere('manga.id = \'' + mangaId + '\'')
+        .getMany();
+      chapters.push(... toScanChapters);
+    }
+    scanChapterPages(chapters);
+  });
 }
