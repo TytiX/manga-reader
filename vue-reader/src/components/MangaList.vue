@@ -1,7 +1,7 @@
 <template>
   <b-container class="manga-list">
     <b-row>
-      <b-col cols="6" sm="4" md="2"
+      <b-col cols="4" sm="4" md="2"
         v-for="manga of mangas"
         :key="manga.id">
         <router-link
