@@ -48,18 +48,12 @@ export function scanfavoritesPages() {
 export function scanMangaPages(mangaIds: string[]) {
   const db = new Database();
   db.connect('manga-page-scanner').then( async () => {
-    // const mangas = await db.mangaRepository.findByIds(mangaIds);
-    const chapters: Chapter[] = []
-    for (const mangaId of mangaIds) {
-      const toScanChapters = await db.connection.createQueryBuilder()
-        .from(Chapter, 'chapter')
-        .innerJoin(ScanSource, 'source', 'source.id = chapter."sourceId"')
-        .innerJoin(Manga, 'manga', 'source."mangaId" = manga.id')
-        .where('scanned = false')
-        .andWhere('manga.id = \'' + mangaId + '\'')
-        .getMany();
-      chapters.push(... toScanChapters);
-    }
-    scanChapterPages(chapters);
+    const toScanChapters = await db.connection.createQueryBuilder(Chapter, 'chapter')
+          .innerJoin(ScanSource, 'source', 'source.id = chapter."sourceId"')
+          .innerJoin(Manga, 'manga', 'source."mangaId" = manga.id')
+          .where('scanned = false')
+          .andWhere( 'manga.id IN (:...ids)', { ids: mangaIds } )
+          .getMany();
+    scanChapterPages(toScanChapters);
   });
 }
