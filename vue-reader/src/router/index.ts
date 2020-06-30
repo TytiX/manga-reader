@@ -52,7 +52,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Settings.vue')
+    component: () => import(/* webpackChunkName: "settings" */ '../views/Settings.vue')
   },
   {
     path: '/manage-tags',
@@ -60,7 +60,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../components/settings/TagsListEditor.vue')
+    component: () => import(/* webpackChunkName: "settings" */ '../components/settings/TagsListEditor.vue')
   },
   {
     path: '/manage-mangas',
@@ -68,7 +68,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../components/settings/MangaMergeEditor.vue')
+    component: () => import(/* webpackChunkName: "settings" */ '../components/settings/MangaMergeEditor.vue')
   },
   {
     path: '/settings/:id',
@@ -76,7 +76,7 @@ Vue.use(VueRouter)
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/SettingsDetail.vue')
+    component: () => import(/* webpackChunkName: "settings" */ '../views/SettingsDetail.vue')
   },
   {
     path: '/about',
