@@ -59,20 +59,21 @@ export class Database {
   }
   async mangaByTags(tags: Tag[]): Promise<Manga[]> {
     const ids = tags.map(t => t.id);
-    const query = createQueryBuilder<Manga>('Manga', 'manga', this.connection.name)
-                  .innerJoinAndSelect('manga.tags', 'tag')
-                  .leftJoinAndSelect('manga.sources', 'source')
-                  .leftJoinAndSelect('source.scannerConfig', 'scannerConfig')
+    const query = createQueryBuilder<Manga>(Manga, 'manga', this.connection.name)
+                  .select('manga.id')
+                  .innerJoin('manga_tags_tag', 'manga_tag', 'manga.id = manga_tag."mangaId"')
+                  .innerJoin(Tag, 'tag', 'manga_tag."tagId" = tag.id')
+                  .innerJoin(ScanSource, 'source', 'source."mangaId" = manga.id')
+                  .innerJoin(ScannerConfig, 'scannerConfig', 'source."scannerConfigId" = scannerConfig.id')
+                  .where('tag.id IN (:...ids)', { ids })
+                  .groupBy('manga.id')
+                  .having('count(*) >= ' + ids.length)
                   .orderBy('manga.name', 'ASC');
-    for (const [pos, tag] of tags.entries()) {
-      if (pos === 0) {
-        query.where('tag.id = (:'+pos+')', { [pos]: tag.id });
-      } else {
-        query.andWhere('tag.id = (:'+pos+')', { [pos]: tag.id });
-      }
-    }
     const mangas = await query.getMany();
-    return mangas;
+
+    return await this.mangaRepository.findByIds(mangas.map(m => m.id), {
+      relations: [ 'sources', 'sources.scannerConfig' ]
+    });
   }
   async findMangaById(id: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
