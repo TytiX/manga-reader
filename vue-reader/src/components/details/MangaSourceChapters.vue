@@ -3,6 +3,7 @@
     <b-row class="mb-3">
       <b-form-select v-model="selectedSource" :options="optionsSources"></b-form-select>
     </b-row>
+
     <b-row class="mb-3">
       <b-button-group class="col-5" pill>
         <b-button
@@ -10,14 +11,14 @@
           variant="warning">
           <b-icon icon="check2-circle"></b-icon>
         </b-button>
-        <b-button
+        <!-- <b-button
           @click.prevent="cacheOnServer(...chapters)">
           <b-icon icon="cloud-upload"></b-icon>
         </b-button>
         <b-button
           @click.prevent="downloadChapters(...chapters)">
           <b-icon icon="cloud-download"></b-icon>
-        </b-button>
+        </b-button> -->
       </b-button-group>
       <div class="col-5">
         <b-form-select v-model="selectedSource.reading" :options="readingOptions"></b-form-select>
@@ -31,28 +32,32 @@
         </b-button>
       </div>
     </b-row>
+
     <b-row class="mb-3">
       <b-list-group class="chapter-list w-100">
         <b-list-group-item
           v-for="chapter of chapters"
           :key="chapter.id"
           :to="chapter.scanned ? '/reader/'+chapter.id : ''"
-          class="d-flex justify-content-between align-items-center">
-          {{ chapter.number }} - {{ chapter.name }}
+          class="d-flex">
+          <div class="flex w-100">
+            <div>{{ chapter.number }} - {{ chapter.name }}</div>
+            <small>{{ chapter.createDate | date }}</small>
+          </div>
           <b-button-group size="sm" pill>
             <b-button
               @click.prevent="scanChapters(chapter)"
               :variant="chapterScanStatus(chapter)">
               <b-icon :icon="chapterIconStatus(chapter)"></b-icon>
             </b-button>
-            <b-button
+            <!-- <b-button
               @click.prevent="cacheOnServer(chapter)">
               <b-icon icon="cloud-upload"></b-icon>
             </b-button>
             <b-button
               @click.prevent="downloadChapters(chapter)">
               <b-icon icon="cloud-download"></b-icon>
-            </b-button>
+            </b-button> -->
           </b-button-group>
         </b-list-group-item>
       </b-list-group>
@@ -65,7 +70,13 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 
 import { Manga, ScanSource, Chapter } from '@/models';
 
-@Component
+@Component({
+  filters: {
+    'date': (value: Date) => {
+      return new Date(value).toLocaleString();
+    }
+  }
+})
 export default class MangaSourceChapters extends Vue {
   @Prop()
   manga!: Manga;
@@ -91,12 +102,12 @@ export default class MangaSourceChapters extends Vue {
       id: ''
     },
     chapters: []
-  }
+  };
   optionsSources: { value: ScanSource; text: string }[] = [];
   readingOptions = [
     {value: 'normal', text: 'normal'},
     {value: 'vertical', text: 'vertical'}
-  ]
+  ];
 
   created() {
     this.reinit();
@@ -113,7 +124,6 @@ export default class MangaSourceChapters extends Vue {
   }
   @Watch('selectedSource')
   changeScanSource() {
-    console.log('change source');
     this.reloadChapters();
   }
 
@@ -159,5 +169,7 @@ export default class MangaSourceChapters extends Vue {
 </script>
 
 <style>
-
+.chapter-list {
+  text-align: left;
+}
 </style>

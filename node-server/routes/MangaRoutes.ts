@@ -59,7 +59,7 @@ export default (db: Database) => {
           moment().subtract( //5, 'hours')
             Number(req.params.number),
             req.params.period as any
-          )
+          ).toDate()
         )
       }
     });

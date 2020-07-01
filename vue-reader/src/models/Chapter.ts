@@ -8,5 +8,6 @@ export interface Chapter {
   link: string;
   scanned: boolean;
   source: ScanSource;
+  createDate: Date;
   pages: Page[];
 }
