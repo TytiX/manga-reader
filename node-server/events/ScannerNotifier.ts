@@ -32,8 +32,8 @@ export class ScannerNotifier {
 
   async newChapterNotif(source: ScanSource, chapter: Chapter) {
     const embed = new Discord.MessageEmbed();
-    embed.setTitle(`Nouveau chapitre de ${source.manga.name}`)
-        .setDescription(`Chapitre ${chapter.number} disponible`)
+    embed.setTitle(`Chapitre ${chapter.number} de ${source.manga.name}`)
+        .setDescription(`Nouveau chapitre n°${chapter.number} disponible sur ${source.name}`)
         .setImage(source.coverLink)
         .setURL(`${DiscordUtils.MANGA_URL}/${source.manga.id}`);
     this.messageQueue.add(() => this.sendNotificationMessage(DiscordUtils.ALL_UPDATE_CHANNEL_ID, embed));
@@ -44,8 +44,8 @@ export class ScannerNotifier {
         relations: [ 'favorites', 'subscriptions' ]
       });
       const payloads = {
-        title: `Nouveau chapitre de ${source.manga.name}`,
-        body: `Chapitre ${chapter.number} disponible`,
+        title: `Chapitre ${chapter.number} de ${source.manga.name}`,
+        body: `Nouveau chapitre n°${chapter.number} disponible sur ${source.name}`,
         icon: source.coverLink,
         data: {
           source,
