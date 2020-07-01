@@ -2,16 +2,14 @@
   <b-container>
     <b-row class="mt-3 mb-3">
       <b-col>
-        <b-carousel
-          class="chapter-covers"
-          img-height="350"
-          indicators>
-          <b-carousel-slide v-for="cover of covers" :key="cover"
-            :img-src="cover"
-            class="img-cover"
-            fluid>
-          </b-carousel-slide>
-        </b-carousel>
+        <carousel
+          :autoplay="true"
+          :perPage="1">
+          <slide v-for="cover of covers" :key="cover"
+            class="img-cover">
+            <b-img :src="cover"></b-img>
+          </slide>
+        </carousel>
       </b-col>
       <b-col class="chapter-desc">{{description}}</b-col>
     </b-row>
@@ -25,10 +23,16 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Carousel, Slide } from 'vue-carousel';
 
 import { Manga, Tag } from '@/models';
 
-@Component
+@Component({
+  components: {
+    Carousel,
+    Slide
+  }
+})
 export default class MangaDetailHeader extends Vue {
   @Prop()
   manga!: Manga;
