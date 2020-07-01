@@ -60,20 +60,25 @@ export class Database {
   async mangaByTags(tags: Tag[]): Promise<Manga[]> {
     const ids = tags.map(t => t.id);
     const query = createQueryBuilder<Manga>(Manga, 'manga', this.connection.name)
-                  .select('manga.id')
-                  .innerJoin('manga_tags_tag', 'manga_tag', 'manga.id = manga_tag."mangaId"')
-                  .innerJoin(Tag, 'tag', 'manga_tag."tagId" = tag.id')
-                  .innerJoin(ScanSource, 'source', 'source."mangaId" = manga.id')
-                  .innerJoin(ScannerConfig, 'scannerConfig', 'source."scannerConfigId" = scannerConfig.id')
-                  .where('tag.id IN (:...ids)', { ids })
-                  .groupBy('manga.id')
-                  .having('count(*) >= ' + ids.length)
-                  .orderBy('manga.name', 'ASC');
+                  .leftJoinAndMapMany('manga.sources', 'manga.sources', 'source', 'source."mangaId" = manga.id')
+                  .leftJoinAndMapOne('source.scannerConfig', 'source.scannerConfig', 'config', 'source."scannerConfigId" = config.id')
+                  .where( qb => {
+                    const subQ = qb.subQuery()
+                                  .select('manga.id')
+                                  .from(Manga, 'manga')
+                                  .innerJoin('manga_tags_tag', 'manga_tag', 'manga.id = manga_tag."mangaId"')
+                                  .innerJoin(Tag, 'tag', 'manga_tag."tagId" = tag.id')
+                                  .where('tag.id IN (:...ids)', { ids })
+                                  .groupBy('manga.id')
+                                  .having('count(manga.id) >= ' + ids.length)
+                                  .getQuery();
+                    return 'manga.id IN ' + subQ;
+                  })
+                  .addOrderBy('manga.name', 'ASC');
+
     const mangas = await query.getMany();
 
-    return await this.mangaRepository.findByIds(mangas.map(m => m.id), {
-      relations: [ 'sources', 'sources.scannerConfig' ]
-    });
+    return mangas;
   }
   async findMangaById(id: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
