@@ -5,7 +5,6 @@ import * as walkSync from 'walk-sync';
 import { Database } from '../database/Database';
 import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
 import { scanAndStore, scanChapterPages } from './scanner-store';
-import { Equal } from 'typeorm';
 
 export default async (firstScan: boolean) => {
   // get all configuration on a new connection...
