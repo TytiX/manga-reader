@@ -9,6 +9,7 @@
           <MangaListItem
             :manga="manga"
             :isFavorite="isInFavorites(manga)"
+            :unreadChapters="unreadChapters(manga)"
             @fav="fav"
             @unfav="unfav">
           </MangaListItem>
@@ -34,9 +35,19 @@ export default class MangaList extends Vue {
   mangas!: Manga[];
   @Prop()
   favorites?: Manga[];
+  @Prop()
+  unread?: {
+    advId: string;
+    mangaId: string;
+    count: number;
+  }[];
 
   isInFavorites(manga: Manga) {
     return this.favorites && this.favorites.findIndex(m => manga.id === m.id) != -1;
+  }
+  unreadChapters(manga: Manga) {
+    const unread = !this.unread ? [] : this.unread.filter( u => u.mangaId === manga.id ).map(u => u.count);
+    return unread;
   }
   fav(mangaId: string) {
     this.$emit('fav', mangaId);

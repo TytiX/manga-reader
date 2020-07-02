@@ -14,6 +14,12 @@
       <b-icon v-if="!isFavorite" @click.prevent="fav()" icon="heart"></b-icon>
       <b-icon v-else @click.prevent="unfav()" icon="heart-fill"></b-icon>
     </div>
+    <div class="unread">
+      <b-badge v-for="unread of unreadChapters"
+        :key="'unread-'+unread"
+        variant="primary"
+        pill>{{unread}}</b-badge>
+    </div>
   </div>
 </template>
 
@@ -28,6 +34,8 @@ export default class MangaListItem extends Vue {
   manga!: Manga;
   @Prop()
   isFavorite!: boolean;
+  @Prop()
+  unreadChapters!: number[];
 
   try = 0;
   coverUrl!: string;
@@ -85,6 +93,11 @@ export default class MangaListItem extends Vue {
 } */
 .actions {
   position: absolute;
+  margin: 5px;
+}
+.unread {
+  position: absolute;
+  right: 0;
   margin: 5px;
 }
 /* .sources {

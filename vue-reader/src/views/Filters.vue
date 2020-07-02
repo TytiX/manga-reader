@@ -14,6 +14,7 @@
       <MangaList v-if="loaded"
         :mangas="displayMangas"
         :favorites="favorites"
+        :unread="unreadChapters"
         @fav="fav"
         @unfav="unfav">
       </MangaList>
@@ -49,6 +50,7 @@ export default class Favorites extends Vue {
   selectedTags: Tag[] = [];
   tagLoaded = false;
   loaded = true;
+  unreadChapters = [];
 
   mounted() {
     this.reloadTags();
@@ -78,6 +80,12 @@ export default class Favorites extends Vue {
       this.mangas = res.data;
       this.searchText('')
       this.loaded = true;
+    });
+    this.unreadReload();
+  }
+  unreadReload() {
+    axios.get('/api/manga/leftToRead' + this.$currentProfile).then( response => {
+      this.unreadChapters = response.data;
     });
   }
   searchText(text: string) {

@@ -7,6 +7,7 @@
       <MangaList
         :mangas="mangas"
         :favorites="favorites"
+        :unread="unreadChapters"
         @fav="fav"
         @unfav="unfav">
       </MangaList>
@@ -35,6 +36,7 @@ export default class Recents extends Vue {
   mangas: Manga[] = [];
   favorites: Manga[] = [];
   loaded = false;
+  unreadChapters = [];
 
   get timeFrame() {
     if (this.$route.path.endsWith('weekly')) {
@@ -52,11 +54,16 @@ export default class Recents extends Vue {
       this.loaded = true;
     });
     this.reloadFavorites();
+    this.unreadReload();
   }
-
   reloadFavorites() {
     axios.get('/api/favorites/' + this.$currentProfile).then( response => {
       this.favorites = response.data;
+    });
+  }
+  unreadReload() {
+    axios.get('/api/manga/leftToRead' + this.$currentProfile).then( response => {
+      this.unreadChapters = response.data;
     });
   }
   fav(mangaId: string) {
