@@ -46,6 +46,14 @@ export default () => {
      * Tags
      ***************************************************************************/
     router.use('/tag', TagRoutes(db));
+    /***************************************************************************
+     * Advancement
+     ***************************************************************************/
+    router.delete('/advancement/:id', async (req, res) => {
+      res.send(
+        await db.advancementRepository.delete(req.params.id)
+      );
+    });
   });
 
   return router;

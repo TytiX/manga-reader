@@ -6,7 +6,9 @@
       class="scrollable">
       <b-container>
         <MangaDetailHeader :manga="manga"></MangaDetailHeader>
-        <MangaDetailAdvancement :advancements="advancements"></MangaDetailAdvancement>
+        <MangaDetailAdvancement
+          :advancements="advancements"
+          @delete-adv="deleteAdvancement"></MangaDetailAdvancement>
         <MangaSourceChapters
           :manga="manga"
           :isFavorite="isInFavorites"
@@ -85,6 +87,12 @@ export default class Detail extends Vue {
     // console.log(source, mode);
     axios.post(`/api/source/${source.id}/readmode`, {mode}).then( () => {
       // readmode changed
+    });
+  }
+
+  deleteAdvancement(adv: Advancement) {
+    axios.delete(`/api/advancement/${adv.id}`).then( () => {
+      this.reload();
     });
   }
 

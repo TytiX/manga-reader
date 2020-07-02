@@ -6,6 +6,7 @@
           v-for="advancement of advancements"
           :key="advancement.id"
           class="d-flex justify-content-between align-items-center">
+          <b-button @click="deleteAdvancement(advancement)" variant="danger"><b-icon icon="trash"></b-icon></b-button>
           <div>
             <div>
               <b-img
@@ -20,7 +21,7 @@
               page: {{ advancement.pageNumber }}
             </div>
           </div>
-          <b-button @click="resume(advancement)">Continue <b-icon icon="chevron-right"></b-icon></b-button>
+          <b-button @click="resume(advancement)"><b-icon icon="chevron-right"></b-icon></b-button>
         </b-list-group-item>
       </b-list-group>
     </b-row>
@@ -40,6 +41,10 @@ export default class MangaDetailAdvancement extends Vue {
   resume(adv: Advancement) {
     // contine
     this.$router.push(`/reader/${adv.chapter.id}/${adv.pageNumber}`);
+  }
+
+  deleteAdvancement(adv: Advancement) {
+    this.$emit('delete-adv', adv);
   }
 }
 </script>
