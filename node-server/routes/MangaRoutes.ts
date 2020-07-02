@@ -3,15 +3,31 @@ import * as moment from 'moment';
 import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
+import { Advancement, ScanSource, Manga, Chapter } from '../database/entity';
 
 export default (db: Database) => {
   const router = Router();
-  router.get('/', async function(req, res) {
+  router.get('/', async (req, res) => {
     res.send(
       await db.allMangas()
     );
   });
-  router.post('/search', async function(req, res) {
+  router.get('/leftToRead/:profileId', async (req, res) => {
+    const read = await db.connection.createQueryBuilder()
+                  .select(['adv.id as "advId"', 'manga.id as "mangaId"', 'manga.name', 'count(chapter.id)'])
+                  .from(Advancement, 'adv')
+                  .innerJoin(ScanSource, 'source', 'source.id = adv."sourceId"')
+                  .innerJoin(Manga, 'manga', 'manga.id = source."mangaId"')
+                  .innerJoin(Chapter, 'chapter', 'chapter."sourceId" = source.id')
+                  .innerJoin(Chapter, 'advchapter', 'adv."chapterId" = advchapter.id')
+                  .where('adv."profileId" = \'' + req.params.profileId + '\'')
+                  .andWhere('chapter.number > advchapter.number')
+                  .groupBy('adv.id')
+                  .addGroupBy('manga.id')
+                  .getRawMany();
+    res.send( read );
+  });
+  router.post('/search', async (req, res) => {
     res.send(
       await db.mangaByTags(req.body.tags)
     )
