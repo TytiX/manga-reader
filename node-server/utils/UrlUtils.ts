@@ -1,3 +1,4 @@
+
 export class UrlUtils {
 
   static chapterCleanup(url: string) {
@@ -16,9 +17,18 @@ export class UrlUtils {
       if (UrlUtils.isURL(urlTrimmed)) {
         return urlTrimmed;
       } else {
-        return urlTrimmed.replace('//', 'https://');
+        const encoded = UrlUtils.encodePartial(urlTrimmed);
+        if (UrlUtils.isURL(encoded)) {
+          return encoded;
+        } else {
+          return urlTrimmed.replace('//', 'https://');
+        }
       }
     }
+  }
+
+  static encodePartial(url: string) {
+    return url.replace(' ', '%20');
   }
 
   static isURL(str: string): boolean {

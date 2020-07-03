@@ -158,19 +158,25 @@ export class ScannerV2 {
     const pages: Page[] = [];
     // iterate over pages until not found
     do {
-      const response = await axios.get(chapterLink + '/' + currentPage);
-      const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-
-      const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
-      if (nodeImageLink) {
-        const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
-        pages.push({
-          number: currentPage,
-          url: imgLink
-        })
-        currentPage++;
-      } else {
+      try {
+        logger.debug(`scanning page : ${chapterLink + '/' + currentPage}`);
+        const response = await axios.get(chapterLink + '/' + currentPage);
+        const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
+  
+        const nodeImageLink = xpath.select1('//*[@id=\'ppp\']/a/img/@src', doc);
+        if (nodeImageLink) {
+          const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
+          pages.push({
+            number: currentPage,
+            url: imgLink
+          })
+          currentPage++;
+        } else {
+          foundPage = false;
+        }
+      } catch (e) {
         foundPage = false;
+        logger.error(`${e}`);
       }
     } while(foundPage);
     return pages;
