@@ -29,7 +29,7 @@ export default (db: Database) => {
 
   router.post('/test-config/chapterScan', async (req, res) => {
     const scanner = new ScannerV2();
-    const pages = await scanner.scanPages(req.body);
+    const pages = await scanner.scanPages(req.body.link);
     res.send({
       status: 'ok',
       pages
