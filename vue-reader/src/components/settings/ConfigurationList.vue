@@ -4,7 +4,7 @@
       v-for="config of configs"
       :key="config.id"
       :to="'/settings/' + config.id">
-      <b-img :src="config.iconUrl"></b-img>
+      <b-img heigth="50" width="50" rounded="circle" :src="config.iconUrl"></b-img>
       {{config.name}}
       <div>
         <b-button variant="danger" @click.prevent="deleteConfig(config.id)"><b-icon icon="trash"></b-icon></b-button>
