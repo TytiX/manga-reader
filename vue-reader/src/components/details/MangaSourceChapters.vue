@@ -7,7 +7,7 @@
     <b-row class="mb-3">
       <b-button-group class="col-5" pill>
         <b-button
-          @click.prevent="scanChapters(...chapters)"
+          @click.prevent="scanChapters(...allChaptersClean)"
           variant="warning">
           <b-icon icon="check2-circle"></b-icon>
         </b-button>
@@ -139,6 +139,21 @@ export default class MangaSourceChapters extends Vue {
     if (this.selectedSource) {
       this.chapters = this.selectedSource.chapters.sort( (c1, c2) => { return  c2.number - c1.number } );
     }
+  }
+
+  get allChaptersClean() {
+    return this.chapters.map( (c: Chapter) => {
+      return {
+        id: c.id,
+        link: c.link,
+        name: c.name,
+        number: c.number,
+        pages: null,
+        scanned: c.scanned,
+        // createDate: c.createDate,
+        // updateDate: c.updateDate
+      }
+    });
   }
 
   chapterScanStatus(chapter: Chapter) {
