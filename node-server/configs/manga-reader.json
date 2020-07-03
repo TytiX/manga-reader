@@ -1,0 +1,23 @@
+{
+  "name": "manga-reader",
+  "iconUrl": "http://s3.mangareader.net/favicon.ico",
+  "mangasUrl": "http://www.mangareader.net/alphabetical",
+
+  "mangasListUrl": "http://www.mangareader.net/alphabetical",
+
+  "mangaEnclosingXpath": "//html:ul[@class=\"series_alpha\"]/html:li",
+  "mangaLinkRelativeXpath": "/html:li/html:a/@href",
+  "mangaNameRelativeXpath": "/html:li/html:a/text()",
+
+
+  "mangaDescriptionXpath": "",
+  "mangaCoverXpath": "//html:div[@id=\"mangaimg\"]/html:img/@src",
+
+  "mangaCategoriesXpath": "",
+  "mangaTagsXpath": "//html:span[@class=\"genretags\"]/text()",
+
+  "chapterEnclosingXpath": "//html:div[@id=\"chapterlist\"]//html:table[@id=\"listing\"]//html:tr/html:td[1]/html:a",
+  "chapterLinkRelativeXpath": "/html:a/@href",
+  "chapterNumberTextRelativeXpath": "/html:a/text()",
+  "chapterNameRelativeXpath": ""
+}
