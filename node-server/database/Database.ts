@@ -1,4 +1,4 @@
-import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan } from 'typeorm';
+import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan, SelectQueryBuilder } from 'typeorm';
 
 import {
   Manga,
@@ -51,11 +51,45 @@ export class Database {
    ***************************************************************************/
   async allMangas(): Promise<Manga[]> {
     return await this.mangaRepository.find({
-      relations: ['sources', 'sources.scannerConfig', 'tags'],
+      relations: [ 'sources', 'sources.scannerConfig' ],
       order: {
         'name': 'ASC'
       }
     });
+  }
+  async searchMangas(search?: string, tagsIds?: string[]) {
+    let ids;
+    if (tagsIds) {
+      ids = tagsIds.map(tid => Number(tid));
+    }
+    const query = createQueryBuilder<Manga>(Manga, 'manga', this.connection.name)
+                  .leftJoinAndMapMany('manga.sources', 'manga.sources', 'source', 'source."mangaId" = manga.id')
+                  .leftJoinAndMapOne('source.scannerConfig', 'source.scannerConfig', 'config', 'source."scannerConfigId" = config.id')
+    if (search) {
+      query.where('LOWER(manga.name) LIKE :name', { name: '%' + search.toLowerCase() + '%' })
+    }
+    if (ids) {
+      const subQ = (qb: SelectQueryBuilder<Manga>) => {
+        const subQ = qb.subQuery()
+                      .select('manga.id')
+                      .from(Manga, 'manga')
+                      .innerJoin('manga_tags_tag', 'manga_tag', 'manga.id = manga_tag."mangaId"')
+                      .innerJoin(Tag, 'tag', 'manga_tag."tagId" = tag.id')
+                      .where('tag.id IN (:...ids)', { ids })
+                      .groupBy('manga.id')
+                      .having('count(manga.id) >= ' + ids.length)
+                      .getQuery();
+        return 'manga.id IN ' + subQ;
+      }
+      if (search) {
+        query.andWhere(subQ);
+      } else {
+        query.where(subQ);
+      }
+    }
+    query.addOrderBy('manga.name', 'ASC');
+    const mangas = await query.getMany();
+    return mangas;
   }
   async mangaByTags(tags: Tag[]): Promise<Manga[]> {
     const ids = tags.map(t => t.id);
@@ -75,9 +109,7 @@ export class Database {
                     return 'manga.id IN ' + subQ;
                   })
                   .addOrderBy('manga.name', 'ASC');
-
     const mangas = await query.getMany();
-
     return mangas;
   }
   async findMangaById(id: string): Promise<Manga> {

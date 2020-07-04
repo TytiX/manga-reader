@@ -4,13 +4,22 @@ import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
 import { Advancement, ScanSource, Manga, Chapter } from '../database/entity';
+import logger from '../logger';
 
 export default (db: Database) => {
   const router = Router();
   router.get('/', async (req, res) => {
     res.send(
-      await db.allMangas()
+      await db.searchMangas(
+        req.query.search as string,
+        req.query.tags as string[]
+      )
     );
+  });
+  router.post('/search', async (req, res) => {
+    res.send(
+      await db.mangaByTags(req.body.tags)
+    )
   });
   router.get('/leftToRead/:profileId', async (req, res) => {
     const read = await db.connection.createQueryBuilder()
@@ -26,11 +35,6 @@ export default (db: Database) => {
                   .addGroupBy('manga.id')
                   .getRawMany();
     res.send( read );
-  });
-  router.post('/search', async (req, res) => {
-    res.send(
-      await db.mangaByTags(req.body.tags)
-    )
   });
   router.get('/simili', async (req, res) => {
     const mangas = await db.connection.createQueryBuilder()
