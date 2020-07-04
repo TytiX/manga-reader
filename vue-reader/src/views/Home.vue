@@ -40,7 +40,7 @@ export default class Home extends Vue {
   loaded = false;
   unreadChapters = [];
 
-  searchTextValue = '';
+  searchTextValue: string | undefined = '';
 
   mounted() {
     this.reloadMangas();

@@ -51,7 +51,7 @@ export default class Favorites extends Vue {
   loaded = true;
   unreadChapters = [];
 
-  searchTextValue = '';
+  searchTextValue: string | undefined = '';
 
   mounted() {
     this.reloadTags();
