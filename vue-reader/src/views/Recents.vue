@@ -62,7 +62,7 @@ export default class Recents extends Vue {
     });
   }
   unreadReload() {
-    axios.get('/api/manga/leftToRead' + this.$currentProfile).then( response => {
+    axios.get('/api/manga/leftToRead/' + this.$currentProfile).then( response => {
       this.unreadChapters = response.data;
     });
   }

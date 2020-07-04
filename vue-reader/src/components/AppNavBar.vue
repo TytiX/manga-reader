@@ -12,7 +12,8 @@
         <b-nav-form v-if="enableSearch">
           <b-form-input size="sm" class="mr-sm-2"
             placeholder="Search"
-            v-model="searchText">
+            v-model="searchText"
+            debounce="500">
           </b-form-input>
         </b-nav-form>
         <b-nav-item v-show="showSetting" to="/settings"><b-icon icon="gear"></b-icon></b-nav-item>

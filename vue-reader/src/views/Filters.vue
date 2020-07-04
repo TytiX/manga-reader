@@ -12,7 +12,7 @@
         @selected-tags="selectTags"></TagList>
       <Loading v-else></Loading>
       <MangaList v-if="loaded"
-        :mangas="displayMangas"
+        :mangas="mangas"
         :favorites="favorites"
         :unread="unreadChapters"
         @fav="fav"
@@ -44,13 +44,14 @@ import { Tag, Manga } from '@/models';
 export default class Favorites extends Vue {
   tags: Tag[] = [];
   mangas: Manga[] = [];
-  displayMangas: Manga[] = [];
   favorites: Manga[] = [];
 
   selectedTags: Tag[] = [];
   tagLoaded = false;
   loaded = true;
   unreadChapters = [];
+
+  searchTextValue = '';
 
   mounted() {
     this.reloadTags();
@@ -76,22 +77,25 @@ export default class Favorites extends Vue {
    ***********************************************************/
   reloadMangas() {
     this.loaded = false;
-    axios.post('/api/manga/search', { tags: this.selectedTags }).then( res => {
+    axios.get('/api/manga', {
+      params: {
+        search: this.searchTextValue,
+        tags: this.selectedTags.map(t => t.id)
+      }
+    }).then( res => {
       this.mangas = res.data;
-      this.searchText('')
       this.loaded = true;
     });
     this.unreadReload();
   }
   unreadReload() {
-    axios.get('/api/manga/leftToRead' + this.$currentProfile).then( response => {
+    axios.get('/api/manga/leftToRead/' + this.$currentProfile).then( response => {
       this.unreadChapters = response.data;
     });
   }
   searchText(text: string) {
-    this.displayMangas = this.mangas.filter( (m: Manga) => {
-      return m.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
-    });
+    this.searchTextValue = (text === '' ? undefined : text );
+    this.reloadMangas();
   }
 
   /***********************************************************

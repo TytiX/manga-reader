@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <AppNavBar title="Mangas"></AppNavBar>
+    <AppNavBar title="Mangas"
+      :enableSearch="true"
+      @search="searchText"></AppNavBar>
     <div v-if="loaded"
       style="height: calc(100% - 56px);"
       class="scrollable">
@@ -38,14 +40,27 @@ export default class Home extends Vue {
   loaded = false;
   unreadChapters = [];
 
+  searchTextValue = '';
+
   mounted() {
+    this.reloadMangas();
+    this.reloadFavorites();
+    this.unreadReload();
+  }
+  reloadMangas() {
     this.loaded = false;
-    axios.get('/api/manga').then( response => {
+    axios.get('/api/manga', {
+      params: {
+        search: this.searchTextValue
+      }
+    }).then( response => {
       this.mangas = response.data;
       this.loaded = true;
     });
-    this.reloadFavorites();
-    this.unreadReload();
+  }
+  searchText(text: string) {
+    this.searchTextValue = (text === '' ? undefined : text );
+    this.reloadMangas();
   }
 
   reloadFavorites() {
@@ -54,7 +69,7 @@ export default class Home extends Vue {
     });
   }
   unreadReload() {
-    axios.get('/api/manga/leftToRead' + this.$currentProfile).then( response => {
+    axios.get('/api/manga/leftToRead/' + this.$currentProfile).then( response => {
       this.unreadChapters = response.data;
     });
   }
