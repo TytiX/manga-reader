@@ -191,25 +191,20 @@ export class ScannerV2 {
         logger.debug(`scanning page : ${chapterLink + '/' + currentPage}`);
         const response = await axios.get(chapterLink + '/' + currentPage);
         const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-  
+
+        let nodeImageLink;
+        // define select method
         let select = null;
         if (doc.documentElement.namespaceURI) {
           select = xpath.useNamespaces({"html": doc.documentElement.namespaceURI});
+          nodeImageLink = select('//html:img[@id="img"]/@src', doc)[0];
         } else {
           select = xpath.select;
+          nodeImageLink = select('//*[@id=\'ppp\']/a/img/@src', doc)[0];
         }
-        const nodeImageLink = select('//*[@id=\'ppp\']/a/img/@src', doc)[0];
-        const nodeImageLinkAlt = select('//html:img[@id="img"]/@src', doc)[0];
 
         if (nodeImageLink) {
           const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
-          pages.push({
-            number: currentPage,
-            url: imgLink
-          })
-          currentPage++;
-        } else if (nodeImageLinkAlt) {
-          const imgLink = UrlUtils.imgLinkCleanup(nodeImageLinkAlt.value);
           pages.push({
             number: currentPage,
             url: imgLink
