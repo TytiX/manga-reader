@@ -14,19 +14,8 @@ import {
 
 export class DatabaseConnectionManager {
 
-  private static connection: Connection;
-
   private constructor() {
     //
-  }
-
-  static async getInstance() {
-    if (!DatabaseConnectionManager.connection) {
-      return DatabaseConnectionManager.connection = await createConnection(
-        DatabaseConnectionManager.getConnectionOptions('default')
-      )
-    }
-    return DatabaseConnectionManager.connection;
   }
 
   static async getOrCreate(name: string) {
@@ -35,10 +24,7 @@ export class DatabaseConnectionManager {
       try {
         return getConnection();
       } catch(e) {
-        return await createConnection({
-          ...opts,
-          name: 'default'
-        });
+        return await createConnection(opts);
       }
     } else {
       try {
@@ -75,7 +61,6 @@ export class DatabaseConnectionManager {
       type: 'sqlite',
       database: './data/database.db',
       synchronize: true,
-      // logging: true,
       entities: entries
     }
   }
