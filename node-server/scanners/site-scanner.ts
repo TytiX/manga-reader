@@ -40,7 +40,9 @@ export function scanfavoritesPages() {
     for (const p of profiles) {
       favs.push(... p.favorites);
     }
-    scanMangaPages(favs.map(f => f.id));
+    if (favs.length > 0) {
+      scanMangaPages(favs.map(f => f.id));
+    }
   });
 }
 
