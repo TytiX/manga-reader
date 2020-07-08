@@ -361,7 +361,7 @@ export class Database {
     });
   }
   async getAdvancementsForManga(profileId: string, mangaId: string) {
-    logger.info(`p: ${profileId} --> m: ${mangaId}`);
+    logger.debug(`p: ${profileId} --> m: ${mangaId}`);
     const manga = await this.mangaRepository.findOne(mangaId, {
       relations: ['sources']
     });
