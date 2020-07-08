@@ -18,7 +18,7 @@
             <div>
               chapitre: {{ advancement.chapter.number }}
               -
-              page: {{ advancement.pageNumber }}
+              page: {{ advancement.pageNumber +1 }}
             </div>
           </div>
           <b-button @click="resume(advancement)"><b-icon icon="chevron-right"></b-icon></b-button>
