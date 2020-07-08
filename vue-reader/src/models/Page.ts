@@ -1,7 +1,7 @@
 import { Chapter } from './Chapter';
 
 export interface Page {
-  id: number;
+  number: number;
   url: string;
   chapter: Chapter;
 }
