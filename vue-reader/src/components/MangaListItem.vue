@@ -15,8 +15,8 @@
       <b-icon v-else @click.prevent="unfav()" icon="heart-fill"></b-icon>
     </div>
     <div class="unread">
-      <b-badge v-for="unread of unreadChapters"
-        :key="'unread-'+unread"
+      <b-badge v-for="[index, unread] of unreadChapters.entries()"
+        :key="'unread-' + index + '-' + unread"
         variant="primary"
         pill>{{unread}}</b-badge>
     </div>
