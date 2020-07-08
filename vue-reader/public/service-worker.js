@@ -1,12 +1,8 @@
-self.addEventListener('push', ev => {
-  const data = ev.data.json();
-  self.registration.showNotification(data.title, data.options);
-});
 /***************************************************************
  * WORKBOX
  ***************************************************************/
 workbox.setConfig({
-  debug: false,
+  debug: true,
 });
 
 workbox.precaching.precacheAndRoute([]);
@@ -21,14 +17,14 @@ workbox.routing.registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
       }),
     ],
-  }),
+  })
 );
 
 workbox.routing.registerRoute(
   new RegExp('http://172.22.22.52:3000/api'),
   workbox.strategies.networkFirst({
     cacheName: 'api',
-  }),
+  })
 );
 
 workbox.routing.registerRoute(
@@ -40,5 +36,5 @@ workbox.routing.registerRoute(
         maxEntries: 30,
       }),
     ],
-  }),
+  })
 );
