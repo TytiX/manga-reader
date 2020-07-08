@@ -8,6 +8,7 @@ import ConfigurationRoutes from './ConfigurationRoutes';
 import UserProfileRoutes from './UserProfileRoutes';
 import PushRoutes from './PushRoutes';
 import TagRoutes from './TagRoutes';
+import ImageRoutes from './ImageRoutes';
 
 export default () => {
 
@@ -54,6 +55,10 @@ export default () => {
         await db.advancementRepository.delete(req.params.id)
       );
     });
+    /***************************************************************************
+     * Images
+     ***************************************************************************/
+    router.use('/image', ImageRoutes(db));
   });
 
   return router;

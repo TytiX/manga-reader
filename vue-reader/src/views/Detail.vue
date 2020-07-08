@@ -28,6 +28,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import axios from 'axios';
+import fs from 'bro-fs';
 
 import AppNavBar from '@/components/AppNavBar.vue';
 import Loading from '@/components/Loading.vue';
@@ -108,9 +109,40 @@ export default class Detail extends Vue {
     });
   }
   downloadChapters(chapters: Chapter[]) {
-    this.$bvToast.toast(`Cannot download chapter ${chapters.length}`, {
-      title: `Cannot download`,
-      variant: 'danger'
+    // this.$bvToast.toast(`Cannot download chapter ${chapters.length}`, {
+    //   title: `Cannot download`,
+    //   variant: 'danger'
+    // });
+    for (const chapter of chapters) {
+      this.downloadChapterFiles(chapter);
+    }
+  }
+
+  async downloadChapterFiles(chapter: Chapter) {
+    await fs.init({type: (window as any).TEMPORARY, bytes: 200 * 1024 * 1024});
+    const chapterFolder = chapter.source.manga.id + ' - ' + chapter.source.manga.name
+                          + '/' + chapter.source.id + ' - ' + chapter.source.name
+                          + '/' + chapter.id + ' - ' + chapter.name;
+    await fs.mkdir(chapterFolder);
+
+    const pagePromises = [];
+    for (const page of chapter.pages) {
+      const p = axios.get(`/api/image/${chapter.id}/${page.number}`, {
+        responseType: 'arraybuffer'
+      })
+      .then(response => new Buffer(response.data, 'binary'))
+      .then(async coverBuffer => {
+        await fs.writeFile(`${chapterFolder}/${page.number}.png`, coverBuffer);
+        const file = await fs.getEntry(`${chapterFolder}/${page.number}.png`);
+
+        return {number: page.number, url: file.toURL()};
+      });
+      pagePromises.push(p);
+    }
+    Promise.all(pagePromises).then( (p) => {
+      console.log(p)
+    }).catch(e => {
+      console.error(e);
     });
   }
 

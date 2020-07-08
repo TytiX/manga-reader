@@ -14,11 +14,11 @@
         <!-- <b-button
           @click.prevent="cacheOnServer(...chapters)">
           <b-icon icon="cloud-upload"></b-icon>
-        </b-button>
+        </b-button> -->
         <b-button
           @click.prevent="downloadChapters(...chapters)">
           <b-icon icon="cloud-download"></b-icon>
-        </b-button> -->
+        </b-button>
       </b-button-group>
       <div class="col-5">
         <b-form-select v-model="selectedSource.reading" :options="readingOptions"></b-form-select>
@@ -53,11 +53,12 @@
             <!-- <b-button
               @click.prevent="cacheOnServer(chapter)">
               <b-icon icon="cloud-upload"></b-icon>
-            </b-button>
-            <b-button
-              @click.prevent="downloadChapters(chapter)">
-              <b-icon icon="cloud-download"></b-icon>
             </b-button> -->
+            <b-button
+              @click.prevent="downloadChapters(chapter)"
+              :disabled="!chapter.scanned">
+              <b-icon icon="cloud-download"></b-icon>
+            </b-button>
           </b-button-group>
         </b-list-group-item>
       </b-list-group>
@@ -170,6 +171,10 @@ export default class MangaSourceChapters extends Vue {
     this.$emit('cache-chapters-on-server', chapters);
   }
   downloadChapters(...chapters: Chapter[]) {
+    for (const chapter of chapters) {
+      chapter.source = this.selectedSource;
+      chapter.source.manga = this.manga;
+    }
     this.$emit('download-chapters', chapters);
   }
 

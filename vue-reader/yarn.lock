@@ -1240,6 +1240,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.12.tgz#9c72e865380a7dc99999ea0ef20fc9635b503d20"
   integrity sha512-zWz/8NEPxoXNT9YyF2osqyA9WjssZukYpgI4UYZpOjcyqwIUqWGkcCionaEb9Ki+FULyPyvNFpg/329Kd2/pbw==
 
+"@types/node@^14.0.19":
+  version "14.0.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.19.tgz#994d99708822bca643a2364f8aeed04a16e0f5a1"
+  integrity sha512-yf3BP/NIXF37BjrK5klu//asUWitOEoUP5xE1mhSUjazotwJ/eJDgEmMQNlOeWOVv72j24QQ+3bqXHE++CFGag==
+
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
   resolved "https://registry.npm.taobao.org/@types/normalize-package-data/download/@types/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
@@ -2266,6 +2271,11 @@ braces@^3.0.1, braces@~3.0.2:
   integrity sha1-NFThpGLujVmeI23zNs2epPiv4Qc=
   dependencies:
     fill-range "^7.0.1"
+
+bro-fs@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/bro-fs/-/bro-fs-0.6.0.tgz#11aeb64201334e4bc653f1d86282fe805fd2a45f"
+  integrity sha512-LQh1uAZoRL44CrEEFzuI+gvUhKzQWZt6U0w0dKxP7/vPtT6B10cf52H8Lco8TG2SFqDAhPtVXONrj1tDxaFWFA==
 
 brorand@^1.0.1:
   version "1.1.0"
