@@ -23,13 +23,14 @@ app.use('/api', apiRoutes());
 // start on boot
 scanfavoritesPages();
 scanAllSites(true);
-cron.schedule('0 9,12,15,19 * * *', () => {
+const task = cron.schedule('0 8-20/2 * * *', () => {
   scanfavoritesPages();
   scanAllSites(false);
 }, {
   scheduled: true,
   timezone: 'Europe/Paris'
 });
+task.start();
 
 // start the express server
 app.listen( port, () => {
