@@ -4,7 +4,7 @@ executors:
     environment:
       IMAGE_NAME: abelliard/manga-reader
     docker:
-      - image: circleci/buildpack-deps:buster
+      - image: circleci/buildpack-deps
 jobs:
   build:
     executor: docker-publisher
