@@ -1,6 +1,7 @@
 FROM node:12 AS vue-builder
 WORKDIR /app
 COPY ./vue-reader .
+RUN yarn cache clean
 RUN yarn install
 RUN yarn build
 
