@@ -23,7 +23,7 @@ app.use('/api', apiRoutes());
 // start on boot
 scanfavoritesPages();
 scanAllSites(true);
-cron.schedule('0 4 * * *', async () => {
+const task = cron.schedule('0 8,12,16,18 * * *', async () => {
   await scanfavoritesPages();
   await scanAllSites(false);
 }, {
