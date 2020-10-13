@@ -30,6 +30,7 @@ cron.schedule('0 4 * * *', async () => {
   scheduled: true,
   timezone: 'Europe/Paris'
 });
+task.start();
 
 // start the express server
 app.listen( port, () => {
