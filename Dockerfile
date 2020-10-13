@@ -5,7 +5,7 @@ RUN yarn cache clean
 RUN yarn install
 RUN yarn build
 
-FROM node:10
+FROM node:12
 WORKDIR /app
 # RUN apk add --update-cache \
 #     python \
