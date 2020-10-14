@@ -4,7 +4,7 @@ COPY ./vue-reader .
 RUN npm install
 RUN yarn build
 
-FROM node:14-alpine
+FROM node:12-alpine
 WORKDIR /app
 # RUN apk add --update-cache \
 #     python \
