@@ -1,4 +1,4 @@
-FROM node:10-alpine AS vue-builder
+FROM node:12-alpine AS vue-builder
 WORKDIR /app
 COPY ./vue-reader .
 RUN npm install
