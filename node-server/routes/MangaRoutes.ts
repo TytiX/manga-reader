@@ -92,6 +92,22 @@ export default (db: Database) => {
       )
     );
   });
+  router.get('/started/:profileId', async (req, res) => {
+    let advs = await db.advancementRepository.find({
+      relations: [ 'profile', 'source', 'source.manga' ],
+      where: {
+        profile: req.params.profileId
+      }
+    });
+    res.send(
+      await db.mangaRepository.findByIds(
+        advs.map( c => c.source.manga),
+        {
+          relations: [ 'sources', 'sources.scannerConfig' ]
+        }
+      )
+    );
+  });
   router.get('/:id', async function(req, res) {
     res.send(
       await db.findMangaById(req.params.id)

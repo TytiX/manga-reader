@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <AppNavBar :title="pageTitle"></AppNavBar>
+    <AppNavBar title="Started"></AppNavBar>
     <div v-if="loaded"
       style="height: calc(100% - 56px);"
       class="scrollable">
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import axios from 'axios';
 
 import AppNavBar from '@/components/AppNavBar.vue';
@@ -32,42 +32,19 @@ import { Manga } from '@/models';
     MangaList
   }
 })
-export default class Recents extends Vue {
+export default class Started extends Vue {
   mangas: Manga[] = [];
   favorites: Manga[] = [];
   loaded = false;
   unreadChapters = [];
 
-  get pageTitle() {
-    if (this.$route.path.endsWith('weekly')) {
-      return 'Weekly';
-    } else if (this.$route.path.endsWith('today')) {
-      return 'Today';
-    }
-    return 'NA';
-  }
-
-  get timeFrame() {
-    if (this.$route.path.endsWith('weekly')) {
-      return '7-days';
-    } else if (this.$route.path.endsWith('today')) {
-      return '24-hours';
-    }
-    return '1-hour';
-  }
-
   mounted() {
-    this.loadPage();
-  }
-
-  @Watch('$route.path')
-  pathChange() {
     this.loadPage();
   }
 
   loadPage() {
     this.loaded = false;
-    axios.get(`/api/manga/latelly/${this.timeFrame}`).then( response => {
+    axios.get(`/api/manga/started/${this.$currentProfile}`).then( response => {
       this.mangas = response.data;
       this.loaded = true;
     });

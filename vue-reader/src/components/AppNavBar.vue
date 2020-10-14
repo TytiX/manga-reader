@@ -29,6 +29,7 @@
           <b-list-group-item to="/filtres">Filtres</b-list-group-item>
           <b-list-group-item to="/updated-today">Today</b-list-group-item>
           <b-list-group-item to="/updated-weekly">This week</b-list-group-item>
+          <b-list-group-item to="/started">Started</b-list-group-item>
         </b-list-group>
       </div>
     </b-sidebar>

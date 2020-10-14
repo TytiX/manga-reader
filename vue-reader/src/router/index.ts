@@ -5,6 +5,7 @@ import Favorites from '../views/Favorites.vue'
 import Filters from '../views/Filters.vue'
 import Home from '../views/Home.vue'
 import Recents from '../views/Recents.vue'
+import Started from '../views/Started.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
 
@@ -35,6 +36,11 @@ Vue.use(VueRouter)
     path: '/updated-weekly',
     name: 'This Week',
     component: Recents
+  },
+  {
+    path: '/started',
+    name: 'Started',
+    component: Started
   },
   {
     path: '/manga/:id',
