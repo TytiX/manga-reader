@@ -119,6 +119,7 @@ export default class Detail extends Vue {
   }
 
   async downloadChapterFiles(chapter: Chapter) {
+    // eslint-disable-next-line
     await fs.init({type: (window as any).TEMPORARY, bytes: 200 * 1024 * 1024});
     const chapterFolder = chapter.source.manga.id + ' - ' + chapter.source.manga.name
                           + '/' + chapter.source.id + ' - ' + chapter.source.name

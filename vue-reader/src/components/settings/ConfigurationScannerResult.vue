@@ -65,7 +65,7 @@ export default class ConfigurationScannerResult extends Vue {
   @Prop() // eslint-disable-next-line
   scannerChapter!: any;
 
-  selectedChapter: any = {};
+  selectedChapter: {} = {};
   mangaIndex = -1;
 
   get mangaOptions() {

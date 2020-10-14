@@ -62,9 +62,8 @@ export default class SettingsDetail extends Vue {
   config: ScannerConfig = {};
   defaultConfigs: ScannerConfig[] = [];
 
-  // eslint-disable-next-line
-  scannerResult: any = {};
-  scannerChapter: any = {};
+  scannerResult: {} = {};
+  scannerChapter: {} = {};
   scannerLoad = false;
   scannerLoadChapters = false;
 
