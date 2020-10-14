@@ -4,13 +4,13 @@ COPY ./vue-reader .
 RUN npm install
 RUN yarn build
 
-FROM node:12-alpine
+FROM node:12
 WORKDIR /app
-# RUN apk add --update-cache \
-#     python \
-#     python-dev \
-#     py-pip \
-#     build-base
+RUN apk add --update-cache \
+    python \
+    python-dev \
+    py-pip \
+    build-base
 COPY ./node-server .
 RUN npm install
 COPY --from=vue-builder /app/dist ./public
