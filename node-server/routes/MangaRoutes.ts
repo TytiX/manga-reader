@@ -179,11 +179,10 @@ export default (db: Database) => {
       .andWhere(`manga.id <> '${req.params.mangaId}'`)
       .groupBy('manga.id')
       .orderBy('count(manga.id)', 'DESC')
-      .take(10)
       .getRawMany();
     res.send(
         await db.mangaRepository.findByIds(
-          rated.map( c => c.manga_id),
+          rated.slice(0, 10).map( c => c.manga_id),
           {
             relations: [ 'sources', 'sources.scannerConfig' ]
           }
