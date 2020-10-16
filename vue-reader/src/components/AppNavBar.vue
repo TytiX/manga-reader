@@ -31,6 +31,7 @@
           <b-list-group-item to="/updated-weekly">This week</b-list-group-item>
           <b-list-group-item to="/started">Started</b-list-group-item>
           <b-list-group-item to="/recomended">Recomended</b-list-group-item>
+          <b-list-group-item to="/untaged">Untaged</b-list-group-item>
         </b-list-group>
       </div>
     </b-sidebar>

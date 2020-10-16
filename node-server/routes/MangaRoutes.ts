@@ -190,8 +190,28 @@ export default (db: Database) => {
       );
   });
   router.get('/untaged', async (req, res) => {
-
-    res.send({});
+    // SELECT id, name 
+    //   FROM   manga
+    //   LEFT   JOIN manga_tags_tag mt ON manga.id = mt."mangaId"  -- short for: ON i.ip = l.ip
+    //   WHERE  mt."mangaId" IS NULL;
+    
+    const untaged = await db.connection.createQueryBuilder()
+      .select(['manga.id'])
+      .from(Manga, 'manga')
+      .leftJoin('manga_tags_tag', 'mt', 'manga.id = mt."mangaId"')
+      .where('mt."mangaId" IS NULL')
+      .getMany()
+    res.send(
+      await db.mangaRepository.findByIds(
+        untaged.map( c => c.id),
+        {
+          relations: [ 'sources', 'sources.scannerConfig' ],
+          order: {
+            name: 'ASC'
+          }
+        }
+      )
+    );
   });
   router.post('/:mangaId/addTag/:tagId', async (req, res) => {
     const manga = await db.mangaRepository.findOne(req.params.mangaId, {

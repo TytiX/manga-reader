@@ -7,6 +7,7 @@ import Home from '../views/Home.vue'
 import Recents from '../views/Recents.vue'
 import Started from '../views/Started.vue'
 import Recomended from '../views/Recomended.vue'
+import Untaged from '../views/Untaged.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
 
@@ -47,6 +48,11 @@ Vue.use(VueRouter)
     path: '/recomended',
     name: 'Recomended',
     component: Recomended
+  },
+  {
+    path: '/untaged',
+    name: 'Untaged',
+    component: Untaged
   },
   {
     path: '/manga/:id',
