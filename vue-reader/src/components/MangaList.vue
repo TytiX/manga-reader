@@ -16,6 +16,7 @@
         </router-link>
       </b-col>
     </b-row>
+    <b-row><div class="load-more" v-b-visible="loadMore"></div></b-row>
   </b-container>
 </template>
 
@@ -55,9 +56,14 @@ export default class MangaList extends Vue {
   unfav(mangaId: string) {
     this.$emit('unfav', mangaId);
   }
+  loadMore() {
+    this.$emit('load-more');
+  }
 }
 </script>
 
 <style scoped>
-
+.load-more {
+  height: 20px;
+}
 </style>

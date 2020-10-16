@@ -6,6 +6,7 @@ import Filters from '../views/Filters.vue'
 import Home from '../views/Home.vue'
 import Recents from '../views/Recents.vue'
 import Started from '../views/Started.vue'
+import Recomended from '../views/Recomended.vue'
 import Detail from '../views/Detail.vue'
 import Reader from '../views/Reader.vue'
 
@@ -41,6 +42,11 @@ Vue.use(VueRouter)
     path: '/started',
     name: 'Started',
     component: Started
+  },
+  {
+    path: '/recomended',
+    name: 'Recomended',
+    component: Recomended
   },
   {
     path: '/manga/:id',

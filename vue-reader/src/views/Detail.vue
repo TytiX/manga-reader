@@ -55,6 +55,7 @@ export default class Detail extends Vue {
   };
   favorites: Manga[] = [];
   advancements: Advancement[] = [];
+  similar: Manga[] = [];
   loaded = false;
 
   mounted() {
@@ -71,11 +72,13 @@ export default class Detail extends Vue {
     Promise.all([
       axios.get<Manga>(`/api/manga/${this.$route.params.id}`),
       axios.get<Advancement[]>(`/api/userprofile/${this.$currentProfile}/advancement/${this.$route.params.id}`),
-      axios.get<Manga[]>('/api/favorites/' + this.$currentProfile)
+      axios.get<Manga[]>('/api/favorites/' + this.$currentProfile),
+      axios.get<Manga[]>(`/api/manga/similar/${this.$route.params.id}`)
     ]).then( values => {
       this.manga = values[0].data;
       this.advancements = values[1].data;
       this.favorites = values[2].data;
+      this.similar = values[3].data;
       this.loaded = true;
     })
   }

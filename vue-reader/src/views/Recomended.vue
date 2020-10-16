@@ -1,8 +1,6 @@
 <template>
   <div class="home">
-    <AppNavBar title="Mangas"
-      :enableSearch="true"
-      @search="searchText"></AppNavBar>
+    <AppNavBar title="Recomended"></AppNavBar>
     <div v-if="loaded"
       style="height: calc(100% - 56px);"
       class="scrollable">
@@ -35,7 +33,7 @@ import { Manga } from '@/models';
     MangaList
   }
 })
-export default class Home extends Vue {
+export default class Started extends Vue {
   mangas: Manga[] = [];
   favorites: Manga[] = [];
   loaded = false;
@@ -43,25 +41,19 @@ export default class Home extends Vue {
   unreadChapters = [];
   currentPage = 0;
 
-  searchTextValue: string | undefined = '';
-
   mounted() {
-    this.loaded = false;
-    this.loadMangaPage(this.currentPage);
+    this.loadPage(this.currentPage);
     this.reloadFavorites();
     this.unreadReload();
   }
-  loadMangaPage(page: number) {
+
+  loadPage(page: number) {
     this.currentPage = page;
     this.canLoadNext = false;
     if (page === 0) {
       this.loaded = false;
     }
-    axios.get(`/api/manga?page=${page}`, {
-      params: {
-        search: this.searchTextValue
-      }
-    }).then( response => {
+    axios.get(`/api/manga/recomended/${this.$currentProfile}?page=${page}`).then( response => {
       if (page === 0) {
         this.mangas = response.data;
       } else {
@@ -76,13 +68,8 @@ export default class Home extends Vue {
 
   loadNextPage() {
     if (this.canLoadNext === true) {
-      this.loadMangaPage(this.currentPage+1);
+      this.loadPage(this.currentPage+1);
     }
-  }
-
-  searchText(text: string) {
-    this.searchTextValue = (text === '' ? undefined : text );
-    this.loadMangaPage(0);
   }
 
   reloadFavorites() {
