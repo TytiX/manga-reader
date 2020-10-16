@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
-import { Advancement, ScanSource, Manga, Chapter } from '../database/entity';
+import { Advancement, ScanSource, Manga, Chapter, Tag } from '../database/entity';
 import logger from '../logger';
 
 export default (db: Database) => {
@@ -106,6 +106,89 @@ export default (db: Database) => {
           relations: [ 'sources', 'sources.scannerConfig' ]
         }
       )
+    );
+  });
+  router.get('/recomended/:profileId', async (req, res) => {
+    const rated = await db.connection.createQueryBuilder()
+                  .select(['manga.id', 'manga.name', 'sum(sq.count)'])
+                  .from(Manga, 'manga')
+                  .innerJoin('manga_tags_tag', 'mt', 'mt."mangaId" = manga.id')
+                  .innerJoin(Tag, 'tag', 'tag.id = mt."tagId"')
+                  .innerJoin(qb => {
+                    return qb.subQuery()
+                      .select(['tag.id as id', 'count(tag.id) as count'])
+                      .from('user_profile_favorites_manga', 'fav')
+                      .innerJoin(Manga, 'manga', 'fav."mangaId" = manga.id')
+                      .innerJoin('manga_tags_tag', 'mt', 'manga.id = mt."mangaId"')
+                      .innerJoin(Tag, 'tag', 'mt."tagId" = tag.id')
+                      .where(`fav."userProfileId" = '${req.params.profileId}'`)
+                      .groupBy('tag.id');
+                  }, 'sq', 'sq.id = tag.id')
+                  .where(qb => {
+                    const sub = qb.subQuery()
+                      .select(['ufav."mangaId"'])
+                      .from('user_profile_favorites_manga', 'ufav')
+                      .where(`ufav."userProfileId" = '${req.params.profileId}'`)
+                      .getQuery();
+                    return 'manga.id NOT IN ' + sub;
+                  })
+                  .groupBy('manga.id')
+                  .orderBy('sum(sq.count)', 'DESC')
+                  .getRawMany();
+    res.send(
+      await db.mangaRepository.findByIds(
+        rated.map( c => c.manga_id),
+        {
+          relations: [ 'sources', 'sources.scannerConfig' ]
+        }
+      )
+    );
+  });
+  router.get('/similar/:mangaId', async (req, res) => {
+    const rated = await db.connection.createQueryBuilder()
+      .select('manga.id')
+      .from('manga_tags_tag', 'mt')
+      .innerJoin(Manga, 'manga', 'manga.id = mt."mangaId"')
+      .innerJoin(Tag, 'tag', 'tag.id = mt."tagId"')
+      .where(qb => {
+        const sub = qb.subQuery()
+          .select('mt."tagId"')
+          .from('manga_tags_tag', 'mt')
+          .where(`mt."mangaId" = '${req.params.mangaId}'`)
+          .getQuery();
+        return 'mt."tagId" IN ' + sub;
+      })
+      .andWhere(`manga.id <> '${req.params.mangaId}'`)
+      .groupBy('manga.id')
+      .orderBy('count(manga.id)', 'DESC')
+      .getRawMany();
+    console.log(rated);
+    res.send(
+        await db.mangaRepository.findByIds(
+          rated.map( c => c.manga_id),
+          {
+            relations: [ 'sources', 'sources.scannerConfig' ]
+          }
+        )
+      );
+  });
+  router.post('/:mangaId/addTag/:tagId', async (req, res) => {
+    const manga = await db.mangaRepository.findOne(req.params.mangaId, {
+      relations: [ 'tags' ]
+    });
+    const tag = await db.tagRepository.findOne(req.params.tagId);
+    manga.tags.push(tag);
+    res.send(
+      await db.mangaRepository.save(manga)
+    );
+  });
+  router.post('/:mangaId/removeTag/:tagId', async (req, res) => {
+    const manga = await db.mangaRepository.findOne(req.params.mangaId, {
+      relations: [ 'tags' ]
+    });
+    manga.tags = manga.tags.filter(t => ''+t.id !== req.params.tagId)
+    res.send(
+      await db.mangaRepository.save(manga)
     );
   });
   router.get('/:id', async function(req, res) {
