@@ -6,11 +6,15 @@ import { Database } from '../database/Database';
 import { Advancement, ScanSource, Manga, Chapter, Tag } from '../database/entity';
 import logger from '../logger';
 
+const ITEM_PER_PAGE = 24;
+
 export default (db: Database) => {
   const router = Router();
   router.get('/', async (req, res) => {
     res.send(
       await db.searchMangas(
+        ITEM_PER_PAGE,
+        req.query.page ? Number(req.query.page) : undefined,
         req.query.search as string,
         req.query.tags as string[]
       )
@@ -109,8 +113,8 @@ export default (db: Database) => {
     );
   });
   router.get('/recomended/:profileId', async (req, res) => {
-    const rated = await db.connection.createQueryBuilder()
-                  .select(['manga.id', 'manga.name', 'sum(sq.count)'])
+    const query = db.connection.createQueryBuilder()
+                  .select(['manga.id', 'manga.name', 'sum(sq.count) as sum'])
                   .from(Manga, 'manga')
                   .innerJoin('manga_tags_tag', 'mt', 'mt."mangaId" = manga.id')
                   .innerJoin(Tag, 'tag', 'tag.id = mt."tagId"')
@@ -133,15 +137,29 @@ export default (db: Database) => {
                     return 'manga.id NOT IN ' + sub;
                   })
                   .groupBy('manga.id')
-                  .orderBy('sum(sq.count)', 'DESC')
-                  .getRawMany();
+                  .orderBy('sum(sq.count)', 'DESC');
+                  // that's fucked
+                  // .offset((Number(req.query.page) | 0) * ITEM_PER_PAGE)
+                  // .limit(ITEM_PER_PAGE);
+    let rated = await query.getRawMany();
+    const startIndex = (Number(req.query.page) | 0) * ITEM_PER_PAGE;
+    rated = rated.slice(startIndex, startIndex + ITEM_PER_PAGE);
+    const results = await db.mangaRepository.findByIds(
+      rated.map( c => c.manga_id),
+      {
+        relations: [ 'sources', 'sources.scannerConfig' ],
+      }
+    );
     res.send(
-      await db.mangaRepository.findByIds(
-        rated.map( c => c.manga_id),
-        {
-          relations: [ 'sources', 'sources.scannerConfig' ]
-        }
-      )
+      results.sort( (a: Manga, b: Manga) => {
+        const aRated = rated.find(m => {
+          return a.id === m.manga_id;
+        });
+        const bRated = rated.find(m => {
+          return b.id === m.manga_id;
+        });
+        return bRated.sum - aRated.sum;
+      })
     );
   });
   router.get('/similar/:mangaId', async (req, res) => {
@@ -161,8 +179,8 @@ export default (db: Database) => {
       .andWhere(`manga.id <> '${req.params.mangaId}'`)
       .groupBy('manga.id')
       .orderBy('count(manga.id)', 'DESC')
+      .take(10)
       .getRawMany();
-    console.log(rated);
     res.send(
         await db.mangaRepository.findByIds(
           rated.map( c => c.manga_id),
@@ -171,6 +189,10 @@ export default (db: Database) => {
           }
         )
       );
+  });
+  router.get('/untaged', async (req, res) => {
+
+    res.send({});
   });
   router.post('/:mangaId/addTag/:tagId', async (req, res) => {
     const manga = await db.mangaRepository.findOne(req.params.mangaId, {

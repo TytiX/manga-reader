@@ -57,7 +57,7 @@ export class Database {
       }
     });
   }
-  async searchMangas(search?: string, tagsIds?: string[]) {
+  async searchMangas(itemPerPage: number, page?: number, search?: string, tagsIds?: string[]) {
     let ids;
     if (tagsIds) {
       ids = tagsIds.map(tid => Number(tid));
@@ -88,6 +88,9 @@ export class Database {
       }
     }
     query.addOrderBy('manga.name', 'ASC');
+    if (page !== undefined) {
+      query.skip((page | 0) * itemPerPage).take(itemPerPage);
+    }
     const mangas = await query.getMany();
     return mangas;
   }
