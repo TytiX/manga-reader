@@ -52,7 +52,7 @@ export default class MangaListItem extends Vue {
       // pick first...
       const url = this.manga.sources[this.try].coverLink;
       if (url && this.isURL(url)) {
-        this.coverUrl = url;
+        this.coverUrl = `/api/image/fromUrl/${encodeURIComponent(url)}`;
       } else if (this.try < this.manga.sources.length) {
         this.try++;
         this.pickRandomCoverUrl();

@@ -54,6 +54,8 @@ export default class MangaDetailHeader extends Vue {
       return s.coverLink && this.isURL(s.coverLink);
     }).map( s => {
       return s.coverLink;
+    }).map( s => {
+      return `/api/image/fromUrl/${encodeURIComponent(s)}`;
     });
     if ( !this.covers || this.covers.length === 0 ) {
       this.covers = ['assets/no-cover.png'];

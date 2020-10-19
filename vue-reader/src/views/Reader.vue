@@ -55,7 +55,7 @@ export default class Reader extends Vue {
       this.chapter = response.data;
       this.loadPage = this.$route.params.page ? Number(this.$route.params.page) : 0;
       if (this.chapter.pages) {
-        this.pages = this.chapter.pages.map(p => p.url);
+        this.pages = this.chapter.pages.map(p => `/api/image/fromUrl/${encodeURIComponent(p.url)}`);
         this.pageChanged(this.loadPage);
       }
       this.loaded =true;
