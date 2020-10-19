@@ -9,6 +9,11 @@
         <MangaDetailAdvancement
           :advancements="advancements"
           @delete-adv="deleteAdvancement"></MangaDetailAdvancement>
+        <MangaSimilar
+          :mangas="similar"
+          :favorites="favorites"
+          @fav="favOther"
+          @unfav="unfavOther"></MangaSimilar>
         <MangaSourceChapters
           :manga="manga"
           :isFavorite="isInFavorites"
@@ -34,6 +39,7 @@ import AppNavBar from '@/components/AppNavBar.vue';
 import Loading from '@/components/Loading.vue';
 import MangaDetailHeader from '@/components/details/MangaDetailHeader.vue';
 import MangaDetailAdvancement from '@/components/details/MangaDetailAdvancement.vue';
+import MangaSimilar from '@/components/details/MangaSimilar.vue';
 import MangaSourceChapters from '@/components/details/MangaSourceChapters.vue';
 import { Manga, ScanSource, Chapter, Advancement } from '@/models';
 
@@ -43,6 +49,7 @@ import { Manga, ScanSource, Chapter, Advancement } from '@/models';
     Loading,
     MangaDetailHeader,
     MangaDetailAdvancement,
+    MangaSimilar,
     MangaSourceChapters
   }
 })
@@ -158,6 +165,22 @@ export default class Detail extends Vue {
   unfav() {
     this.$removeFromFavorite(this.manga.id).then( () => {
       //
+    });
+  }
+
+  reloadFavorites() {
+    axios.get<Manga[]>('/api/favorites/' + this.$currentProfile).then(res => {
+      this.favorites = res.data;
+    });
+  }
+  favOther(mangaId: string) {
+    this.$addToFavorite(mangaId).then( () => {
+      this.reloadFavorites();
+    });
+  }
+  unfavOther(mangaId: string) {
+    this.$removeFromFavorite(mangaId).then( () => {
+      this.reloadFavorites();
     });
   }
 }
