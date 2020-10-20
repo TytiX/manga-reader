@@ -1089,6 +1089,13 @@
   dependencies:
     source-map "^0.6.1"
 
+"@types/vue-select@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@types/vue-select/-/vue-select-2.5.1.tgz#de4095505a29d2b7fc9013e4c0d41868e72b9c6f"
+  integrity sha512-TpHrESMXa6Y9Q6NTSFySkX7U/iZU2ENXHaDC+ZukJLKzGn2Mzn+QtdLuGEQQEK5OZ+u115btH5wf7nrRO/jcRA==
+  dependencies:
+    vue "^2.0.0"
+
 "@types/vuedraggable@^2.23.1":
   version "2.23.1"
   resolved "https://registry.yarnpkg.com/@types/vuedraggable/-/vuedraggable-2.23.1.tgz#3f6aad6d86adc42a9fec5665a41884b4da8d4d61"
@@ -8673,6 +8680,11 @@ vue-router@^3.2.0:
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.4.6.tgz#f7bda2c9a43d39837621c9a02ba7789f5daa24b2"
   integrity sha512-kaXnB3pfFxhAJl/Mp+XG1HJMyFqrL/xPqV7oXlpXn4AwMmm6VNgf0nllW8ksflmZANfI4kdo0bVn/FYSsAolPQ==
 
+vue-select@^3.10.8:
+  version "3.10.8"
+  resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-3.10.8.tgz#5d0839cba228a9a5efa1a88e5436840eb3fd0c7a"
+  integrity sha512-PnjtZWCTiSr04bs8ctPIiU41qnBK+oh/SOe6Pb4gElMMxofDFwUxiUe++mz0+84aTy4zrleGxtvVVyWbiPYBiw==
+
 vue-style-loader@^4.1.0, vue-style-loader@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.1.2.tgz#dedf349806f25ceb4e64f3ad7c0a44fba735fcf8"
@@ -8699,7 +8711,7 @@ vue-zoomer@^0.3.6:
   resolved "https://registry.yarnpkg.com/vue-zoomer/-/vue-zoomer-0.3.6.tgz#4203cd64dc7050fed3042ee193d3d71901e352f9"
   integrity sha512-MzouVy32Lbwg6+5XzBy/BIRKxg3ulyi3TGpn3WaVFxLlomoxsDx81Q6i5JF+o7sP3dGRq+PJzjuymJcVCJoRDA==
 
-vue@>=2.0.0, vue@^2.5.17, vue@^2.6.11:
+vue@>=2.0.0, vue@^2.0.0, vue@^2.5.17, vue@^2.6.11:
   version "2.6.12"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg==

@@ -5,7 +5,11 @@
       style="height: calc(100% - 56px);"
       class="scrollable">
       <b-container>
-        <MangaDetailHeader :manga="manga"></MangaDetailHeader>
+        <MangaDetailHeader
+          :manga="manga"
+          :allTags="allTags"
+          @add-tag="addTag"
+          @remove-tag="removeTag"></MangaDetailHeader>
         <MangaDetailAdvancement
           :advancements="advancements"
           @delete-adv="deleteAdvancement"></MangaDetailAdvancement>
@@ -41,7 +45,8 @@ import MangaDetailHeader from '@/components/details/MangaDetailHeader.vue';
 import MangaDetailAdvancement from '@/components/details/MangaDetailAdvancement.vue';
 import MangaSimilar from '@/components/details/MangaSimilar.vue';
 import MangaSourceChapters from '@/components/details/MangaSourceChapters.vue';
-import { Manga, ScanSource, Chapter, Advancement } from '@/models';
+
+import { Manga, Tag, ScanSource, Chapter, Advancement } from '@/models';
 
 @Component({
   components: {
@@ -63,6 +68,7 @@ export default class Detail extends Vue {
   favorites: Manga[] = [];
   advancements: Advancement[] = [];
   similar: Manga[] = [];
+  allTags: Tag[] = [];
   loaded = false;
 
   mounted() {
@@ -80,12 +86,14 @@ export default class Detail extends Vue {
       axios.get<Manga>(`/api/manga/${this.$route.params.id}`),
       axios.get<Advancement[]>(`/api/userprofile/${this.$currentProfile}/advancement/${this.$route.params.id}`),
       axios.get<Manga[]>('/api/favorites/' + this.$currentProfile),
-      axios.get<Manga[]>(`/api/manga/similar/${this.$route.params.id}`)
+      axios.get<Manga[]>(`/api/manga/similar/${this.$route.params.id}`),
+      axios.get<Tag[]>('/api/tag')
     ]).then( values => {
       this.manga = values[0].data;
       this.advancements = values[1].data;
       this.favorites = values[2].data;
       this.similar = values[3].data;
+      this.allTags = values[4].data;
       this.loaded = true;
     })
   }
@@ -165,6 +173,23 @@ export default class Detail extends Vue {
   unfav() {
     this.$removeFromFavorite(this.manga.id).then( () => {
       //
+    });
+  }
+
+  reloadManga() {
+    axios.get<Manga>(`/api/manga/${this.$route.params.id}`).then(res => {
+      this.manga = res.data
+    });
+  }
+
+  addTag(tag: Tag) {
+    axios.post<Manga>(`/api/manga/${this.manga.id}/addTag/${tag.id}`).then( () => {
+      this.reloadManga();
+    });
+  }
+  removeTag(tag: Tag) {
+    axios.post<Manga>(`/api/manga/${this.manga.id}/removeTag/${tag.id}`).then( () => {
+      this.reloadManga();
     });
   }
 

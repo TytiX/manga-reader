@@ -15,7 +15,13 @@
     </b-row>
     <b-row>
       <b-col>
-        <span class="tag" v-for="tag of tags" :key="tag.id">{{tag.name}}</span>
+        <span class="tag" v-for="tag of tags" :key="tag.id">{{tag.name}}<b-icon class="ml-1" icon="x" @click="removeTag(tag)"></b-icon></span>
+        <b-input-group class="mb-2">
+          <v-select class="form-control style-chooser" v-model="selectedTag" label="name" :options="allTags"></v-select>
+          <b-input-group-append>
+            <b-button @click="addTag(selectedTag)">Add Tag</b-button>
+          </b-input-group-append>
+        </b-input-group>
       </b-col>
     </b-row>
   </b-container>
@@ -36,6 +42,10 @@ import { Manga, Tag } from '@/models';
 export default class MangaDetailHeader extends Vue {
   @Prop()
   manga!: Manga;
+  @Prop()
+  allTags!: Tag[];
+
+  selectedTag: Tag | null = null;
 
   covers: string[] = [];
   description = '';
@@ -76,6 +86,14 @@ export default class MangaDetailHeader extends Vue {
     this.description = this.manga.sources[index].description;
   }
 
+  addTag(tag: Tag) {
+    this.$emit('add-tag', tag);
+    this.selectedTag = null;
+  }
+  removeTag(tag: Tag) {
+    this.$emit('remove-tag', tag);
+  }
+
 }
 </script>
 
@@ -100,4 +118,17 @@ export default class MangaDetailHeader extends Vue {
   padding: 3px 7px;
   position: relative;
 }
+</style>
+<style>
+.style-chooser .vs__search::placeholder,
+  .style-chooser .vs__dropdown-toggle,
+  .style-chooser .vs__dropdown-menu {
+    border: none;
+  }
+
+  .style-chooser .vs__clear,
+  .style-chooser .vs__open-indicator,
+  .style-chooser .vs__actions {
+    padding: 0;
+  }
 </style>
