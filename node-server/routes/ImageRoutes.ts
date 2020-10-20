@@ -26,7 +26,7 @@ export default (db: Database) => {
       );
       response.data.pipe(res);
     } catch (e) {
-      res.sendStatus(500)
+      res.status(500).send(e)
     }
   });
 
@@ -41,7 +41,7 @@ export default (db: Database) => {
       )
       response.data.pipe(res);
     } catch (e) {
-      res.sendStatus(500)
+      res.status(500).send(e)
     }
   });
 
