@@ -23,7 +23,7 @@ app.use('/api', apiRoutes());
 // start on boot
 scanfavoritesPages();
 scanAllSites(true);
-const task = new CronJob('0 0 8-18/2 * * *', async () => {
+const task = new CronJob('0 0 8-18/5 * * *', async () => {
   await scanfavoritesPages();
   await scanAllSites(false);
 });

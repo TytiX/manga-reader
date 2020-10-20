@@ -1,4 +1,4 @@
-import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan, SelectQueryBuilder } from 'typeorm';
+import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan, SelectQueryBuilder, Like } from 'typeorm';
 
 import {
   Manga,
@@ -162,7 +162,7 @@ export class Database {
   async findMangaByName(name: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
       relations: ['sources', 'tags'],
-      where: { name }
+      where: { name: Like(name) }
     });
   }
   async findMangaBySourceLink(link: string): Promise<[Manga, ScanSource]> {
