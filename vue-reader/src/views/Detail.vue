@@ -127,10 +127,6 @@ export default class Detail extends Vue {
     });
   }
   downloadChapters(chapters: Chapter[]) {
-    // this.$bvToast.toast(`Cannot download chapter ${chapters.length}`, {
-    //   title: `Cannot download`,
-    //   variant: 'danger'
-    // });
     for (const chapter of chapters) {
       this.downloadChapterFiles(chapter);
     }
@@ -167,12 +163,12 @@ export default class Detail extends Vue {
 
   fav() {
     this.$addToFavorite(this.manga.id).then( () => {
-      //
+      this.reloadFavorites();
     });
   }
   unfav() {
     this.$removeFromFavorite(this.manga.id).then( () => {
-      //
+      this.reloadFavorites();
     });
   }
 
