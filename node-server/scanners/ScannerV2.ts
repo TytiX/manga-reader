@@ -4,9 +4,10 @@ import axios from 'axios';
 
 import logger from '../logger';
 
-import { ScannerConfig, ScanSource, Page } from '../database/entity';
+import { ScannerConfig, ScanSource } from '../database/entity';
 import { UrlUtils } from '../utils/UrlUtils';
 import { URL } from 'url';
+import { ChapterScannerFactory } from './ChapterScannerFactory';
 
 export class ScannerV2 {
   config: ScannerConfig;
@@ -38,9 +39,7 @@ export class ScannerV2 {
     } else {
       select = xpath.select;
     }
-
     const mangasEncloseNodes = select(this.config.mangaEnclosingXpath, doc);
-
     const mangas: { name: string; link: string; }[] = [];
 
     for (const node of mangasEncloseNodes) {
@@ -132,11 +131,11 @@ export class ScannerV2 {
         name = select(this.config.chapterNameRelativeXpath, parsedNode)[0];
       }
 
-      const [chapterN, lastPartUrl] = this.findChapterNumberFromUrl(nodeLink.value as string);
-      logger.debug(`${source.manga.name} - ${source.name} --> chapter number: ${lastPartUrl}`);
+      const chapterN = this.findChapterNumberFromUrl(nodeLink.value as string);
+      logger.debug(`${source.manga.name} - ${source.name} --> chapter number: ${chapterN}`);
 
       if (Number.isNaN(chapterN)) {
-        logger.error(`Error scanning : ${source.manga.name} - ${source.name} --> ${lastPartUrl}`);
+        logger.error(`Error scanning : ${source.manga.name} - ${source.name} --> ${chapterN}`);
       } else {
         chapters.push({
           link: UrlUtils.completeUrl(new URL(this.config.mangasListUrl).origin, nodeLink.value),
@@ -150,7 +149,8 @@ export class ScannerV2 {
     logger.info(`${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
     if (scanPages) {
       for (const chapter of chapters) {
-        const pages = await this.scanPages(chapter.link);
+        const scanner = ChapterScannerFactory.from(chapter.link);
+        const pages = await scanner.scan(chapter.link);
         chapter.pages = pages;
       }
     }
@@ -159,66 +159,39 @@ export class ScannerV2 {
   }
 
   // TODO: parameterize
-  private findChapterNumberFromUrl(url: string) {
-    const urlSplit = url.split('/');
-    let lastPartUrl = urlSplit[urlSplit.length-1];
-    lastPartUrl = lastPartUrl.split('-')[0];
+  private findChapterNumberFromUrl(pUrl: string) {
+    const url = new URL(pUrl);
+    const urlSplit = url.pathname.split('/');
+    let lastPartUrl: string;
+    let cLastPartUrl: string;
     let chapterN: number;
-    if (lastPartUrl) {
-      lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-      chapterN = Number(lastPartUrl);
-    }
-
-    if (Number.isNaN(chapterN)) {
-      lastPartUrl = urlSplit[urlSplit.length-1];
-      lastPartUrl = lastPartUrl.split('-')[1];
-      if (lastPartUrl) {
-        lastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
-        chapterN = Number(lastPartUrl);
-      }
-    }
-    return [chapterN, lastPartUrl];
-  }
-
-  // TODO: parametrize chapter scanner config...
-  async scanPages(chapterLink: string) {
-    let foundPage = true;
-    let currentPage = 1;
-    const pages: Page[] = [];
-    // iterate over pages until not found
-    do {
-      try {
-        logger.debug(`scanning page : ${chapterLink + '/' + currentPage}`);
-        const response = await axios.get(chapterLink + '/' + currentPage);
-        const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
-
-        let nodeImageLink;
-        // define select method
-        let select = null;
-        if (doc.documentElement.namespaceURI) {
-          select = xpath.useNamespaces({"html": doc.documentElement.namespaceURI});
-          nodeImageLink = select('//html:img[@id="img"]/@src', doc)[0];
-        } else {
-          select = xpath.select;
-          nodeImageLink = select('//*[@id=\'ppp\']/a/img/@src', doc)[0];
+    switch(url.host) {
+      case 'lel.lecercleduscan.com':
+        lastPartUrl = urlSplit[5];
+        cLastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
+        chapterN = Number(cLastPartUrl);
+        break;
+      case 'lel.koneko-scantrad.fr':
+        lastPartUrl = urlSplit[urlSplit.length-2];
+        cLastPartUrl = UrlUtils.chapterCleanup(lastPartUrl);
+        chapterN = Number(cLastPartUrl);
+        break;
+      default:
+        lastPartUrl = urlSplit[urlSplit.length-1];
+        const fLastPart = lastPartUrl.split('-')[0];
+        const lLastPart = lastPartUrl.split('-')[1];
+        cLastPartUrl = UrlUtils.chapterCleanup(fLastPart);
+        chapterN = Number(cLastPartUrl);
+        if (Number.isNaN(chapterN)) {
+          cLastPartUrl = UrlUtils.chapterCleanup(lLastPart);
+          chapterN = Number(cLastPartUrl);
         }
-
-        if (nodeImageLink) {
-          const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
-          pages.push({
-            number: currentPage,
-            url: imgLink
-          })
-          currentPage++;
-        } else {
-          foundPage = false;
+        if (Number.isNaN(chapterN)) {
+          logger.error(`chapterN to be found --> ${lastPartUrl}`);
         }
-      } catch (e) {
-        foundPage = false;
-        logger.error(`${e}`);
-      }
-    } while(foundPage);
-    return pages;
+        break;
+    }
+    return chapterN;
   }
 
 }

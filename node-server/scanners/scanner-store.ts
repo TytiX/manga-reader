@@ -4,6 +4,7 @@ import PQueue from 'p-queue/dist';
 import { Database } from '../database/Database';
 import logger from '../logger';
 import { ScannerNotifier } from '../events/ScannerNotifier';
+import { ChapterScannerFactory } from './ChapterScannerFactory';
 
 /**
  * Scan a configuration and Store in the database
@@ -126,8 +127,7 @@ async function updateTags(database: Database, manga: Manga, tags: string[]) {
  * @param chapters chapters to parse
  */
 export async function scanChapterPages(chapters: Chapter[]) {
-  // TODO: add config
-  const scanner = new ScannerV2();
+  // add config
   const scanQueue = new PQueue({ concurrency: 10 });
   try {
     const db = new Database();
@@ -136,7 +136,7 @@ export async function scanChapterPages(chapters: Chapter[]) {
       for (const chapter of chapters) {
         const dbChapter = await db.findChapterById(chapter.id);
         if (dbChapter) {
-          scanQueue.add( () => scanPagesAndUpdateChapter(db, scanner, notifier, dbChapter) );
+          scanQueue.add( () => scanPagesAndUpdateChapter(db, notifier, dbChapter) );
         } else {
           logger.warn(`chapter not found: ${chapter.link}`);
         }
@@ -154,8 +154,9 @@ export async function scanChapterPages(chapters: Chapter[]) {
  * @param scanner the scanner
  * @param chapter the chapter to scan
  */
-async function scanPagesAndUpdateChapter(database: Database, scanner: ScannerV2, notifier: ScannerNotifier, chapter: Chapter) {
-  const pages = await scanner.scanPages(chapter.link);
+async function scanPagesAndUpdateChapter(database: Database, notifier: ScannerNotifier, chapter: Chapter) {
+  const scanner = ChapterScannerFactory.from(chapter.link);
+  const pages = await scanner.scan(chapter.link);
   chapter.pages = pages;
   chapter.scanned = true;
   await database.chapterRepository.save(chapter);

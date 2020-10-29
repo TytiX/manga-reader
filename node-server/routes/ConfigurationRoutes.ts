@@ -5,6 +5,7 @@ import { getDefaultConfigs } from '../scanners/site-scanner';
 import { ScannerV2 } from '../scanners/ScannerV2';
 import { ScanSource, Manga } from '../database/entity';
 import { scanAndStore } from '../scanners/scanner-store';
+import { ChapterScannerFactory } from '../scanners/ChapterScannerFactory';
 
 export default (db: Database) => {
   const router = Router();
@@ -28,8 +29,8 @@ export default (db: Database) => {
   });
 
   router.post('/test-config/chapterScan', async (req, res) => {
-    const scanner = new ScannerV2();
-    const pages = await scanner.scanPages(req.body.link);
+    const scanner = ChapterScannerFactory.from(req.body.link);
+    const pages = await scanner.scan(req.body.link);
     res.send({
       status: 'ok',
       pages
