@@ -8,6 +8,7 @@
         :mangas="mangas"
         :favorites="mangas"
         :unread="unreadChapters"
+        :unreadFirst="true"
         @fav="fav"
         @unfav="unfav">
       </MangaList>
