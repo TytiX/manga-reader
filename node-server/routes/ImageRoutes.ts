@@ -38,7 +38,7 @@ export default (db: Database) => {
           p => p.number = Number(req.params.pageNumber)
         ).url,
         { responseType:'stream' }
-      )
+      );
       response.data.pipe(res);
     } catch (e) {
       res.status(500).send(e)
