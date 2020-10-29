@@ -1,0 +1,22 @@
+{
+  "name": "koneko-scantrad",
+  "iconUrl": "https://i.ytimg.com/vi_webp/Og7yVX5UgDc/sddefault.webp",
+  "mangasUrl": "https://www.koneko-scantrad.fr/projets/",
+
+  "mangasListUrl": "https://www.koneko-scantrad.fr/projets/",
+
+  "mangaEnclosingXpath": "//*[@id='page-container']/table[1]/tbody/tr/td/a",
+  "mangaLinkRelativeXpath": "/a/@href",
+  "mangaNameRelativeXpath": "/a/img/@alt",
+
+  "mangaDescriptionXpath": "//*[@id='content']/div/div[1]/div/div/text()[6]",
+  "mangaCoverXpath": "//*[@id='content']/div/div[1]/div/img/@src",
+
+  "mangaCategoriesXpath": "//*[@id='content']/div/div[1]/div/div/text()[4]",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "//div[@class='title']/a",
+  "chapterLinkRelativeXpath": "/a/@href",
+  "chapterNumberTextRelativeXpath": "/a/text()",
+  "chapterNameRelativeXpath": "/a/text()"
+}

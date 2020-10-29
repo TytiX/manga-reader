@@ -1,0 +1,22 @@
+{
+  "name": "le-cercle-du-scan",
+  "iconUrl": "http://www.lecercleduscan.com/templates/images/logo.png",
+  "mangasUrl": "http://www.lecercleduscan.com/projets/manga/",
+
+  "mangasListUrl": "http://www.lecercleduscan.com/projets/manga/",
+
+  "mangaEnclosingXpath": "//div[@class='project-item']/a",
+  "mangaLinkRelativeXpath": "/a/@href",
+  "mangaNameRelativeXpath": "/a/div/text()",
+
+  "mangaDescriptionXpath": "/html/body/div/main/div/div[1]/div[2]/p/p/text()",
+  "mangaCoverXpath": "/html/body/div/main/div/div[1]/div[1]/div[1]/img/@src",
+
+  "mangaCategoriesXpath": "//a[@class='badge badge-dark']/text()",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "//*[@id='wrapper']/main/div/div[1]/div[3]/a",
+  "chapterLinkRelativeXpath": "/a/@href",
+  "chapterNumberTextRelativeXpath": "/a/text()",
+  "chapterNameRelativeXpath": "/a/text()"
+}

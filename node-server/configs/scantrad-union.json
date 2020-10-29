@@ -1,0 +1,22 @@
+{
+  "name": "scantrad-union",
+  "iconUrl": "https://scantrad-union.com/wp-content/themes/REM/img/logodragonstu.png",
+  "mangasUrl": "https://scantrad-union.com/projets/",
+
+  "mangasListUrl": "https://scantrad-union.com/projets/",
+
+  "mangaEnclosingXpath": "//*[@id='main']/section/div/div/a",
+  "mangaLinkRelativeXpath": "/a/@href",
+  "mangaNameRelativeXpath": "/a/div/div/div/h2/text()",
+
+  "mangaDescriptionXpath": "/html/body/div[2]/main/div/section/article/div/div/div[1]/p/text()",
+  "mangaCoverXpath": "/html/body/div[2]/main/div/section/article/div/div/div[2]/img/@src",
+
+  "mangaCategoriesXpath": "/html/body/div[2]/main/div/section/article/div/div/div[1]/div[2]/a/text()",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "//*[@id='wrapper']/main/div/div[1]/div[3]/a",
+  "chapterLinkRelativeXpath": "/a/@href",
+  "chapterNumberTextRelativeXpath": "/a/text()",
+  "chapterNameRelativeXpath": "/a/text()"
+}

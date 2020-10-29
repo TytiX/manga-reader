@@ -1,0 +1,22 @@
+{
+  "name": "scantrad",
+  "iconUrl": "https://scantrad.net/images/logo.png",
+  "mangasUrl": "https://scantrad.net/mangas",
+
+  "mangasListUrl": "https://scantrad.net/mangas",
+  
+  "mangaEnclosingXpath": "//div[@class='home']/div[1]/a",
+  "mangaLinkRelativeXpath": "/a/@href",
+  "mangaNameRelativeXpath": "/a/div[1]/div[2]/div[1]/text()",
+
+  "mangaDescriptionXpath": "/html/body/div[4]/div[2]/div[4]/text()",
+  "mangaCoverXpath": "/html/body/div[4]/div[2]/div[1]/img/@src",
+
+  "mangaCategoriesXpath": "",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "/html/body/div[4]/div[1]/div[class='chapitre']",
+  "chapterLinkRelativeXpath": "/div/div[2]/a[1]/@href",
+  "chapterNumberTextRelativeXpath": "/div/div[2]/a[1]/@href",
+  "chapterNameRelativeXpath": "/div/div[1]/div[1]/span[2]"
+}
