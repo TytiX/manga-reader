@@ -11,6 +11,8 @@ WORKDIR /app
 #     python-dev \
 #     py-pip \
 #     build-base
+RUN apk update && apk add dcron rsync ca-certificates && rm -rf /var/cache/apk/*
+RUN mkdir -p /var/log/cron && mkdir -m 0644 -p /var/spool/cron/crontabs && touch /var/log/cron/cron.log && mkdir -m 0644 -p /etc/cron.d
 COPY ./node-server .
 RUN npm install
 COPY --from=vue-builder /app/dist ./public
