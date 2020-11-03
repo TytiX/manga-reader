@@ -4,7 +4,6 @@ import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
 import { Advancement, ScanSource, Manga, Chapter, Tag } from '../database/entity';
-import logger from '../logger';
 
 const ITEM_PER_PAGE = 24;
 

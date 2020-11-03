@@ -1,17 +1,18 @@
-import { URL } from "url";
 
 export class UrlUtils {
 
   static chapterCleanup(url: string) {
-    return url.replace(' ', '')
+    return url ? url.replace(' ', '')
       .replace(',', '.')
       .replace('%20', '')
       .replace('%60', '')
-      .replace('%5D', '');
+      .replace('%5D', '') : '';
   }
 
   static imgLinkCleanup(url: string) {
-    if (UrlUtils.isURL(url)) {
+    if (url === undefined || url === null) {
+      return '';
+    } else if (UrlUtils.isURL(url)) {
       return url;
     } else {
       const urlTrimmed = url.trim();
@@ -33,7 +34,7 @@ export class UrlUtils {
   }
 
   static encodePartial(url: string) {
-    return url.replace(' ', '%20');
+    return url ? url.replace(' ', '%20') : '';
   }
 
   static isURL(str: string): boolean {
