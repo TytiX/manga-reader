@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import { CronJob } from 'cron';
+// import { CronJob } from 'cron';
+import * as cron from 'node-cron';
 
 import scanAllSites, { scanfavoritesPages } from './scanners/site-scanner';
 import apiRoutes from './routes/ApiRoute';
@@ -24,16 +25,21 @@ app.use('/api', apiRoutes());
 // start on boot
 scanfavoritesPages();
 scanAllSites();
-const task = new CronJob('0 8-21/10 * * *', async () => {
+// const task = new CronJob('0 8-21/10 * * *', async () => {
+cron.schedule('0 8-21/10 * * *', async () => {
   try {
     await scanfavoritesPages();
     await scanAllSites();
   } catch (e) {
     logger.error(e);
   }
-}, () => {
-  logger.error('Finish cron job sould not be triggered');
-}, true, 'Europe/Paris');
+}, {
+  scheduled: true,
+  timezone: 'Europe/Paris'
+});
+// }, () => {
+//   logger.error('Finish cron job sould not be triggered');
+// }, true, 'Europe/Paris');
 // task.start(); -- should be auto
 
 // start the express server
