@@ -6,7 +6,7 @@ import { Database } from '../database/Database';
 import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
 import { scanAndStore, scanChapterPages } from './scanner-store';
 
-export default async () => {
+export default () => {
   // get all configuration on a new connection...
   const db = new Database();
   db.connect('site-scanner').then( async () => {

@@ -26,10 +26,10 @@ app.use('/api', apiRoutes());
 scanfavoritesPages();
 scanAllSites();
 // const task = new CronJob('0 8-21/10 * * *', async () => {
-cron.schedule('0 8-21/10 * * *', async () => {
+cron.schedule('0 8-21/10 * * *', () => {
   try {
-    await scanfavoritesPages();
-    await scanAllSites();
+    scanfavoritesPages();
+    scanAllSites();
   } catch (e) {
     logger.error(e);
   }
