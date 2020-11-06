@@ -40,5 +40,5 @@ cron.schedule('0 8-21/10 * * *', () => {
 // start the express server
 app.listen( port, () => {
     // tslint:disable-next-line:no-console
-    console.log( `server started at http://localhost:${ port }` );
+    logger.info( `server started at http://localhost:${ port }` );
 });

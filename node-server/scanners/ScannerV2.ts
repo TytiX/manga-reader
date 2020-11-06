@@ -146,7 +146,7 @@ export class ScannerV2 {
     }
 
     // scan chapters pages
-    logger.info(`${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
+    logger.debug(`${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
     if (scanPages) {
       for (const chapter of chapters) {
         const scanner = ChapterScannerFactory.from(chapter.link);

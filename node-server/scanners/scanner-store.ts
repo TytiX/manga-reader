@@ -1,6 +1,8 @@
 import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
 import { ScannerV2 } from './ScannerV2';
 import PQueue from 'p-queue/dist';
+import * as moment from 'moment';
+
 import { Database } from '../database/Database';
 import logger from '../logger';
 import { ScannerNotifier } from '../events/ScannerNotifier';
@@ -26,7 +28,7 @@ export async function scanAndStore(config: ScannerConfig) {
 
   try {
     const notifier = new ScannerNotifier(db);
-    const startTime = new Date().getTime();
+    const startTime = moment();
     const mangas = await scanner.listMangas();
 
     for (const manga of mangas) {
@@ -38,7 +40,7 @@ export async function scanAndStore(config: ScannerConfig) {
       s.link = manga.link;
       s.manga = m;
       const [source, tags] = await scanner.scanMangaSource(s, false);
-      // logger.info('scanned manga : ', source, tags);
+      logger.debug('scanned manga : ', source, tags);
       storageQueue.add( () => createOrUpdate(
         db,
         notifier,
@@ -51,7 +53,7 @@ export async function scanAndStore(config: ScannerConfig) {
     storageQueue.onEmpty().then( () => {
       if ( db.connection ) {
         db.connection.close();
-        logger.info(`config scann finished ${config.name} in : ${(new Date().getTime() - startTime) / 1000}s`)
+        logger.info(`config scan finished ${config.name} in : ${moment.duration(moment().diff(startTime)).humanize()}`);
       }
     }).catch(e => {
       logger.error(`${e}`);
@@ -64,11 +66,11 @@ export async function scanAndStore(config: ScannerConfig) {
 async function createOrUpdate(database: Database, notifier: ScannerNotifier, source: ScanSource, tags: string[]) {
   try {
     const dbSource = await retrieveSource(database, notifier, source);
-    logger.info(`source updated : ${dbSource.manga.name}`);
+    logger.debug(`source updated : ${dbSource.manga.name}`);
     await updateOrAddChapter(database, notifier, dbSource, source.chapters);
-    logger.info(`chapters updated : ${dbSource.manga.name}`);
+    logger.debug(`chapters updated : ${dbSource.manga.name}`);
     await updateTags(database, dbSource.manga, tags);
-    logger.info(`tags updated : ${dbSource.manga.name}`);
+    logger.debug(`tags updated : ${dbSource.manga.name}`);
   } catch (e) {
     console.warn(e);
   }
