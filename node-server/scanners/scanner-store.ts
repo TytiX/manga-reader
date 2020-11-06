@@ -53,6 +53,8 @@ export async function scanAndStore(config: ScannerConfig) {
         db.connection.close();
         logger.info(`config scann finished ${config.name} in : ${(new Date().getTime() - startTime) / 1000}s`)
       }
+    }).catch(e => {
+      logger.error(`${e}`);
     });
   } catch(e) {
     logger.error(`${e}`);

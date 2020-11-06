@@ -16,4 +16,5 @@ RUN mkdir -p /var/log/cron && mkdir -m 0644 -p /var/spool/cron/crontabs && touch
 COPY ./node-server .
 RUN npm install
 COPY --from=vue-builder /app/dist ./public
+EXPOSE 3000
 ENTRYPOINT [ "yarn", "start" ]

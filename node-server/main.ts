@@ -27,15 +27,10 @@ scanfavoritesPages();
 scanAllSites();
 // const task = new CronJob('0 8-21/10 * * *', async () => {
 cron.schedule('0 8-21/10 * * *', () => {
-  try {
-    scanfavoritesPages();
-    scanAllSites();
-  } catch (e) {
-    logger.error(e);
-  }
+  scanfavoritesPages();
+  scanAllSites();
 }, {
-  scheduled: true,
-  timezone: 'Europe/Paris'
+  scheduled: true
 });
 // }, () => {
 //   logger.error('Finish cron job sould not be triggered');

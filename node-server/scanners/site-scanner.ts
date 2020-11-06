@@ -4,6 +4,7 @@ import * as walkSync from 'walk-sync';
 
 import { Database } from '../database/Database';
 import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
+import logger from '../logger';
 import { scanAndStore, scanChapterPages } from './scanner-store';
 
 export default () => {
@@ -15,6 +16,8 @@ export default () => {
       scanAndStore(scanerConfig);
     }
     db.connection.close();
+  }).catch(e => {
+    logger.error(`${e}`);
   });
 }
 
@@ -43,6 +46,8 @@ export function scanfavoritesPages() {
     if (favs.length > 0) {
       scanMangaPages(favs.map(f => f.id));
     }
+  }).catch(e => {
+    logger.error(`${e}`);
   });
 }
 
@@ -56,5 +61,7 @@ export function scanMangaPages(mangaIds: string[]) {
           .andWhere( 'manga.id IN (:...ids)', { ids: mangaIds } )
           .getMany();
     scanChapterPages(toScanChapters);
+  }).catch(e => {
+    logger.error(`${e}`);
   });
 }

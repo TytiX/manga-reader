@@ -9,6 +9,7 @@ import UserProfileRoutes from './UserProfileRoutes';
 import PushRoutes from './PushRoutes';
 import TagRoutes from './TagRoutes';
 import ImageRoutes from './ImageRoutes';
+import logger from '../logger';
 
 export default () => {
 
@@ -59,6 +60,8 @@ export default () => {
      * Images
      ***************************************************************************/
     router.use('/image', ImageRoutes(db));
+  }).catch(e => {
+    logger.error(`${e}`);
   });
 
   return router;
