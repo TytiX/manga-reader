@@ -14,7 +14,7 @@ WORKDIR /app
 RUN apk update && apk add dcron && rm -rf /var/cache/apk/*
 RUN mkdir -p /var/log/cron && mkdir -m 0644 -p /var/spool/cron/crontabs && touch /var/log/cron/cron.log && mkdir -m 0644 -p /etc/cron.d
 COPY ./node-server .
-RUN npm install
+RUN yarn install
 COPY --from=vue-builder /app/dist ./public
 EXPOSE 3000
 ENTRYPOINT [ "yarn", "start" ]
