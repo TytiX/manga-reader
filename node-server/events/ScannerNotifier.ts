@@ -65,7 +65,7 @@ export class ScannerNotifier {
         }
       }
     } catch(e) {
-      logger.error(`${e}`);
+      logger.error(`: ${this.constructor.name} -> ${e}`);
     }
     return scanPages;
   }
@@ -102,7 +102,7 @@ export class ScannerNotifier {
         (channel as any).send(embed);
       }
     } catch(e) {
-      logger.error(`${e}`);
+      logger.error(`: ${this.constructor.name} -> ${e}`);
     }
   }
 

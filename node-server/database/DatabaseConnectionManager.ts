@@ -11,6 +11,7 @@ import {
   UserProfile,
   Advancement,
   Subscription } from './entity';
+import logger from '../logger';
 
 export class DatabaseConnectionManager {
 
@@ -30,7 +31,12 @@ export class DatabaseConnectionManager {
       try {
         return getConnection(name);
       } catch(e) {
-        return await createConnection(opts);
+        logger.warn(`${e}`);
+        try {
+          return await createConnection(opts);
+        } catch(e) {
+          logger.error(`: ${this.constructor.name} -> ${e}`);
+        }
       }
     }
   }

@@ -61,7 +61,7 @@ export default () => {
      ***************************************************************************/
     router.use('/image', ImageRoutes(db));
   }).catch(e => {
-    logger.error(`${e}`);
+    logger.error(`: ${this.constructor.name} -> ${e}`);
   });
 
   return router;

@@ -135,7 +135,7 @@ export class ScannerV2 {
       logger.debug(`${source.manga.name} - ${source.name} --> chapter number: ${chapterN}`);
 
       if (Number.isNaN(chapterN)) {
-        logger.error(`Error scanning : ${source.manga.name} - ${source.name} --> ${chapterN}`);
+        logger.warn(`scanning : ${source.manga.name} - ${source.name} --> ${chapterN}`);
       } else {
         chapters.push({
           link: UrlUtils.completeUrl(new URL(this.config.mangasListUrl).origin, nodeLink.value),
@@ -187,7 +187,7 @@ export class ScannerV2 {
           chapterN = Number(cLastPartUrl);
         }
         if (Number.isNaN(chapterN)) {
-          logger.error(`chapterN to be found --> ${lastPartUrl}`);
+          logger.warn(`chapterN to be found --> ${lastPartUrl}`);
         }
         break;
     }

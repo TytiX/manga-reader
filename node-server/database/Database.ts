@@ -134,7 +134,7 @@ export class Database {
     try {
       scanSource = await this.sourceRepository.save(scanSource);
     } catch (e) {
-      logger.error(`${e}`);
+      logger.error(`: ${this.constructor.name} -> ${e}`);
     }
 
     manga.sources = [scanSource];
@@ -300,7 +300,7 @@ export class Database {
       await this.configRepository.delete(id);
       return true;
     } catch(e) {
-      logger.error(`${e}`);
+      logger.error(`: ${this.constructor.name} -> ${e}`);
       return false;
     }
   }

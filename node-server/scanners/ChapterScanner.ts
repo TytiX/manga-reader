@@ -54,7 +54,7 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
         }
       } catch (e) {
         foundPage = false;
-        logger.error(`${e}`);
+        logger.error(`: ${this.constructor.name} -> ${e}`);
       }
     } while(foundPage);
     return pages;

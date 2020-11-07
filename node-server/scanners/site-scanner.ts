@@ -17,7 +17,7 @@ export default () => {
     }
     db.connection.close();
   }).catch(e => {
-    logger.error(`${e}`);
+    logger.error(`: ${this.constructor.name} -> ${e}`);
   });
 }
 
@@ -47,7 +47,7 @@ export function scanfavoritesPages() {
       scanMangaPages(favs.map(f => f.id));
     }
   }).catch(e => {
-    logger.error(`${e}`);
+    logger.error(`: ${this.constructor.name} -> ${e}`);
   });
 }
 
@@ -62,6 +62,6 @@ export function scanMangaPages(mangaIds: string[]) {
           .getMany();
     scanChapterPages(toScanChapters);
   }).catch(e => {
-    logger.error(`${e}`);
+    logger.error(`: ${this.constructor.name} -> ${e}`);
   });
 }
