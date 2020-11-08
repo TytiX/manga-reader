@@ -23,7 +23,7 @@ export async function scanAndStore(config: ScannerConfig) {
   db.connect(config.name).then( () => {
     storageQueue.start();
   }).catch(e => {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanAndStore -> ${e}`);
   });
 
   try {
@@ -56,10 +56,10 @@ export async function scanAndStore(config: ScannerConfig) {
         logger.info(`config scan finished ${config.name} in : ${moment.duration(moment().diff(startTime)).humanize()}`);
       }
     }).catch(e => {
-      logger.error(`: ${this.constructor.name} -> ${e}`);
+      logger.error(`: scanAndStore -> ${e}`);
     });
   } catch(e) {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanAndStore -> ${e}`);
   }
 }
 
@@ -72,7 +72,7 @@ async function createOrUpdate(database: Database, notifier: ScannerNotifier, sou
     await updateTags(database, dbSource.manga, tags);
     logger.debug(`tags updated : ${dbSource.manga.name}`);
   } catch (e) {
-    console.warn(e);
+    console.warn(`${e}`);
   }
 }
 
@@ -148,7 +148,7 @@ export async function scanChapterPages(chapters: Chapter[]) {
       scanQueue.start();
     });
   } catch (e) {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanChapterPages -> ${e}`);
   }
 }
 

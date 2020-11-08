@@ -7,7 +7,7 @@ import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
 import logger from '../logger';
 import { scanAndStore, scanChapterPages } from './scanner-store';
 
-export default () => {
+export default function scanAllSites() {
   // get all configuration on a new connection...
   const db = new Database();
   db.connect('site-scanner').then( async () => {
@@ -17,7 +17,7 @@ export default () => {
     }
     db.connection.close();
   }).catch(e => {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanAllSites -> ${e}`);
   });
 }
 
@@ -47,7 +47,7 @@ export function scanfavoritesPages() {
       scanMangaPages(favs.map(f => f.id));
     }
   }).catch(e => {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanfavoritesPages -> ${e}`);
   });
 }
 
@@ -62,6 +62,6 @@ export function scanMangaPages(mangaIds: string[]) {
           .getMany();
     scanChapterPages(toScanChapters);
   }).catch(e => {
-    logger.error(`: ${this.constructor.name} -> ${e}`);
+    logger.error(`: scanMangaPages -> ${e}`);
   });
 }

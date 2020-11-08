@@ -57,7 +57,7 @@ export class Database {
       }
     });
   }
-  async searchMangas(itemPerPage: number, page?: number, search?: string, tagsIds?: string[]) {
+  async searchMangas(itemPerPage: number, page?: number, search?: string, tagsIds?: string[]): Promise<Manga[]> {
     let ids;
     if (tagsIds) {
       ids = tagsIds.map(tid => Number(tid));
@@ -250,7 +250,7 @@ export class Database {
   /***************************************************************************
    * Chapters
    ***************************************************************************/
-  async findNextChapterById(chapterId: string) {
+  async findNextChapterById(chapterId: string): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne(chapterId, {
       relations: ['source']
     });
@@ -267,7 +267,7 @@ export class Database {
     });
     return previous;
   }
-  async findPreviousChapterById(chapterId: string) {
+  async findPreviousChapterById(chapterId: string): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne(chapterId, {
       relations: ['source']
     });
@@ -355,7 +355,7 @@ export class Database {
   /***************************************************************************
    * Advancement
    ***************************************************************************/
-  async getAdvancements(profileId) {
+  async getAdvancements(profileId): Promise<Advancement[]> {
     return await this.advancementRepository.find({
       relations: [ 'profile', 'source', 'source.manga', 'chapter' ],
       where: {
@@ -363,7 +363,7 @@ export class Database {
       }
     });
   }
-  async getAdvancementsForManga(profileId: string, mangaId: string) {
+  async getAdvancementsForManga(profileId: string, mangaId: string): Promise<Advancement[]> {
     logger.debug(`p: ${profileId} --> m: ${mangaId}`);
     const manga = await this.mangaRepository.findOne(mangaId, {
       relations: ['sources']
