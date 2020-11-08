@@ -54,7 +54,7 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
         }
       } catch (e) {
         foundPage = false;
-        logger.error(`: ${this.constructor.name} -> ${e}`);
+        logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
       }
     } while(foundPage);
     return pages;
@@ -113,7 +113,7 @@ export class LeCercleDuScanChapterScanner implements ChapterScanner {
         )
       );
     } catch (e) {
-      logger.error(e);
+      logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
     }
     return pages;
   }

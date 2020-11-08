@@ -14,7 +14,7 @@ export class DiscordUtils {
       const key = fs.readFileSync('./data/discordkey');
       return key.toString();
     } catch (e) {
-      logger.error(`: ${this.constructor.name} -> ${e}`);
+      logger.error(`: DiscordUtils -> ${e.message} : ${e.stack}`);
       return undefined;
     }
   }

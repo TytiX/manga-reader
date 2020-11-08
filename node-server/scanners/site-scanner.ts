@@ -17,7 +17,7 @@ export default function scanAllSites() {
     }
     db.connection.close();
   }).catch(e => {
-    logger.error(`: scanAllSites -> ${e}`);
+    logger.error(`: scanAllSites -> ${e.message} : ${e.stack}`);
   });
 }
 
@@ -47,7 +47,7 @@ export function scanfavoritesPages() {
       scanMangaPages(favs.map(f => f.id));
     }
   }).catch(e => {
-    logger.error(`: scanfavoritesPages -> ${e}`);
+    logger.error(`: scanfavoritesPages -> ${e.message} : ${e.stack}`);
   });
 }
 
@@ -62,6 +62,6 @@ export function scanMangaPages(mangaIds: string[]) {
           .getMany();
     scanChapterPages(toScanChapters);
   }).catch(e => {
-    logger.error(`: scanMangaPages -> ${e}`);
+    logger.error(`: scanMangaPages -> ${e.message} : ${e.stack}`);
   });
 }

@@ -35,7 +35,7 @@ export class DatabaseConnectionManager {
         try {
           return await createConnection(opts);
         } catch(e) {
-          logger.error(`: ${this.constructor.name} -> ${e}`);
+          logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
         }
       }
     }
