@@ -29,6 +29,7 @@ export class ScannerV2 {
   }
 
   async listMangas() {
+    logger.debug(`Scanner : ${this.config.name} --> list manga from : ${this.config.mangasListUrl}`);
     const response = await axios.get(this.config.mangasListUrl);
     const correctedDoc = '<!doctype html>'.concat(' ',  response.data);
     const doc = new DOMParser(this.parserOptions).parseFromString(correctedDoc);
@@ -46,6 +47,7 @@ export class ScannerV2 {
       const parsedNode = new DOMParser(this.parserOptions).parseFromString(`${node}`);
       const nodeLink = select(this.config.mangaLinkRelativeXpath, parsedNode)[0];
       const name = select(this.config.mangaNameRelativeXpath, parsedNode)[0];
+      logger.debug(`Scanner : ${this.config.name} --> manga found : ${name.nodeValue}`);
       mangas.push({
         name: name.nodeValue,
         link: UrlUtils.completeUrl(new URL(this.config.mangasListUrl).origin, nodeLink.value)
@@ -55,6 +57,7 @@ export class ScannerV2 {
   }
 
   async scanMangaSource(pSource: ScanSource, scanChaptersPages: boolean) {
+    logger.debug(`Scanner : ${this.config.name} --> manga detail from : ${pSource.link}`);
     const response = await axios.get(pSource.link);
     const correctedDoc = '<!doctype html>'.concat(' ',  response.data);
 
@@ -69,6 +72,7 @@ export class ScannerV2 {
 
     const [source, tags] = this.updateScanSource(pSource, doc, select);
     const chapters = await this.scanMangaChapters(source, doc, select, scanChaptersPages);
+    logger.debug(`Scanner : ${this.config.name} --> manga ${pSource.manga.name} chapters : ${chapters.length}`);
     source.chapters = chapters;
 
     return [source, tags];
@@ -79,6 +83,7 @@ export class ScannerV2 {
     if (!source.coverLink && this.config.mangaCoverXpath) {
       const coverImage = select(this.config.mangaCoverXpath, doc)[0];
       if (coverImage) {
+        logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find cover : ${coverImage.value}`);
         const coverUri = UrlUtils.imgLinkCleanup(coverImage.value);
         source.coverLink = coverUri;
       }
@@ -88,7 +93,7 @@ export class ScannerV2 {
     if (!source.description && this.config.mangaDescriptionXpath) {
       const descriptionNode = select(this.config.mangaDescriptionXpath, doc)[0];
       if (descriptionNode) {
-        logger.debug(`description: ${descriptionNode.nodeValue}`);
+        logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find desc : ${descriptionNode.nodeValue}`);
         source.description = descriptionNode.nodeValue;
       }
     }
@@ -98,7 +103,7 @@ export class ScannerV2 {
     if (this.config.mangaCategoriesXpath && this.config.mangaCategoriesXpath !== '') {
       const genderNodes = select(this.config.mangaCategoriesXpath, doc);
       for (const genderNode of genderNodes) {
-        logger.debug(`gender: ${genderNode.nodeValue}`);
+        logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find gender : ${genderNode.nodeValue}`);
         // TODO: cleanup value...
         tags.push(genderNode.nodeValue);
       }
@@ -107,7 +112,7 @@ export class ScannerV2 {
     if (this.config.mangaTagsXpath && this.config.mangaTagsXpath !== '') {
       const tagNodes = select(this.config.mangaTagsXpath, doc);
       for (const tagNode of tagNodes) {
-        logger.debug(`tags: ${tagNode.nodeValue}`);
+        logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find tags : ${tagNode.nodeValue}`);
         // TODO: cleanup value...
         tags.push(tagNode.nodeValue);
       }
@@ -132,6 +137,7 @@ export class ScannerV2 {
       }
 
       const chapterN = this.findChapterNumberFromUrl(nodeLink.value as string);
+      logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find chapter : ${nodeLink.value}`);
       logger.debug(`${source.manga.name} - ${source.name} --> chapter number: ${chapterN}`);
 
       if (Number.isNaN(chapterN)) {
@@ -146,7 +152,7 @@ export class ScannerV2 {
     }
 
     // scan chapters pages
-    logger.debug(`${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
+    logger.debug(`Scanner : ${this.config.name} --> ${source.manga.name} --> found ${chapters.length} chapters - in source ${source.name}`);
     if (scanPages) {
       for (const chapter of chapters) {
         const scanner = ChapterScannerFactory.from(chapter.link);

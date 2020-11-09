@@ -9,6 +9,7 @@ import { scanAndStore, scanChapterPages } from './scanner-store';
 
 export default function scanAllSites() {
   // get all configuration on a new connection...
+  logger.info('start scanning all sites')
   const db = new Database();
   db.connect('site-scanner').then( async () => {
     const configs = await db.allConfigs();
@@ -16,6 +17,7 @@ export default function scanAllSites() {
       scanAndStore(scanerConfig);
     }
     db.connection.close();
+    logger.debug('close site-scanner connection');
   }).catch(e => {
     logger.error(`: scanAllSites -> ${e.message} : ${e.stack}`);
   });
@@ -34,6 +36,7 @@ export function getDefaultConfigs() {
 }
 
 export function scanfavoritesPages() {
+  logger.info('start scanning favorites chapters')
   const db = new Database();
   db.connect('manga-favorit-page-scanner').then( async () => {
     const profiles = await db.userProfileRepository.find({

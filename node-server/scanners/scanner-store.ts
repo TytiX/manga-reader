@@ -22,6 +22,7 @@ export async function scanAndStore(config: ScannerConfig) {
   const db = new Database();
   db.connect(config.name).then( () => {
     storageQueue.start();
+    logger.info(`Scan start ${config.name}`);
   }).catch(e => {
     logger.error(`: scanAndStore -> ${e.message} : ${e.stack}`);
   });
@@ -53,7 +54,7 @@ export async function scanAndStore(config: ScannerConfig) {
     storageQueue.onEmpty().then( () => {
       if ( db.connection ) {
         db.connection.close();
-        logger.info(`config scan finished ${config.name} in : ${moment.duration(moment().diff(startTime)).humanize()}`);
+        logger.info(`Scan finished ${config.name} in : ${moment.duration(moment().diff(startTime)).humanize()}`);
       }
     }).catch(e => {
       logger.error(`: scanAndStore -> ${e.message} : ${e.stack}`);

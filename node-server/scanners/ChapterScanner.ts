@@ -29,6 +29,7 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
     let foundPage = true;
     let currentPage = 1;
     const pages: Page[] = [];
+    logger.info(`scan chapter from link : ${chapterLink}`);
     // iterate over pages until not found
     do {
       try {
@@ -40,6 +41,7 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
 
         if (nodeImageLink) {
           const imgLink = UrlUtils.imgLinkCleanup(nodeImageLink.value);
+          logger.debug(`page link found : ${imgLink}`);
           if (pages.length > 0 && pages[pages.length-1].url === imgLink) {
             foundPage = false;
           } else {
@@ -57,6 +59,7 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
         logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
       }
     } while(foundPage);
+    logger.info(`chapter scan return ${pages.length} pages`);
     return pages;
   }
 
@@ -97,11 +100,13 @@ export class LeCercleDuScanChapterScanner implements ChapterScanner {
 
   async scan(chapterLink: string) {
     const pages: Page[] = [];
+    logger.info(`scan chapter from link : ${chapterLink}`);
     try {
       const response = await axios.get(chapterLink);
       const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
       const select = xpath.select;
       const pagesUrl = select('//*[@id="page"]/div/a/img', doc);
+      logger.debug(`page link found : ${pagesUrl}`);
       pages.push(
         ... pagesUrl.map(
           (n, index: number) => {
@@ -115,6 +120,7 @@ export class LeCercleDuScanChapterScanner implements ChapterScanner {
     } catch (e) {
       logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
     }
+    logger.info(`chapter scan return ${pages.length} pages`);
     return pages;
   }
   
