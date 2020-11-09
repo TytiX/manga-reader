@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node main.ts",
-    "dev": "ts-node-dev --inspect --respawn --transpileOnly main.ts"
+    "dev": "ts-node-dev --inspect --respawn main.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
