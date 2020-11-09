@@ -8,7 +8,7 @@ const logger: winston.Logger = winston.createLogger({
     //   format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.level} - ${info.message}`)
     // }),
     new DailyRotateFile({
-      level: 'debug',
+      level: 'info',
       format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.level} - ${info.message}`),
       frequency: '1d',
       filename: './logs/info-%DATE%.log',
