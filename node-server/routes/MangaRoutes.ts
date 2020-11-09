@@ -4,12 +4,14 @@ import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';
 import { Advancement, ScanSource, Manga, Chapter, Tag } from '../database/entity';
+import logger from '../logger';
 
 const ITEM_PER_PAGE = 24;
 
 export default (db: Database) => {
   const router = Router();
   router.get('/', async (req, res) => {
+    logger.debug(`MangaAPI --> get all mangas : search ${req.query.page}, ${req.query.search}, ${req.query.tags}`);
     res.send(
       await db.searchMangas(
         ITEM_PER_PAGE,
@@ -20,11 +22,13 @@ export default (db: Database) => {
     );
   });
   router.post('/search', async (req, res) => {
+    logger.debug(`MangaAPI --> search mangas : search ${req.body.tags}`);
     res.send(
       await db.mangaByTags(req.body.tags)
     )
   });
   router.get('/leftToRead/:profileId', async (req, res) => {
+    logger.debug(`MangaAPI --> Mangas left to read for profile ${req.body.profileId}`);
     const read = await db.connection.createQueryBuilder()
                   .select(['adv.id as "advId"', 'manga.id as "mangaId"', 'manga.name', 'count(chapter.id)'])
                   .from(Advancement, 'adv')
@@ -40,6 +44,7 @@ export default (db: Database) => {
     res.send( read );
   });
   router.get('/simili', async (req, res) => {
+    logger.debug(`MangaAPI --> Mangas similar names`);
     const mangas = await db.connection.createQueryBuilder()
       .select([
         'm1.id',
@@ -54,6 +59,7 @@ export default (db: Database) => {
     res.send(mangas);
   });
   router.post('/migrateSources', async (req, res) => {
+    logger.debug(`MangaAPI --> Mangas migrate source from ${req.body.from.id} to ${req.body.to.id}`);
     const fromId = req.body.from.id
     const toId = req.body.to.id;
 
@@ -75,6 +81,7 @@ export default (db: Database) => {
     }
   });
   router.get('/latelly/:number-:period', async (req, res) => {
+    logger.debug(`MangaAPI --> Latest insert manga : ${req.params.number} ${req.params.period}`);
     let chapters = await db.chapterRepository.find({
       relations: [ 'source', 'source.manga' ],
       where: {
@@ -96,6 +103,7 @@ export default (db: Database) => {
     );
   });
   router.get('/started/:profileId', async (req, res) => {
+    logger.debug(`MangaAPI --> Started manga for profile ${req.params.profileId}`);
     let advs = await db.advancementRepository.find({
       relations: [ 'profile', 'source', 'source.manga' ],
       where: {
@@ -112,6 +120,7 @@ export default (db: Database) => {
     );
   });
   router.get('/recomended/:profileId', async (req, res) => {
+    logger.debug(`MangaAPI --> Recomended manga for profile ${req.params.profileId}`);
     const query = db.connection.createQueryBuilder()
                   .select(['manga.id', 'manga.name', 'sum(sq.count) as sum'])
                   .from(Manga, 'manga')
@@ -162,6 +171,7 @@ export default (db: Database) => {
     );
   });
   router.get('/similar/:mangaId', async (req, res) => {
+    logger.debug(`MangaAPI --> Similar manga to ${req.params.mangaId}`);
     const rated = await db.connection.createQueryBuilder()
       .select('manga.id')
       .from('manga_tags_tag', 'mt')
@@ -189,6 +199,7 @@ export default (db: Database) => {
       );
   });
   router.get('/untaged', async (req, res) => {
+    logger.debug(`MangaAPI --> untaged manga`);
     // SELECT id, name 
     //   FROM   manga
     //   LEFT   JOIN manga_tags_tag mt ON manga.id = mt."mangaId"  -- short for: ON i.ip = l.ip
@@ -213,6 +224,7 @@ export default (db: Database) => {
     );
   });
   router.post('/:mangaId/addTag/:tagId', async (req, res) => {
+    logger.debug(`MangaAPI --> Add tag ${req.params.tagId} to manga ${req.params.mangaId}`);
     const manga = await db.mangaRepository.findOne(req.params.mangaId, {
       relations: [ 'tags' ]
     });
@@ -223,6 +235,7 @@ export default (db: Database) => {
     );
   });
   router.post('/:mangaId/removeTag/:tagId', async (req, res) => {
+    logger.debug(`MangaAPI --> Remove tag ${req.params.tagId} from manga ${req.params.mangaId}`);
     const manga = await db.mangaRepository.findOne(req.params.mangaId, {
       relations: [ 'tags' ]
     });
@@ -232,6 +245,7 @@ export default (db: Database) => {
     );
   });
   router.get('/:id', async function(req, res) {
+    logger.debug(`MangaAPI --> Get manga ${req.params.id}`);
     res.send(
       await db.findMangaById(req.params.id)
     );
