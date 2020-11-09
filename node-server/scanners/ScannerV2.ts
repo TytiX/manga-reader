@@ -72,7 +72,6 @@ export class ScannerV2 {
 
     const [source, tags] = this.updateScanSource(pSource, doc, select);
     const chapters = await this.scanMangaChapters(source, doc, select, scanChaptersPages);
-    logger.debug(`Scanner : ${this.config.name} --> manga ${pSource.manga.name} chapters : ${chapters.length}`);
     source.chapters = chapters;
 
     return [source, tags];
@@ -138,10 +137,9 @@ export class ScannerV2 {
 
       const chapterN = this.findChapterNumberFromUrl(nodeLink.value as string);
       logger.debug(`Scanner : ${this.config.name} --> manga ${source.manga.name} find chapter : ${nodeLink.value}`);
-      logger.debug(`${source.manga.name} - ${source.name} --> chapter number: ${chapterN}`);
 
       if (Number.isNaN(chapterN)) {
-        logger.warn(`scanning : ${source.manga.name} - ${source.name} --> ${chapterN}`);
+        logger.warn(`Scanner : ${this.config.name} --> scanning : ${source.manga.name} - ${source.name} --> ${chapterN}`);
       } else {
         chapters.push({
           link: UrlUtils.completeUrl(new URL(this.config.mangasListUrl).origin, nodeLink.value),
