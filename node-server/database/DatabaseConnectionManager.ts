@@ -1,4 +1,4 @@
-import { createConnection, Connection, ConnectionOptions, getConnection } from 'typeorm';
+import { createConnection, ConnectionOptions, getConnection } from 'typeorm';
 import { existsSync, readFileSync } from 'fs';
 
 import {
@@ -27,7 +27,8 @@ export class DatabaseConnectionManager {
       try {
         return await createConnection(opts);
       } catch(e) {
-        logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
+        logger.warn(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
+        return getConnection(opts.name);
       }
     }
   }
