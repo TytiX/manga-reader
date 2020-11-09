@@ -28,6 +28,7 @@
     "walk-sync": "^2.1.0",
     "web-push": "^3.4.4",
     "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.5.0",
     "xmldom": "^0.3.0",
     "xpath": "^0.0.27"
   }
