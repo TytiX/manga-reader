@@ -12,7 +12,7 @@ const logger: winston.Logger = winston.createLogger({
       format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.level} - ${info.message}`),
       frequency: '1d',
       filename: './logs/info-%DATE%.log',
-      datePattern: 'YYYY-MM-DD-HH',
+      datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '7d'
