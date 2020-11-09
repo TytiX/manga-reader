@@ -22,13 +22,24 @@ export class DatabaseConnectionManager {
   static async getOrCreate(name: string) {
     const opts = DatabaseConnectionManager.getConnectionOptions(name);
     if (opts.type === 'sqlite') {
-      return await createConnection(opts);
+      try {
+        return await createConnection(opts);
+      } catch(e) {
+        try {
+          return getConnection();
+        } catch (e) {
+          logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
+        }
+      }
     } else {
       try {
         return await createConnection(opts);
       } catch(e) {
-        logger.warn(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
-        return getConnection(opts.name);
+        try {
+          return getConnection(opts.name);
+        } catch (e) {
+          logger.error(`: ${this.constructor.name} -> ${e.message} : ${e.stack}`);
+        }
       }
     }
   }
