@@ -6,11 +6,13 @@ import { ScannerV2 } from '../scanners/ScannerV2';
 import { ScanSource, Manga } from '../database/entity';
 import { scanAndStore } from '../scanners/scanner-store';
 import { ChapterScannerFactory } from '../scanners/ChapterScannerFactory';
+import logger from '../logger';
 
 export default (db: Database) => {
   const router = Router();
   
   router.get('/', async function(req, res) {
+    logger.debug(`ConfigAPI --> get all config`);
     res.send(await db.allConfigs());
   });
   router.get('/default', async function(req, res) {
@@ -20,6 +22,7 @@ export default (db: Database) => {
   });
 
   router.post('/test-config', async (req, res) => {
+    logger.debug(`ConfigAPI --> test config ${req.body}`);
     const scanner = new ScannerV2(req.body);
     const mangas = await scanner.listMangas();
     res.send({
@@ -29,6 +32,7 @@ export default (db: Database) => {
   });
 
   router.post('/test-config/chapterScan', async (req, res) => {
+    logger.debug(`ConfigAPI --> test config scan chapter ${req.body.link}`);
     const scanner = ChapterScannerFactory.from(req.body.link);
     const pages = await scanner.scan(req.body.link);
     res.send({
@@ -37,6 +41,7 @@ export default (db: Database) => {
     });
   });
   router.post('/test-config/:mangaIndex', async (req, res) => {
+    logger.debug(`ConfigAPI --> test config scan manga ${req.params.mangaIndex}`);
     const scanner = new ScannerV2(req.body);
     const mangas = await scanner.listMangas();
     const index = Number(req.params.mangaIndex);
@@ -55,12 +60,15 @@ export default (db: Database) => {
   });
 
   router.get('/:id', async function(req, res) {
+    logger.debug(`ConfigAPI --> find config ${req.params.id}`);
     res.send(await db.findScanConfigById(req.params.id));
   });
   router.delete('/:id', async function(req, res) {
+    logger.debug(`ConfigAPI --> delete config ${req.params.id}`);
     res.send(await db.deleteConfig(req.params.id));
   });
   router.post('/', async function(req, res) {
+    logger.debug(`ConfigAPI --> create or update config ${req.body}`);
     const config = await db.createOrUpdateScanConfig(req.body);
     scanAndStore(config);
     res.send(config);
