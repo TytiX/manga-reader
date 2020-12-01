@@ -26,6 +26,10 @@
         <h3>Mangas</h3>
         <b-button to="/manage-mangas">Manage mangas</b-button>
       </div>
+      <div class="card container mt-3">
+        <h3>Logs</h3>
+        <b-button to="/manage-logs">Manage logs</b-button>
+      </div>
     </div>
   </div>
 </template>

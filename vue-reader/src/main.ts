@@ -18,9 +18,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'vue-select/dist/vue-select.css';
 
 Vue.use(UserProfilePlugin)
-
 Vue.use(VueZoomer)
-
 Vue.component('v-select', vSelect)
 
 Vue.config.productionTip = false
