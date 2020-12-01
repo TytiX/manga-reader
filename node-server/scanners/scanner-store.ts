@@ -118,7 +118,7 @@ export async function scanSiteAndStoreFavorites(config: ScannerConfig) {
   }
 }
 
-async function createOrUpdate(database: Database, notifier: ScannerNotifier, source: ScanSource, tags: string[]) {
+export async function createOrUpdate(database: Database, notifier: ScannerNotifier, source: ScanSource, tags: string[]) {
   try {
     const dbSource = await retrieveSource(database, notifier, source);
     logger.debug(`source updated : ${dbSource.manga.name}`);
@@ -180,10 +180,10 @@ async function retrieveSource(database: Database, notifier: ScannerNotifier, sou
     const dbManga = await database.findMangaByName(source.manga.name);
     if (dbManga) {
       dbSource = await database.addSourceToManga(dbManga, source);
-      notifier.newMangaSource(dbManga, dbSource);
+      if (notifier) notifier.newMangaSource(dbManga, dbSource);
     } else {
       dbSource = await database.createMangaAndSource(source);
-      notifier.newManga(dbSource.manga);
+      if (notifier) notifier.newManga(dbSource.manga);
     }
   } else {
     // source.id = dbSource.id;
@@ -200,7 +200,10 @@ async function updateOrAddChapter(database: Database, notifier: ScannerNotifier,
     if (!dbChapter) {
       dbChapter = await database.addChapterToSource(source, chapter);
       // send update...
-      const scanPages = await notifier.newChapterNotif(source, dbChapter);
+      let scanPages = false;
+      if (notifier) {
+        scanPages = await notifier.newChapterNotif(source, dbChapter);
+      }
       if (scanPages) {
         await scanChapterPages([dbChapter]);
       }

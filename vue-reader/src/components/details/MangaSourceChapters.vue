@@ -1,36 +1,48 @@
 <template>
   <b-container>
     <b-row class="mb-3">
-      <b-form-select v-model="selectedSource" :options="optionsSources"></b-form-select>
+      <b-input-group>
+        <b-input-group-prepend>
+          <b-button
+            @click="rescanManga()"
+            variant="warning">
+            <b-iconstack scale="1.2">
+              <b-icon stacked icon="arrow-clockwise" scale="1.2"></b-icon>
+              <b-icon stacked icon="binoculars" scale="0.5"></b-icon>
+            </b-iconstack>
+          </b-button>
+        </b-input-group-prepend>
+        <b-form-select v-model="selectedSource" :options="optionsSources"></b-form-select>
+      </b-input-group>
     </b-row>
 
     <b-row class="mb-3">
-      <b-button-group class="col-5" pill>
-        <b-button
-          @click.prevent="scanChapters(...allChaptersClean)"
-          variant="warning">
-          <b-icon icon="check2-circle"></b-icon>
-        </b-button>
-        <!-- <b-button
-          @click.prevent="cacheOnServer(...chapters)">
-          <b-icon icon="cloud-upload"></b-icon>
-        </b-button> -->
-        <b-button
-          @click.prevent="downloadChapters(...chapters)">
-          <b-icon icon="cloud-download"></b-icon>
-        </b-button>
-      </b-button-group>
-      <div class="col-5">
+      <b-input-group>
+        <b-input-group-prepend>
+          <b-button
+            @click.prevent="scanChapters(...allChaptersClean)"
+            variant="warning">
+            <b-icon icon="check2-circle"></b-icon>
+          </b-button>
+          <!-- <b-button
+            @click.prevent="cacheOnServer(...chapters)">
+            <b-icon icon="cloud-upload"></b-icon>
+          </b-button> -->
+          <b-button
+            @click.prevent="downloadChapters(...chapters)">
+            <b-icon icon="cloud-download"></b-icon>
+          </b-button>
+        </b-input-group-prepend>
         <b-form-select v-model="selectedSource.reading" :options="readingOptions"></b-form-select>
-      </div>
-      <div class="col-2">
-        <b-button v-if="!isFavorite">
-          <b-icon @click="fav()" icon="heart"></b-icon>
-        </b-button>
-        <b-button v-else>
-          <b-icon @click="unfav()" icon="heart-fill"></b-icon>
-        </b-button>
-      </div>
+        <b-input-group-append>
+          <b-button v-if="!isFavorite">
+            <b-icon @click="fav()" icon="heart"></b-icon>
+          </b-button>
+          <b-button v-else>
+            <b-icon @click="unfav()" icon="heart-fill"></b-icon>
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
     </b-row>
 
     <b-row class="mb-3">
@@ -176,6 +188,9 @@ export default class MangaSourceChapters extends Vue {
       chapter.source.manga = this.manga;
     }
     this.$emit('download-chapters', chapters);
+  }
+  rescanManga() {
+    this.$emit('rescan-manga', this.manga);
   }
 
   fav() {

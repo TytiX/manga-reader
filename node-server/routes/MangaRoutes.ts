@@ -5,6 +5,9 @@ import { MoreThanOrEqual } from 'typeorm';
 import { Database } from '../database/Database';
 import { Advancement, ScanSource, Manga, Chapter, Tag } from '../database/entity';
 import logger from '../logger';
+import { ChapterScannerFactory } from '../scanners/ChapterScannerFactory';
+import { createOrUpdate } from '../scanners/scanner-store';
+import { ScannerV2 } from '../scanners/ScannerV2';
 
 const ITEM_PER_PAGE = 24;
 
@@ -222,6 +225,24 @@ export default (db: Database) => {
         }
       )
     );
+  });
+  router.get('/scan/:mangaid', async (req, res) => {
+    let scanner: ScannerV2;
+    try {
+      const manga = await db.mangaRepository.findOne({
+        relations: ['sources', 'sources.scannerConfig'],
+        where: { id: req.params.mangaid }
+      });
+      for (const source of manga.sources) {
+        source.manga = manga;
+        scanner = new ScannerV2(source.scannerConfig);
+        const [scanSource, tags] = await scanner.scanMangaSource(source, false);
+        await createOrUpdate(db, null, scanSource as ScanSource, tags as string[]);
+      }
+      res.send({});
+    } catch (e) {
+      res.status(500).send(e);
+    }
   });
   router.post('/:mangaId/addTag/:tagId', async (req, res) => {
     logger.debug(`MangaAPI --> Add tag ${req.params.tagId} to manga ${req.params.mangaId}`);

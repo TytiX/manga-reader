@@ -24,6 +24,7 @@
           @fav="fav"
           @unfav="unfav"
           @read-mode="changeReadMode"
+          @rescan-manga="rescanManga"
           @scan-chapters="scanChapters"
           @cache-chapters-on-server="cacheOnServer"
           @download-chapters="downloadChapters">
@@ -130,6 +131,12 @@ export default class Detail extends Vue {
     for (const chapter of chapters) {
       this.downloadChapterFiles(chapter);
     }
+  }
+  rescanManga(manga: Manga) {
+    axios.get(`/api/manga/scan/${manga.id}`).then( () => {
+      // reload
+      this.reload();
+    });
   }
 
   async downloadChapterFiles(chapter: Chapter) {
