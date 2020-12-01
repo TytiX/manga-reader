@@ -2,7 +2,7 @@ import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logger: winston.Logger = winston.createLogger({
-  level: 'debug',
+  level: 'info',
   format: winston.format.printf(info => `${new Date().toLocaleString()} - ${info.level} - ${info.message}`),
   transports: [
     // new winston.transports.Console(),
