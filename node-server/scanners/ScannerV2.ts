@@ -1,6 +1,6 @@
 import { DOMParser } from 'xmldom';
-import * as xpath from 'xpath';
-import axios from 'axios';
+import xpath from 'xpath';
+import { http } from '../utils/Http';
 
 import logger from '../logger';
 
@@ -30,8 +30,8 @@ export class ScannerV2 {
 
   async listMangas() {
     logger.debug(`Scanner : ${this.config.name} --> list manga from : ${this.config.mangasListUrl}`);
-    const response = await axios.get(this.config.mangasListUrl);
-    const correctedDoc = '<!doctype html>'.concat(' ',  response.data);
+    const response = await http.get(this.config.mangasListUrl);
+    const correctedDoc = '<!doctype html>'.concat(' ',  response);
     const doc = new DOMParser(this.parserOptions).parseFromString(correctedDoc);
 
     let select = null;
@@ -58,8 +58,8 @@ export class ScannerV2 {
 
   async scanMangaSource(pSource: ScanSource, scanChaptersPages: boolean) {
     logger.debug(`Scanner : ${this.config.name} --> manga detail from : ${pSource.link}`);
-    const response = await axios.get(pSource.link);
-    const correctedDoc = '<!doctype html>'.concat(' ',  response.data);
+    const response = await http.get(pSource.link);
+    const correctedDoc = '<!doctype html>'.concat(' ',  response);
 
     const doc = new DOMParser(this.parserOptions).parseFromString(correctedDoc);
 

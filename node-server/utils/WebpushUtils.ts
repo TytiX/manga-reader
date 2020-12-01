@@ -1,5 +1,5 @@
-import * as webpush from 'web-push';
-import * as fs from 'fs';
+import webpush from 'web-push';
+import fs from 'fs';
 
 export class WebpushUtils {
 

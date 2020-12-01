@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { spawn } from 'child_process';
+import walkSync from 'walk-sync';
 
 import { Database } from '../database/Database';
 import { getDefaultConfigs } from '../scanners/site-scanner';
@@ -59,6 +61,34 @@ export default (db: Database) => {
     });
   });
 
+  router.get('/logger', (req, res) => {
+    logger.debug(`ConfigAPI --> Get all log files`);
+    const configs = walkSync.entries('./logs');
+    logger.debug(`ConfigAPI --> ${configs}`);
+    res.send(configs);
+  });
+  router.get('/logger/level', (req, res) => {
+    logger.debug(`ConfigAPI --> Get logging level`);
+    res.send(logger.level);
+  });
+  router.get('/logger/:level', (req, res) => {
+    logger.debug(`ConfigAPI --> Change logging level : ${req.params.level}`);
+    logger.level = req.params.level;
+    res.send(req.params.level);
+  });
+  router.get('/tail/:file', (req, res) => {
+    logger.debug(`ConfigAPI --> tail file : ${req.params.file}`);
+    const tail = spawn('tail', ['-f', `./logs/${req.params.file}`]);
+    req.connection.on('end', () => {
+      logger.debug(`ConfigAPI --> file end ${req.params.file}`);
+      tail.kill();
+    });
+    tail.stdout.on('data', (line) => {
+      logger.debug(`ConfigAPI --> file ${req.params.file} : ${line}`);
+      res.write(line);
+    });
+  });
+
   router.get('/:id', async function(req, res) {
     logger.debug(`ConfigAPI --> find config ${req.params.id}`);
     res.send(await db.findScanConfigById(req.params.id));
@@ -73,7 +103,6 @@ export default (db: Database) => {
     scanAndStore(config);
     res.send(config);
   });
-
 
   return router;
 }

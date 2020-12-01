@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import * as cron from 'node-cron';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cron from 'node-cron';
 
-import scanAllSites, { scanfavoritesPages } from './scanners/site-scanner';
+import { scanFavoritesAllSite, scanfavoritesPages } from './scanners/site-scanner';
 import apiRoutes from './routes/ApiRoute';
 import { WebpushUtils } from './utils/WebpushUtils';
 import logger from './logger';
@@ -23,11 +23,12 @@ app.use('/api', apiRoutes());
 
 const mainCycle = () => {
   scanfavoritesPages();
-  scanAllSites();
+  scanFavoritesAllSite();
 }
 
 // start on boot
 mainCycle();
+
 cron.schedule('0 8-21/10 * * *', (() => {
   mainCycle();
 }).bind(this), {

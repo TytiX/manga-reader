@@ -150,6 +150,13 @@ export class Database {
     source.manga = dbManga;
     return await this.sourceRepository.save(source);
   }
+  async mangaIsIncludeInFavorites(manga: Manga): Promise<boolean> {
+    const count = await createQueryBuilder('user_profile_favorites_manga', 'fmanga', this.connection.name)
+                        .select('"mangaId"')
+                        .where( `fmanga."mangaId" = '${manga.id}'` )
+                        .getCount();
+    return count > 0;
+  }
   /***************************************************************************
    * Sources
    ***************************************************************************/
@@ -162,7 +169,7 @@ export class Database {
   async findMangaByName(name: string): Promise<Manga> {
     return await this.mangaRepository.findOne({
       relations: ['sources', 'tags'],
-      where: { name: Like(name) }
+      where: { name: Like(`%${name}%`) }
     });
   }
   async findMangaBySourceLink(link: string): Promise<[Manga, ScanSource]> {

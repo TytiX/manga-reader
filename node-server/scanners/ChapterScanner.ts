@@ -1,7 +1,7 @@
 import { DOMParser } from 'xmldom';
-import * as xpath from 'xpath';
-import axios from 'axios';
+import xpath from 'xpath';
 
+import { http } from '../utils/Http';
 import logger from '../logger';
 
 import { Page } from '../database/entity';
@@ -34,8 +34,8 @@ export abstract class AbstractChapterScanner implements ChapterScanner {
     do {
       try {
         logger.debug(`scanning page : ${this.constructPageUrl(chapterLink, currentPage)}`);
-        const response = await axios.get(this.constructPageUrl(chapterLink, currentPage));
-        const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
+        const response = await http.get(this.constructPageUrl(chapterLink, currentPage));
+        const doc = new DOMParser(this.parserOptions).parseFromString(response);
 
         let nodeImageLink = this.findImageLinkNode(doc);
 
@@ -102,8 +102,8 @@ export class LeCercleDuScanChapterScanner implements ChapterScanner {
     const pages: Page[] = [];
     logger.info(`scan chapter from link : ${chapterLink}`);
     try {
-      const response = await axios.get(chapterLink);
-      const doc = new DOMParser(this.parserOptions).parseFromString(response.data);
+      const response = await http.get(chapterLink);
+      const doc = new DOMParser(this.parserOptions).parseFromString(response);
       const select = xpath.select;
       const pagesUrl = select('//*[@id="page"]/div/a/img', doc);
       logger.debug(`page link found : ${pagesUrl}`);

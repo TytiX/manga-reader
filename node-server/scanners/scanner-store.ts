@@ -1,7 +1,7 @@
 import { ScannerConfig, Manga, ScanSource, Chapter } from '../database/entity';
 import { ScannerV2 } from './ScannerV2';
 import PQueue from 'p-queue/dist';
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { Database } from '../database/Database';
 import logger from '../logger';
@@ -64,6 +64,60 @@ export async function scanAndStore(config: ScannerConfig) {
   }
 }
 
+export async function scanSiteAndStoreFavorites(config: ScannerConfig) {
+  const scanner = new ScannerV2(config);
+
+  const storageQueue = new PQueue({
+    concurrency: 1,
+    autoStart: false
+  });
+  const db = new Database();
+  // start queue after database connection
+  db.connect(config.name).then( () => {
+    storageQueue.start();
+    logger.info(`Scan start ${config.name}`);
+  }).catch(e => {
+    logger.error(`: scanSiteAndStoreFavorites -> ${e.message} : ${e.stack}`);
+  });
+
+  try {
+    const notifier = new ScannerNotifier(db);
+    const startTime = moment();
+
+    // TODO: scan new mangas and favorite manga
+    const mangas = await scanner.listMangas();
+    logger.debug(`scaned manga ${mangas.length}`);
+    for (const manga of mangas) {
+      const m = new Manga();
+      m.name = manga.name;
+      const s = new ScanSource();
+      s.name = config.name;
+      s.scannerConfig = config;
+      s.link = manga.link;
+      s.manga = m;
+      logger.debug(`source manga : ${s.name} - ${s.link}`);
+      storageQueue.add( () => findAndUpdateFavoritesOrNew(
+        db,
+        scanner,
+        notifier,
+        s as ScanSource)
+      );
+    }
+
+    // close after usage
+    storageQueue.onEmpty().then( () => {
+      if ( db.connection ) {
+        db.connection.close();
+        logger.info(`Scan finished ${config.name} in : ${moment.duration(moment().diff(startTime)).humanize()}`);
+      }
+    }).catch(e => {
+      logger.error(`: scanSiteAndStoreFavorites -> ${e.message} : ${e.stack}`);
+    });
+  } catch (e) {
+    logger.error(`: scanSiteAndStoreFavorites -> ${e.message} : ${e.stack}`);
+  }
+}
+
 async function createOrUpdate(database: Database, notifier: ScannerNotifier, source: ScanSource, tags: string[]) {
   try {
     const dbSource = await retrieveSource(database, notifier, source);
@@ -72,6 +126,43 @@ async function createOrUpdate(database: Database, notifier: ScannerNotifier, sou
     logger.debug(`chapters updated : ${dbSource.manga.name}`);
     await updateTags(database, dbSource.manga, tags);
     logger.debug(`tags updated : ${dbSource.manga.name}`);
+  } catch (e) {
+    console.warn(`${e}`);
+  }
+}
+
+/**
+ * find favorites manga and update details.
+ * Update chapters for this source.
+ * @param database
+ * @param notifier
+ * @param source the source 
+ */
+async function findAndUpdateFavoritesOrNew(database: Database, scanner: ScannerV2, notifier: ScannerNotifier, source: ScanSource) {
+  try {
+    let dbSource = await database.findSourceByLink(source.link);
+    if (!dbSource) {
+      const dbManga = await database.findMangaByName(source.manga.name);
+      if (dbManga) {
+        dbSource = await database.addSourceToManga(dbManga, source);
+        notifier.newMangaSource(dbManga, dbSource);
+      } else {
+        dbSource = await database.createMangaAndSource(source);
+        notifier.newManga(dbSource.manga);
+      }
+      // scan manga page
+      const [scanSource, tags] = await scanner.scanMangaSource(source, false);
+      await createOrUpdate(database, notifier, scanSource as ScanSource, tags as string[]);
+    } else {
+      // if manga in favorite of a profile
+      const shouldBeScanned = await database.mangaIsIncludeInFavorites(dbSource.manga);
+      // scan manga page
+      if (shouldBeScanned) {
+        const [scanSource, tags] = await scanner.scanMangaSource(source, false);
+        await createOrUpdate(database, notifier, scanSource as ScanSource, tags as string[]);
+      }
+      // else do nothing...
+    }
   } catch (e) {
     console.warn(`${e}`);
   }

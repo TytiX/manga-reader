@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as walkSync from 'walk-sync';
+import fs from 'fs';
+import path from 'path';
+import walkSync from 'walk-sync';
 
 import { Database } from '../database/Database';
 import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
 import logger from '../logger';
-import { scanAndStore, scanChapterPages } from './scanner-store';
+import { scanAndStore, scanSiteAndStoreFavorites, scanChapterPages } from './scanner-store';
 
 export default function scanAllSites() {
   // get all configuration on a new connection...
@@ -15,6 +15,21 @@ export default function scanAllSites() {
     const configs = await db.allConfigs();
     for (const scanerConfig of configs) {
       scanAndStore(scanerConfig);
+    }
+    db.connection.close();
+    logger.debug('close site-scanner connection');
+  }).catch(e => {
+    logger.error(`: scanAllSites -> ${e.message} : ${e.stack}`);
+  });
+}
+
+export function scanFavoritesAllSite() {
+  logger.info('start scanning favorites sites')
+  const db = new Database();
+  db.connect('site-scanner').then( async () => {
+    const configs = await db.allConfigs();
+    for (const scanerConfig of configs) {
+      scanSiteAndStoreFavorites(scanerConfig);
     }
     db.connection.close();
     logger.debug('close site-scanner connection');

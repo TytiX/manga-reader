@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import * as moment from 'moment';
+import moment from 'moment';
 import { MoreThanOrEqual } from 'typeorm';
 
 import { Database } from '../database/Database';

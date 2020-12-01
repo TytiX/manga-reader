@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import { Client } from 'discord.js';
 import logger from '../logger';
 
