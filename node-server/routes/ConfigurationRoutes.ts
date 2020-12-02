@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { spawn } from 'child_process';
 import walkSync from 'walk-sync';
+import cron from 'node-cron';
 
 import { Database } from '../database/Database';
 import { getDefaultConfigs } from '../scanners/site-scanner';
@@ -9,10 +10,12 @@ import { ScanSource, Manga } from '../database/entity';
 import { scanAndStore } from '../scanners/scanner-store';
 import { ChapterScannerFactory } from '../scanners/ChapterScannerFactory';
 import logger from '../logger';
+import crons from '../crons';
 
 export default (db: Database) => {
   const router = Router();
   
+  /****************************** CONFGI *******************************/
   router.get('/', async function(req, res) {
     logger.debug(`ConfigAPI --> get all config`);
     res.send(await db.allConfigs());
@@ -23,6 +26,7 @@ export default (db: Database) => {
     );
   });
 
+  /****************************** TEST CONFIGS *******************************/
   router.post('/test-config', async (req, res) => {
     logger.debug(`ConfigAPI --> test config ${req.body}`);
     const scanner = new ScannerV2(req.body);
@@ -32,7 +36,6 @@ export default (db: Database) => {
       mangas
     });
   });
-
   router.post('/test-config/chapterScan', async (req, res) => {
     logger.debug(`ConfigAPI --> test config scan chapter ${req.body.link}`);
     const scanner = ChapterScannerFactory.from(req.body.link);
@@ -61,6 +64,7 @@ export default (db: Database) => {
     });
   });
 
+  /****************************** LOGGER *******************************/
   router.get('/logger', (req, res) => {
     logger.debug(`ConfigAPI --> Get all log files`);
     const configs = walkSync.entries('./logs');
@@ -89,6 +93,32 @@ export default (db: Database) => {
     });
   });
 
+  /****************************** CRON *******************************/
+  router.get('/cron/:what', (req, res) => {
+    const what = req.params.what;
+    res.send({
+      what,
+      cron: crons.getExpression(what)
+    })
+  });
+  router.post('/cron/:what', (req, res) => {
+    const what = req.params.what;
+    const cronExpression = req.body.cron;
+    res.send({
+      what,
+      updated: crons.updateCron(what, cronExpression)
+    })
+  });
+  router.post('/cron/test', (req, res) => {
+    const cronExpression = req.body.cron;
+    const valid = cron.validate(cronExpression);
+    res.send({
+      cron: cronExpression,
+      valid
+    });
+  });
+
+  /*************************** CONFIG **********************************/
   router.get('/:id', async function(req, res) {
     logger.debug(`ConfigAPI --> find config ${req.params.id}`);
     res.send(await db.findScanConfigById(req.params.id));
