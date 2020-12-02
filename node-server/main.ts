@@ -3,7 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cron from 'node-cron';
 
-import { scanFavoritesAllSite, scanfavoritesPages } from './scanners/site-scanner';
+import { scanFavoritesAllSite, scanfavoritesPages, scanAllSites } from './scanners/site-scanner';
 import apiRoutes from './routes/ApiRoute';
 import { WebpushUtils } from './utils/WebpushUtils';
 import logger from './logger';
@@ -25,12 +25,21 @@ const mainCycle = () => {
   scanfavoritesPages();
   scanFavoritesAllSite();
 }
+const weaklyCycle = () => {
+  scanAllSites();
+}
 
 // start on boot
 mainCycle();
 
 cron.schedule('0 8-21/10 * * *', (() => {
   mainCycle();
+}).bind(this), {
+  scheduled: true
+});
+
+cron.schedule('0 10 * * */7', (() => {
+  weaklyCycle();
 }).bind(this), {
   scheduled: true
 });

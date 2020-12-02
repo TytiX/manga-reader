@@ -7,7 +7,7 @@ import { ScannerConfig, Chapter, ScanSource, Manga } from '../database/entity';
 import logger from '../logger';
 import { scanAndStore, scanSiteAndStoreFavorites, scanChapterPages } from './scanner-store';
 
-export default function scanAllSites() {
+export function scanAllSites() {
   // get all configuration on a new connection...
   logger.info('start scanning all sites')
   const db = new Database();
