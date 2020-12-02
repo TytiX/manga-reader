@@ -94,6 +94,14 @@ export default (db: Database) => {
   });
 
   /****************************** CRON *******************************/
+  router.post('/cron/test', (req, res) => {
+    const cronExpression = req.body.cron;
+    const valid = cron.validate(cronExpression);
+    res.send({
+      cron: cronExpression,
+      valid
+    });
+  });
   router.get('/cron/:what', (req, res) => {
     const what = req.params.what;
     res.send({
@@ -108,14 +116,6 @@ export default (db: Database) => {
       what,
       updated: crons.updateCron(what, cronExpression)
     })
-  });
-  router.post('/cron/test', (req, res) => {
-    const cronExpression = req.body.cron;
-    const valid = cron.validate(cronExpression);
-    res.send({
-      cron: cronExpression,
-      valid
-    });
   });
 
   /*************************** CONFIG **********************************/
