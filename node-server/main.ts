@@ -38,7 +38,7 @@ cron.schedule('0 8-21/10 * * *', (() => {
   scheduled: true
 });
 
-cron.schedule('0 10 * * */7', (() => {
+cron.schedule('0 10 * * Sunday', (() => {
   weaklyCycle();
 }).bind(this), {
   scheduled: true
