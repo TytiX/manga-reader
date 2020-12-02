@@ -45,9 +45,9 @@ import AppNavBar from '@/components/AppNavBar.vue';
 })
 export default class ManageCrons extends Vue {
   dailyExpression = '* * * * *';
-  validDailyExpression = null;
+  validDailyExpression: boolean | null = null;
   weeklyExpression = '* * * * *';
-  validWeeklyExpression = null;
+  validWeeklyExpression: boolean | null = null;
 
   mounted() {
     axios.get('/api/configuration/cron/daily').then( res => {
