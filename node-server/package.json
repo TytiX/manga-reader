@@ -17,6 +17,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
+    "cloudflare-scraper": "^1.0.7",
     "discord.js": "^12.2.0",
     "express": "^4.17.1",
     "got": "^11.8.0",
@@ -24,6 +25,7 @@
     "node-cron": "^2.0.3",
     "p-queue": "^6.4.0",
     "pg": "^8.2.1",
+    "puppeteer": "^5.5.0",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.25",
     "walk-sync": "^2.1.0",

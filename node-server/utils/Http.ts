@@ -1,24 +1,27 @@
-import axios from 'axios';
-// import { axiosCloudflare } from './cloudflare-craper';
-// axiosCloudflare(axios);
-// TODO: test on next cloudfare error
-// import cloudfareScraper from 'cloudflare-scraper';
+// import axios from 'axios';
+import { Readable } from 'stream';
+import cloudfareScraper from 'cloudflare-scraper';
+import logger from '../logger';
 
 export class http {
-  static get(url: string): Promise<any> {
-    return new Promise( (resolve, reject) => {
-
-      axios.get(url).then( res => {
-        resolve(res.data);
-      }).catch(e => {
-        reject(e);
-      });
-
-    });
+  static async get(url: string): Promise<any> {
+    const response = await cloudfareScraper.get(url);
+    return response;
   }
   static async stream(url: string): Promise<any> {
-    // return hooman.stream(url);
-    const response = await axios.get(url, { responseType: 'stream' })
-    return response.data;
+    try {
+      let res = await cloudfareScraper.get(url, { encoding: null });
+      const buffer = Buffer.from(res, 'binary');
+      const stream = new Readable();
+      stream.push(buffer);
+      stream.push(null);
+      return stream;
+    }
+    catch (e) {
+      logger.warn(`stream : ${url} --> ${e.message} : ${e.stack}`);
+      const stream = new Readable();
+      stream.push(null);
+      return stream;
+    }
   }
 }
