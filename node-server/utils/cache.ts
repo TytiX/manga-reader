@@ -39,12 +39,11 @@ class CacheManager {
       const dm = moment.duration( moment().diff(moment(stat.mtime)) );
       logger.debug(`scan file --> ${file} : last access: ${da.humanize()} -- last modified: ${dm.humanize()} -- is cover: ${file.indexOf('cover') != -1}`);
       // Cover files should leave longer in cache...
-      if (file.indexOf('cover') != -1 && dm.months() > 3) {
+      if (file.indexOf('cover') != -1 && dm.months() > 1) {
         fs.rmSync(path.join(CACHE_DIR, file));
-      } else if (da.days() > 7 || dm.days() > 0) { // Standard files cached ... image
+      } else if (da.days() > 7 || dm.days() > 7) { // Standard files cached ... image
         fs.rmSync(path.join(CACHE_DIR, file));
       }
-
     });
   }
 
