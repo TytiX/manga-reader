@@ -21,7 +21,7 @@
 
           <div>
             <h2>{{scanResult.source.manga.name}}</h2>
-            <b-img :src="scanResult.source.coverLink"></b-img>
+            <b-img :src="getImg(scanResult.source.coverLink)"></b-img>
             <p class="scrolling-container">{{scanResult.source.description}}</p>
             <div class="scrolling-container">
               <div
@@ -92,6 +92,10 @@ export default class ConfigurationScannerResult extends Vue {
   @Watch('selectedChapter')
   changeChapterScan() {
     this.$emit('load-scan-chapter', this.selectedChapter);
+  }
+
+  getImg(url: string) {
+    return `/api/image/fromUrl/${encodeURIComponent(url)}`;
   }
 }
 </script>

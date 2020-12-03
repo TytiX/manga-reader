@@ -11,7 +11,7 @@
             <div>
               <b-img
                 class="source-icon"
-                :src="advancement.source.scannerConfig.iconUrl">
+                :src="getImg(advancement.source.scannerConfig.iconUrl)">
               </b-img>
               {{ advancement.source.name }}
             </div>
@@ -41,6 +41,9 @@ export default class MangaDetailAdvancement extends Vue {
   resume(adv: Advancement) {
     // contine
     this.$router.push(`/reader/${adv.chapter.id}/${adv.pageNumber}`);
+  }
+  getImg(url: string) {
+    return `/api/image/fromUrl/${encodeURIComponent(url)}`;
   }
 
   deleteAdvancement(adv: Advancement) {

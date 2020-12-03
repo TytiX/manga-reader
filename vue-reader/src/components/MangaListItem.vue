@@ -6,7 +6,7 @@
       <b-img-lazy
         v-for="source of manga.sources"
         :key="source.id"
-        :src="source.scannerConfig.iconUrl"
+        :src="sourceIcon(source.scannerConfig.iconUrl)"
         class="source-icon">
       </b-img-lazy>
     </div>
@@ -62,6 +62,10 @@ export default class MangaListItem extends Vue {
     } else {
       this.coverUrl = MangaListItem.CoverNotFoundUrl;
     }
+  }
+
+  sourceIcon(url: string) {
+    return `/api/image/fromUrl/${encodeURIComponent(url)}`;
   }
 
   isURL(str: string): boolean {
