@@ -1,0 +1,22 @@
+{
+  "name": "scan-vf-cc",
+  "iconUrl": "https://www.scan-fr.cc/favicon.png",
+  "mangasUrl": "https://www.scan-fr.cc/manga-list",
+
+  "mangasListUrl": "https://www.scan-fr.cc/changeMangaList?type=text",
+
+  "mangaEnclosingXpath": "//a[@class='alpha-link']",
+  "mangaLinkRelativeXpath": "/a/@href",
+  "mangaNameRelativeXpath": "/a/h6/text()",
+
+  "mangaDescriptionXpath": "/html/body/div[1]/div[2]/div[2]/div/div/p/text()",
+  "mangaCoverXpath": "/html/body/div[1]/div[2]/div[1]/div/div[1]/div/img/@src",
+
+  "mangaCategoriesXpath": "",
+  "mangaTagsXpath": "",
+
+  "chapterEnclosingXpath": "//h5[@class='chapter-title-rtlrr']",
+  "chapterLinkRelativeXpath": "/h5/a/@href",
+  "chapterNumberTextRelativeXpath": "/h5/a/text()",
+  "chapterNameRelativeXpath": "/h5/em/text()"
+}
