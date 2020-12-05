@@ -189,6 +189,7 @@ async function retrieveSource(database: Database, notifier: ScannerNotifier, sou
     // source.id = dbSource.id;
     dbSource.coverLink = source.coverLink;
     dbSource.description = source.description;
+    dbSource.lastScan = moment().toDate();
     dbSource = await database.updateScanSource(dbSource);
   }
   return dbSource;

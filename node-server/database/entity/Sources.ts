@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { Chapter } from './Chapter';
 import { Manga } from './Manga';
 import { ScannerConfig } from './ScannerConfig';
@@ -18,6 +18,9 @@ export class ScanSource {
   description: string;
   @Column({ default: 'normal' })
   reading: string;
+
+  @Column({ default: '1990-01-01' })
+  lastScan: Date;
 
   @ManyToOne(type => Manga, manga => manga.sources, { onDelete: 'CASCADE' })
   manga: Manga;

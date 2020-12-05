@@ -1,4 +1,5 @@
 import { Connection, getRepository, Repository, In, createQueryBuilder, MoreThan, LessThan, SelectQueryBuilder, Like } from 'typeorm';
+import moment from 'moment';
 
 import {
   Manga,
@@ -148,6 +149,7 @@ export class Database {
     const dbManga = await this.mangaRepository.save(manga);
 
     source.manga = dbManga;
+    source.lastScan = moment().toDate();
     return await this.sourceRepository.save(source);
   }
   async mangaIsIncludeInFavorites(manga: Manga): Promise<boolean> {
@@ -156,6 +158,17 @@ export class Database {
                         .where( `fmanga."mangaId" = '${manga.id}'` )
                         .getCount();
     return count > 0;
+  }
+  async getUnupdatedMangas(limit: number) {
+    const mangas = await createQueryBuilder(Manga, 'manga', this.connection.name)
+        .select('manga.id, manga.name, MIN(ss."lastScan") as oldest_scan, MAX(chapter."createDate") as newest_chapter, MIN(ss."lastScan") - MAX(chapter."createDate") as time_since_last')
+        .innerJoin(ScanSource, 'ss', 'ss."mangaId" = manga.id')
+        .innerJoin(Chapter, 'chapter', 'ss.id = chapter."sourceId"')
+        .orderBy('oldest_scan', 'ASC')
+        .limit(limit)
+        .groupBy('manga.id')
+        .getRawMany();
+    return mangas;
   }
   /***************************************************************************
    * Sources
@@ -204,6 +217,7 @@ export class Database {
   }
   async addSourceToManga(manga: Manga, source: ScanSource): Promise<ScanSource> {
     source.manga = manga;
+    source.lastScan = moment().toDate();
     return await this.sourceRepository.save(source);
   }
   async updateScanSource(source: ScanSource): Promise<ScanSource> {
