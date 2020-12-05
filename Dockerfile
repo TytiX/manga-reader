@@ -7,25 +7,28 @@ RUN yarn build
 
 FROM node:12-alpine
 WORKDIR /app
-RUN apk update && apk add --no-cache nmap && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache \
+# peppeter install chrome
+# Installs latest Chromium (85) package.
+RUN apk add --no-cache \
       chromium \
+      nss \
+      freetype \
+      freetype-dev \
       harfbuzz \
-      "freetype>2.8" \
-      ttf-freefont \
-      nss
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-# RUN apk add --update-cache \
-#     python \
-#     python-dev \
-#     py-pip \
-#     build-base
-# RUN apk update && apk add dcron && rm -rf /var/cache/apk/*
-# RUN mkdir -p /var/log/cron && mkdir -m 0644 -p /var/spool/cron/crontabs && touch /var/log/cron/cron.log && mkdir -m 0644 -p /etc/cron.d
+      ca-certificates \
+      ttf-freefont
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Copy application
 COPY ./node-server .
+# Add user so we don't need --no-sandbox.
+RUN addgroup -S pptruser && adduser -S -g pptruser pptruser \
+    && mkdir -p /home/pptruser/Downloads /app \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
+# change user
+USER pptruser
 # RUN yarn install NOT WORKING ON CI...
 RUN npm install
 COPY --from=vue-builder /app/dist ./public
