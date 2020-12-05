@@ -55,7 +55,7 @@ export class DatabaseConnectionManager {
       UserProfile,
       Advancement,
       Subscription
-    ]
+    ];
     const databaseConfigPath = './data/databaseconfig.json';
     if (existsSync(databaseConfigPath)) {
       const configJSON = readFileSync(databaseConfigPath);
