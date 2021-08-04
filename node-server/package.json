@@ -32,7 +32,7 @@
     "web-push": "^3.4.4",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.5.0",
-    "xmldom": "^0.3.0",
+    "xmldom": "^0.6.0",
     "xpath": "^0.0.27"
   }
 }
